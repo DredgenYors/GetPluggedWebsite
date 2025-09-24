@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Home - GetPlugged{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Title Banner -->
+        <div class="title-banner bg-primary text-white p-4 rounded-3 mb-4 text-center">
+            <h1 class="display-4 fw-bold mb-0">GetPlugged</h1>
+        </div>
+
+        <!-- Content Sections -->
+        <div class="row g-4">
+            <!-- What is GPNJ Section -->
+            <div class="col-lg-4 col-md-12">
+                <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-question-circle fa-3x text-primary mb-3"></i>
+                        <h3 class="text-primary">What is GPNJ?</h3>
+                    </div>
+                    <p class="text-muted">
+                        [Content about GPNJ will be added here]
+                    </p>
+                    <p class="text-muted">
+                        [Mission statement and additional information will be added here]
+                    </p>
+                </div>
+            </div>
+
+            <!-- Our Story Section -->
+            <div class="col-lg-4 col-md-12">
+                <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-book-open fa-3x text-success mb-3"></i>
+                        <h3 class="text-success">Our Story</h3>
+                    </div>
+                    <p class="text-muted">
+                        [Story content will be added here]
+                    </p>
+                    
+                    <!-- Creators Section -->
+                    <div class="creators-section mb-3">
+                        <h5 class="text-success text-center mb-3">Meet Our Founders</h5>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="creator-card text-center">
+                                    <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-user fa-2x text-muted"></i>
+                                    </div>
+                                    <h6 class="text-muted mb-0">[Founder Name]</h6>
+                                    <small class="text-muted">[Title]</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="creator-card text-center">
+                                    <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-user fa-2x text-muted"></i>
+                                    </div>
+                                    <h6 class="text-muted mb-0">[Founder Name]</h6>
+                                    <small class="text-muted">[Title]</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted">
+                        [Additional story content will be added here]
+                    </p>
+                </div>
+            </div>
+
+            <!-- Contact Us Section -->
+            <div class="col-lg-4 col-md-12">
+                <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-envelope fa-3x text-info mb-3"></i>
+                        <h3 class="text-info">Contact Us</h3>
+                    </div>
+                    <div class="contact-info text-muted">
+                        <div class="mb-3">
+                            <i class="fas fa-envelope me-2 text-info"></i>
+                            <strong>Email:</strong> [email@example.com]
+                        </div>
+                        <div class="mb-3">
+                            <i class="fas fa-phone me-2 text-info"></i>
+                            <strong>Phone:</strong> [phone number]
+                        </div>
+                        <div class="mb-3">
+                            <i class="fab fa-instagram me-2 text-info"></i>
+                            <strong>Instagram:</strong> [@instagram_handle]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

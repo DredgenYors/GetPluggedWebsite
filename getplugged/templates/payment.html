@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Payment - GetPlugged{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-lg-6">
+        <div class="card shadow-lg">
+            <div class="card-body text-center">
+                <h2 class="mb-4">Payment</h2>
+                <!-- Payment form can go here in the future -->
+                <button class="btn btn-success btn-lg" id="payBtn">PAY</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('payBtn').onclick = function() {
+        window.location.href = "/post_payment";
+    };
+});
+</script>
+{% endblock %}

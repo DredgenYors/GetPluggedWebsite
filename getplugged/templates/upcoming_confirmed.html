@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Upcoming Events - GetPlugged{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Dynamic Header Section -->
+        {% if events_confirmed and next_event %}
+            <header class="mb-5 text-center">
+                <h1 class="text-success">Next Event Confirmed!</h1>
+                <h2 class="mb-2">{{ next_event.title }}</h2>
+                <p class="fs-5">
+                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                    <strong>Date:</strong> {{ next_event.date }}
+                </p>
+                <!-- Flyer image placeholder -->
+                <div class="my-3">
+                    <img src="{{ url_for('static', filename='flyer_placeholder.jpg') }}" alt="Event Flyer" class="img-fluid rounded shadow" style="max-width: 400px;">
+                </div>
+                <p class="lead">{{ next_event.description }}</p>
+            </header>
+        {% else %}
+            <header class="mb-5 text-center">
+                <h1 class="text-warning">Coming Soon!</h1>
+                <p class="fs-5">Our next event is being planned. Please check back soon!</p>
+                <p>
+                    In the meantime, check out our 
+                    <a href="{{ url_for('previous') }}" class="text-primary fw-bold">previous events</a>
+                    to see what we've been up to!
+                </p>
+            </header>
+        {% endif %}
+
+        <!-- Call to Action: Don't Miss Out Modal Trigger -->
+        <div class="row justify-content-center mt-5">
+            <div class="col-12 text-center">
+                <div class="bg-dark p-4 rounded-3" style="border: 1px solid #404040; display: inline-block;">
+                    <h4 class="text-primary mb-3">Don't Miss Out!</h4>
+                    <p class="mb-3 text-muted">Want to stay updated with the latest events? Subscribe for updates!</p>
+                    <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#subscribeModal">Subscribe Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Email Subscription -->
+        <div class="modal fade" id="subscribeModal" tabindex="-1" aria-labelledby="subscribeModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="subscribeModalLabel">Subscribe for Updates</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="subscribeForm">
+                  <div class="mb-3">
+                    <label for="emailInput" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="emailInput" placeholder="Enter your email" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary w-100">Subscribe</button>
+                </form>
+                <div id="subscribeSuccess" class="alert alert-success mt-3 d-none" role="alert">
+                  Thank you for subscribing! You'll receive updates about our events.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal JS (Bootstrap 5) -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('subscribeForm');
+            const successMsg = document.getElementById('subscribeSuccess');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                form.classList.add('d-none');
+                successMsg.classList.remove('d-none');
+            });
+        });
+        </script>
+    </div>
+</div>
+{% endblock %}
