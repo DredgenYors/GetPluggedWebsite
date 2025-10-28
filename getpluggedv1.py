@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.secret_key = 'GP_Session_Key'
 
 # Configuration for upcoming events display
-EVENTS_CONFIRMED = False # Set to False to show "coming soon" page
+EVENTS_CONFIRMED = True # Set to False to show "coming soon" page
 
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -292,7 +292,8 @@ previous_events = [
 @app.route('/')
 def home():
     """Home page route"""
-    return render_template('home.html', events_confirmed=EVENTS_CONFIRMED)
+    next_event = upcoming_events[0] if upcoming_events else None
+    return render_template('home.html', events_confirmed=EVENTS_CONFIRMED, next_event=next_event)
 
 
 # --- SUBSCRIBE ROUTE ---

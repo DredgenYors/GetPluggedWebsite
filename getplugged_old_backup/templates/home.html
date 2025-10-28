@@ -6,8 +6,8 @@
 <div class="row">
     <div class="col-12">
         <!-- Title Banner -->
-        <div class="title-banner text-white rounded-3 text-center" style="margin:0; padding:0; border:none; box-shadow:none;">
-            <img src="{{ url_for('static', filename='GPLogo.png') }}" alt="Get Plugged" class="header-logo-img">
+        <div class="title-banner bg-primary text-white p-4 rounded-3 mb-4 text-center">
+            <h1 class="display-4 fw-bold mb-0">GetPlugged</h1>
         </div>
 
         <!-- Content Sections -->
@@ -20,10 +20,10 @@
                         <h3 class="text-primary">What is GPNJ?</h3>
                     </div>
                     <p class="text-muted">
-                        <strong>Get Plugged was built on a simple belief:</strong> the best moments are designed. The team connects emerging talent with real audiences through curated lineups, tight production, and clear communication. With every event we intend to build on artist-first practices and partnerships with DJs, creators, and vendors. Every show is mapped for flow, tuned for sound, and captured with content that extends the life of the night. From intimate rooms to high-energy pop-ups, community thrives and memories stick.
+                        [Content about GPNJ will be added here]
                     </p>
                     <p class="text-muted">
-                        <strong>Our Mission:</strong> Connecting creatives and audiences through events that foster an intimate and up-lifting environment.
+                        [Mission statement and additional information will be added here]
                     </p>
                 </div>
             </div>
@@ -74,54 +74,23 @@
             <div class="col-lg-4 col-md-12">
                 <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
                     <div class="text-center mb-3">
-                        <i class="fas fa-envelope fa-3x text-success mb-3"></i>
-                        <h3 class="text-success">Contact Us</h3>
+                        <i class="fas fa-envelope fa-3x text-info mb-3"></i>
+                        <h3 class="text-info">Contact Us</h3>
                     </div>
                     <div class="contact-info text-muted">
                         <div class="mb-3">
                             <i class="fas fa-envelope me-2 text-info"></i>
-                            <strong>Email:</strong>
-                            <span class="ms-2">getpluggednj@gmail.com</span>
+                            <strong>Email:</strong> [email@example.com]
                         </div>
                         <div class="mb-3">
                             <i class="fas fa-phone me-2 text-info"></i>
-                            <strong>Phone:</strong>
-                            <span class="ms-2">732-676-3120</span>
+                            <strong>Phone:</strong> [phone number]
                         </div>
                         <div class="mb-3">
                             <i class="fab fa-instagram me-2 text-info"></i>
-                            <strong>Instagram:</strong>
-                            <a href="https://www.instagram.com/getpluggednj/" target="_blank" rel="noopener noreferrer" class="ms-2 text-success">getpluggednj</a>
+                            <strong>Instagram:</strong> [@instagram_handle]
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Next Event Section -->
-        <div class="row mt-5">
-            <div class="col-12">
-                <div class="content-section bg-white p-4 rounded-3 shadow-sm">
-                    {% if events_confirmed and next_event %}
-                        <!-- Confirmed Event -->
-                        <header class="mb-5 text-center">
-                            <!-- Flyer image placeholder -->
-                            <div class="my-3">
-                                <img src="{{ url_for('static', filename='flyer_placeholder.jpg') }}" alt="Event Flyer" class="img-fluid rounded shadow" style="max-width: 400px;">
-                            </div>
-                        </header>
-                    {% else %}
-                        <!-- Coming Soon -->
-                        <header class="mb-5 text-center">
-                            <h1 class="text-success">Exciting Events Coming Soon!</h1>
-                            <p class="fs-5">We're currently planning our next amazing events and experiences.</p>
-                            <p>
-                                In the meantime, check out our 
-                                previous events
-                                to see what we've been up to, and follow us on social media for the latest updates!
-                            </p>
-                        </header>
-                    {% endif %}
                 </div>
             </div>
         </div>

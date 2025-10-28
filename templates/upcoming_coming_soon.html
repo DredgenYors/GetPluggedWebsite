@@ -31,59 +31,10 @@
                 <!-- Action Buttons -->
                 <div class="row justify-content-center mb-5">
                     <div class="col-auto">
-                        <a href="{{ url_for('previous') }}" class="btn btn-primary btn-lg me-3">
-                            <i class="fas fa-history me-2"></i>View Previous Events
+                        <a href="{{ url_for('previous') }}" class="btn btn-success btn-lg me-3">
+                            <i class="fas fa-history me-2 text-primary"></i>View Previous Events
                         </a>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stay Connected Section -->
-        <div class="row mt-5">
-            <div class="col-12">
-                <div class="content-section bg-dark p-5 rounded-3 text-center" style="border: 1px solid #404040;">
-                    <h3 class="text-primary mb-4">Stay Connected</h3>
-                    <p class="text-muted mb-4">
-                        Be the first to know when we announce our next event!
-                    </p>
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <form id="newsletterForm" method="POST" action="{{ url_for('subscribe') }}" class="row g-3 justify-content-center">
-                                <div class="col-md-8">
-                                    <input type="email" class="form-control" id="newsletterEmail" name="email" placeholder="Enter your email for updates" required>
-                                </div>
-                                <div class="col-md-4">
-                                    <button type="submit" class="btn btn-primary w-100">Subscribe</button>
-                                </div>
-                            </form>
-                            <div id="newsletterSuccess" class="alert alert-success mt-3 d-none" role="alert">
-                                Thank you for subscribing! You'll receive updates about our events.
-                            </div>
-                        </div>
-                    </div>
-                    <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const form = document.getElementById('newsletterForm');
-                        const emailInput = document.getElementById('newsletterEmail');
-                        const successMsg = document.getElementById('newsletterSuccess');
-                        form.addEventListener('submit', function(e) {
-                            e.preventDefault();
-                            fetch(form.action, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ email: emailInput.value })
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success) {
-                                    form.classList.add('d-none');
-                                    successMsg.classList.remove('d-none');
-                                }
-                            });
-                        });
-                    });
-                    </script>
                 </div>
             </div>
         </div>

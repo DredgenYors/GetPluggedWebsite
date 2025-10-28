@@ -1,0 +1,609 @@
+/* Custom styles for GetPlugged Flask App - Dark Theme */
+
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 5px;
+}
+
+/* Title Banner */
+.title-banner {
+    background: linear-gradient(135deg, #1a4d1a 0%, #0d2d0d 100%) !important;
+    border: none;
+    box-shadow: 0 4px 15px rgba(26, 77, 26, 0.5);
+}
+
+/* Navigation Buttons */
+.navigation-buttons .btn {
+    min-height: 120px;
+    border: 2px solid #1a4d1a;
+    transition: all 0.3s ease;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+.navigation-buttons .btn:hover {
+    background-color: #1a4d1a;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(26, 77, 26, 0.4);
+}
+
+.navigation-buttons .btn i {
+    transition: transform 0.3s ease;
+}
+
+.navigation-buttons .btn:hover i {
+    transform: scale(1.1);
+}
+
+/* Content Area */
+.content-area {
+    min-height: 200px;
+    border: 2px dashed #dee2e6;
+    background-color: #f8f9fa !important;
+}
+
+/* Content Sections */
+.content-section {
+    border: 1px solid #404040;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    background-color: #2a2a2a !important;
+    color: #e0e0e0;
+}
+
+.content-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(26, 77, 26, 0.3) !important;
+    border-color: #1a4d1a;
+}
+
+.content-section .btn {
+    margin-top: auto;
+}
+
+.contact-info {
+    flex-grow: 1;
+}
+
+.contact-info div {
+    display: flex;
+    align-items: center;
+}
+
+/* Creator Cards */
+.creators-section {
+    padding: 15px;
+    background-color: #404040;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.creator-card {
+    padding: 10px;
+}
+
+.creator-image-placeholder {
+    border: 2px dashed #606060;
+    transition: all 0.3s ease;
+    background-color: #404040 !important;
+}
+
+.creator-image-placeholder:hover {
+    border-color: #1a4d1a;
+    background-color: #2d4d2d !important;
+}
+
+.creator-card h6 {
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+}
+
+.creator-card small {
+    font-size: 0.75rem;
+}
+
+/* Cards */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 10px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 25px;
+    padding: 8px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Override for navigation buttons */
+.navigation-buttons .btn {
+    border-radius: 10px;
+}
+
+/* Jumbotron */
+.jumbotron {
+    border-radius: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+}
+
+/* Icons */
+.fas, .fab {
+    transition: color 0.3s ease;
+}
+
+/* Badge */
+.badge {
+    border-radius: 20px;
+    padding: 8px 15px;
+    background-color: #1a4d1a !important;
+    color: white !important;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+/* Dark theme specific adjustments */
+.nav-link.active {
+    background-color: rgba(26, 77, 26, 0.3) !important;
+    border-radius: 5px;
+}
+
+/* Content area placeholder styling */
+.content-area {
+    min-height: 200px;
+    border: 2px dashed #606060;
+    background-color: #2a2a2a !important;
+    color: #a0a0a0;
+}
+
+/* Coming Soon Page Styles */
+.coming-soon-container {
+    padding: 40px 20px;
+}
+
+.social-card {
+    transition: all 0.3s ease;
+}
+
+.social-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(26, 77, 26, 0.3);
+    border-color: #1a4d1a !important;
+}
+
+.timeline-icon {
+    transition: all 0.3s ease;
+}
+
+.timeline-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Enhanced badge styling */
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+/* Previous Events Page Styles */
+.events-banner {
+    background: linear-gradient(135deg, #1a4d1a 0%, #4ade80 100%) !important;
+    box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3);
+    border: none !important;
+}
+
+.date-selector-container {
+    transition: all 0.3s ease;
+}
+
+.date-selector-container:hover {
+    border-color: #4ade80 !important;
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.2);
+}
+
+.artists-list-section .artists-list {
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #4ade80 #2a2a2a;
+}
+
+.artists-list-section .artists-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.artists-list-section .artists-list::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.artists-list-section .artists-list::-webkit-scrollbar-thumb {
+    background: #4ade80;
+    border-radius: 4px;
+}
+
+.artists-list-section .artists-list::-webkit-scrollbar-thumb:hover {
+    background: #22c55e;
+}
+
+.event-section {
+    transition: all 0.3s ease;
+}
+
+.event-section:hover {
+    border-color: #4ade80 !important;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.1);
+}
+
+.artist-card {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.artist-card:hover {
+    background-color: #404040 !important;
+    border-color: #4ade80 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74, 222, 128, 0.2);
+}
+
+.artist-card .artist-info h6 {
+    transition: color 0.3s ease;
+}
+
+.artist-card:hover .artist-info h6 {
+    color: #4ade80 !important;
+}
+
+.social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #404040;
+    color: #e0e0e0;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.social-link:hover {
+    transform: scale(1.1);
+    background-color: #4ade80;
+    color: #1a1a1a !important;
+    text-decoration: none;
+}
+
+.social-link i.fab.fa-instagram:hover,
+.social-link:hover i.fab.fa-instagram {
+    color: #E4405F !important;
+}
+
+.social-link i.fab.fa-spotify:hover,
+.social-link:hover i.fab.fa-spotify {
+    color: #1DB954 !important;
+}
+
+.social-link i.fab.fa-facebook:hover,
+.social-link:hover i.fab.fa-facebook {
+    color: #1877F2 !important;
+}
+
+.social-link i.fab.fa-youtube:hover,
+.social-link:hover i.fab.fa-youtube {
+    color: #FF0000 !important;
+}
+
+.social-link i.fab.fa-soundcloud:hover,
+.social-link:hover i.fab.fa-soundcloud {
+    color: #FF5500 !important;
+}
+
+.social-link i.fab.fa-tiktok:hover,
+.social-link:hover i.fab.fa-tiktok {
+    color: #000000 !important;
+}
+
+.social-link i.fab.fa-twitter:hover,
+.social-link:hover i.fab.fa-twitter {
+    color: #1DA1F2 !important;
+}
+
+.contact-info a {
+    transition: color 0.3s ease;
+}
+
+.contact-info a:hover {
+    color: #4ade80 !important;
+    text-decoration: underline;
+}
+
+.artist-actions .btn {
+    transition: all 0.3s ease;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+}
+
+.artist-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(74, 222, 128, 0.3);
+}
+
+.badge.bg-primary {
+    background: linear-gradient(45deg, #1e40af, #3b82f6) !important;
+}
+
+.event-header {
+    border-bottom: 1px solid #404040;
+    padding-bottom: 0.5rem;
+}
+
+.events-list-section .events-list {
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #4ade80 #2a2a2a;
+}
+
+.events-list-section .events-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.events-list-section .events-list::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.events-list-section .events-list::-webkit-scrollbar-thumb {
+    background: #4ade80;
+    border-radius: 4px;
+}
+
+.events-list-section .events-list::-webkit-scrollbar-thumb:hover {
+    background: #22c55e;
+}
+
+.event-item {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.event-item:hover {
+    background-color: #333333 !important;
+    border-color: #4ade80 !important;
+    transform: translateX(5px);
+}
+
+.event-item .btn {
+    transition: all 0.3s ease;
+}
+
+.event-item .btn:hover {
+    transform: translateY(-1px);
+}
+
+.media-container {
+    transition: all 0.3s ease;
+}
+
+.media-container:hover {
+    border-color: #4ade80 !important;
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.1);
+}
+
+.video-placeholder, .image-placeholder {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.video-placeholder:hover, .image-placeholder:hover {
+    background-color: #404040 !important;
+}
+
+.video-controls button, .image-controls button {
+    transition: all 0.3s ease;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+}
+
+.video-controls button:hover, .image-controls button:hover {
+    background-color: #4ade80 !important;
+    border-color: #4ade80 !important;
+    color: #1a1a1a !important;
+    transform: scale(1.05);
+}
+
+.video-controls button:disabled, .image-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.badge.bg-success {
+    background: linear-gradient(45deg, #1a4d1a, #4ade80) !important;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 20px;
+}
+
+/* Media Section Responsive Styles */
+@media (max-width: 991.98px) {
+    .artists-list {
+        max-height: 400px !important;
+    }
+    
+    .video-player-container, .image-gallery-container {
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .events-banner {
+        padding: 2rem !important;
+    }
+    
+    .events-banner h1 {
+        font-size: 2rem !important;
+    }
+    
+    .date-selector-container .row {
+        text-align: center;
+    }
+    
+    .date-selector-container .col-md-3,
+    .date-selector-container .col-md-6 {
+        margin-bottom: 1rem;
+    }
+    
+    .artist-card {
+        margin-bottom: 1rem !important;
+    }
+    
+    .social-links {
+        justify-content: center;
+    }
+    
+    .artist-actions {
+        text-align: center;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .btn-lg {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+    
+    .navigation-buttons .btn {
+        min-height: 100px;
+        font-size: 0.9rem;
+    }
+    
+    .navigation-buttons .btn i {
+        font-size: 1.5rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .navigation-buttons .row {
+        flex-direction: column;
+    }
+    
+    .navigation-buttons .col {
+        margin-bottom: 10px;
+    }
+    
+    .navigation-buttons .btn {
+        min-height: 80px;
+    }
+}
+
+/* Custom animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card, .navigation-buttons .btn {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Color scheme enhancements - Dark Theme */
+.bg-primary {
+    background: linear-gradient(135deg, #1a4d1a 0%, #0d2d0d 100%) !important;
+}
+
+.bg-success {
+    background: linear-gradient(135deg, #1a4d1a 0%, #0d2d0d 100%) !important;
+}
+
+.text-primary {
+    color: #4ade80 !important;
+}
+
+.text-success {
+    color: #22c55e !important;
+}
+
+.text-info {
+    color: #38bdf8 !important;
+}
+
+.text-muted {
+    color: #a0a0a0 !important;
+}
+
+/* Cards - Dark Theme */
+.card {
+    background-color: #2a2a2a !important;
+    border: 1px solid #404040 !important;
+    color: #e0e0e0;
+}
+
+.card-header {
+    background-color: #1a4d1a !important;
+    border-bottom: 1px solid #404040 !important;
+}
+
+/* Footer - Dark Theme */
+footer {
+    background-color: #0d1117 !important;
+    border-top: 1px solid #404040;
+}
