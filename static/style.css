@@ -662,3 +662,10 @@ h1, h2, h3, h4, h5, h6,
     font-family: 'Be Vietnam Pro', Arial, Helvetica, sans-serif !important;
     font-weight: 600;
 }
+
+.navbar-nav .nav-link {
+    font-size: 2.1rem !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+

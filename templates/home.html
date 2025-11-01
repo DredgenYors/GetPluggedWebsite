@@ -10,6 +10,34 @@
             <img src="{{ url_for('static', filename='GPLogo.png') }}" alt="Get Plugged" class="header-logo-img">
         </div>
 
+        <!-- Next Event Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="content-section bg-white p-4 rounded-3 shadow-sm">
+                    {% if events_confirmed and next_event %}
+                        <!-- Confirmed Event -->
+                        <header class="mb-5 text-center">
+                            <!-- Flyer image placeholder -->
+                            <div class="my-3">
+                                <img src="{{ url_for('static', filename='gp11-8flyer.PNG') }}" alt="Event Flyer" class="img-fluid rounded shadow" style="max-width: 400px;">
+                            </div>
+                        </header>
+                    {% else %}
+                        <!-- Coming Soon -->
+                        <header id="coming-soon" class="mb-5 text-center">
+                            <h1 class="text-success">Exciting Events Coming Soon!</h1>
+                            <p class="fs-5">We're currently planning our next amazing events and experiences.</p>
+                            <p>
+                                In the meantime, check out our 
+                                previous events
+                                to see what we've been up to, and follow us on social media for the latest updates!
+                            </p>
+                        </header>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
         <!-- Content Sections -->
         <div class="row g-4">
             <!-- What is GPNJ Section -->
@@ -94,34 +122,6 @@
                             <a href="https://www.instagram.com/getpluggednj/" target="_blank" rel="noopener noreferrer" class="ms-2 text-success">getpluggednj</a>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Next Event Section -->
-        <div class="row mt-5">
-            <div class="col-12">
-                <div class="content-section bg-white p-4 rounded-3 shadow-sm">
-                    {% if events_confirmed and next_event %}
-                        <!-- Confirmed Event -->
-                        <header class="mb-5 text-center">
-                            <!-- Flyer image placeholder -->
-                            <div class="my-3">
-                                <img src="{{ url_for('static', filename='gp11-8flyer.PNG') }}" alt="Event Flyer" class="img-fluid rounded shadow" style="max-width: 400px;">
-                            </div>
-                        </header>
-                    {% else %}
-                        <!-- Coming Soon -->
-                        <header class="mb-5 text-center">
-                            <h1 class="text-success">Exciting Events Coming Soon!</h1>
-                            <p class="fs-5">We're currently planning our next amazing events and experiences.</p>
-                            <p>
-                                In the meantime, check out our 
-                                previous events
-                                to see what we've been up to, and follow us on social media for the latest updates!
-                            </p>
-                        </header>
-                    {% endif %}
                 </div>
             </div>
         </div>

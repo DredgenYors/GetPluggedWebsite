@@ -18,7 +18,7 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse fw-bold" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link nav-link-lg {% if request.endpoint == 'previous' %}active{% endif %}" href="{{ url_for('previous') }}">Previous Events</a>
@@ -27,7 +27,7 @@
                         {% if events_confirmed %}
                             <a class="nav-link nav-link-lg" href="https://posh.vip/e/get-plugged-mixer">Purchase Tickets</a>
                         {% else %}
-                            <a class="nav-link nav-link-lg" href="{{ url_for('home') }}">Purchase Tickets</a>
+                            <a class="nav-link nav-link-lg" href="/#coming-soon">Purchase Tickets</a>
                         {% endif %}
                     </li>
                 </ul>

@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.secret_key = 'GP_Session_Key'
 
 # Configuration for upcoming events display
-EVENTS_CONFIRMED = False # Set to False to show "coming soon" page
+EVENTS_CONFIRMED = True # Set to False to show "coming soon" page
 
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
