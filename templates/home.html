@@ -11,20 +11,21 @@
         </div>
 
         <!-- Next Event Section -->
-        <div class="row mt-5">
-            <div class="col-12">
+        <div class="row mt-5 justify-content-center mb-4">
+            <div class="col-6">
                 <div class="content-section bg-white p-4 rounded-3 shadow-sm">
                     {% if events_confirmed and next_event %}
                         <!-- Confirmed Event -->
-                        <header class="mb-5 text-center">
+                        <header class="text-center">
+                            <h2 class="text-primary">Join us for our next event!</h2>
                             <!-- Flyer image placeholder -->
-                            <div class="my-3">
-                                <img src="{{ url_for('static', filename='gp11-8flyer.PNG') }}" alt="Event Flyer" class="img-fluid rounded shadow" style="max-width: 400px;">
+                            <div class="my-3 text-center">
+                                <img src="{{ url_for('static', filename='gp11-8flyer.PNG') }}" alt="Event Flyer" class="img-fluid rounded shadow">
                             </div>
                         </header>
                     {% else %}
                         <!-- Coming Soon -->
-                        <header id="coming-soon" class="mb-5 text-center">
+                        <header id="coming-soon" class="text-center">
                             <h1 class="text-success">Exciting Events Coming Soon!</h1>
                             <p class="fs-5">We're currently planning our next amazing events and experiences.</p>
                             <p>
