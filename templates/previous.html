@@ -18,112 +18,40 @@
                     <h3 class="text-success mb-3">
                         <i class="fas fa-music me-2"></i>Featured Artists
                     </h3>
-                    <div class="artists-list bg-dark p-4 rounded-3"
-                        style="border: 1px solid #404040; max-height: 790px; overflow-y: auto;">
-                        {% if events %}
-                        {% if request.args.get('date', 'all') == 'all' %}
-                        <!-- Show all artists if 'All Events' is selected -->
+                    <div class="artists-list bg-dark p-4 rounded-3 gp-bordered">
                         {% if all_artists %}
-                        {% for artist in all_artists %}
-                        <div class="artist-card mb-3 p-3 rounded"
-                            style="background-color: #333333; border: 1px solid #404040;">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="artist-info">
-                                    <h6 class="text-light mb-1">
-                                        <i class="fas fa-microphone text-warning"></i>{{ artist.name }}:
-                                        {% for platform, handle in artist.social_media.items() %}
-                                            {% if platform == 'instagram' %}
-                                                <a href="https://instagram.com/{{ handle.lstrip('@') }}" target="_blank" class="text-success text-decoration-underline">
-                                                    {{ handle }}
-                                                </a>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </h6>
-                                </div>
-                            </div>
-                            <!-- Social media links, etc. -->
-                            <ul class="list-unstyled mb-0 mt-2">
-                                {% for platform, handle in artist.social_media.items() %}
-                                <li>
-                                    {% if platform == 'instagram' %}
-                                    {% else %}
-                                    {{ handle }}
-                                    {% endif %}
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        {% endfor %}
-                        {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-music fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No Artist Profiles Found</h5>
-                        </div>
-                        {% endif %}
-                        {% else %}
-                        <!-- Existing per-event logic here -->
-                        {% for event in events %}
-                        {% set event_idx = loop.index %}
-                        <div class="event-section mb-4 p-3 rounded"
-                            style="background-color: #2a2a2a; border: 1px solid #404040;" data-date="{{ event.date }}">
-                            <div class="event-header mb-3">
-                                <h5 class="text-info mb-1">{{ event.title }}</h5>
-                                <p class="text-muted mb-0">
-                                    <i class="fas fa-calendar me-1"></i>{{ event.date }} |
-                                    <i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}
-                                </p>
-                            </div>
-                            {% if event.artists %}
-                            <div class="artists-grid">
-                                {% for artist in event.artists %}
-                                {% set artist_idx = loop.index %}
-                                <div class="artist-card mb-3 p-3 rounded"
-                                    style="background-color: #333333; border: 1px solid #404040;">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div class="artist-info">
-                                            <h6 class="text-light mb-1">
-                                                <i class="fas fa-microphone text-warning"></i>{{ artist.name }}:
+                            {% for artist in all_artists %}
+                                <div class="artist-card mb-3 p-3 rounded">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <div class="artist-info text-center w-100">
+                                            <h6 class="text-light mb-0 lh-1 fs-5">
                                                 {% for platform, handle in artist.social_media.items() %}
                                                     {% if platform == 'instagram' %}
-                                                        <a href="https://instagram.com/{{ handle.lstrip('@') }}" target="_blank" class="text-success text-decoration-underline">
+                                                        <a href="https://instagram.com/{{ handle.lstrip('@') }}"
+                                                        target="_blank"
+                                                        class="text-success text-decoration-none">
                                                             {{ handle }}
                                                         </a>
                                                     {% endif %}
                                                 {% endfor %}
                                             </h6>
-                                            <small class="text-muted">{{ artist.genre }}</small>
-                                            <div class="text-muted">{{ artist.bio }}</div>
                                         </div>
                                     </div>
+
                                     <ul class="list-unstyled mb-0 mt-2">
                                         {% for platform, handle in artist.social_media.items() %}
-                                        <li>
-                                            <strong>{{ platform|capitalize }}:</strong>
-                                            {% if platform == 'instagram' %}
-                                            <a href="https://instagram.com/{{ handle.lstrip('@') }}" target="_blank"
-                                                class="text-info text-decoration-underline">
-                                                {{ handle }}
-                                            </a>
-                                            {% else %}
-                                            {{ handle }}
+                                            {% if platform != 'instagram' %}
+                                                <li>{{ handle }}</li>
                                             {% endif %}
-                                        </li>
                                         {% endfor %}
                                     </ul>
                                 </div>
-                                {% endfor %}
-                            </div>
-                            {% else %}
-                            <p class="text-muted">No artist information available for this event.</p>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                        {% endif %}
+                            {% endfor %}
                         {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-music fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No Artist Profiles Found</h5>
-                        </div>
+                            <div class="text-center py-4">
+                                <i class="fas fa-music fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No Artist Profiles Found</h5>
+                            </div>
                         {% endif %}
                     </div>
                 </div>
@@ -133,21 +61,20 @@
             <div class="col-lg-6">
                 <div class="media-section">
                     <h3 class="text-success mb-3">
-                        <i class="fas fa-photo-video me-2"></i>Media
+                        <i class="fas fa-film me-2"></i>Media
                     </h3>
 
                     <!-- Video Section -->
                     <div class="video-section mb-4">
-                        <div class="media-container bg-dark p-3 rounded-3" style="border: 1px solid #404040;">
+                        <div class="media-container bg-dark p-3 rounded-3 gp-bordered">
                             <h5 class="text-light mb-3">
                                 <i class="fas fa-video me-2"></i>Videos
                             </h5>
                             <div class="video-player-container position-relative">
-                                <div class="video-placeholder bg-secondary rounded d-flex align-items-center justify-content-center"
-                                    style="height: 250px;">
+                                <div class="video-placeholder bg-secondary rounded d-flex align-items-center justify-content-center gp-media-placeholder">
                                     <div class="text-center" id="videoMediaContent">
                                         <i class="fas fa-play-circle fa-4x text-light mb-2"></i>
-                                        <p class="text-light mb-0">Select an event to view videos</p>
+                                        <p class="text-light mb-0">Videos coming soon</p>
                                     </div>
                                 </div>
                                 <div class="video-controls mt-3 d-flex justify-content-center">
@@ -165,16 +92,15 @@
 
                     <!-- Image Section -->
                     <div class="image-section">
-                        <div class="media-container bg-dark p-3 rounded-3" style="border: 1px solid #404040;">
+                        <div class="media-container bg-dark p-3 rounded-3 gp-bordered">
                             <h5 class="text-light mb-3">
                                 <i class="fas fa-images me-2"></i>Photos
                             </h5>
                             <div class="image-gallery-container position-relative">
-                                <div class="image-placeholder bg-secondary rounded d-flex align-items-center justify-content-center"
-                                    style="height: 250px;">
+                                <div class="image-placeholder bg-secondary rounded d-flex align-items-center justify-content-center gp-media-placeholder">
                                     <div class="text-center" id="imageMediaContent">
                                         <i class="fas fa-camera fa-4x text-light mb-2"></i>
-                                        <p class="text-light mb-0">Select an event to view photos</p>
+                                        <p class="text-light mb-0">Photos coming soon</p>
                                     </div>
                                 </div>
                                 <div class="image-controls mt-3 d-flex justify-content-center">
@@ -195,64 +121,13 @@
     </div>
 </div>
 
-<!-- JavaScript for Interactive Functionality -->
+{% endblock %}
+{% block scripts %}
 <script>
     let currentVideoIndex = 0;
     let currentImageIndex = 0;
     let currentEventVideos = [];
     let currentEventImages = [];
-    let selectedArtist = null;
-
-    // Sample event media data (replace with your actual event media data)
-    const eventMedia = {
-        '2025-07-04': {
-            videos: ['charity_run_vid1.mp4', 'charity_run_vid2.mp4'],
-            images: ['charity_run_img1.jpg', 'charity_run_img2.jpg', 'charity_run_img3.jpg']
-        },
-        '2025-06-15': {
-            videos: ['food_truck_vid1.mp4', 'food_truck_vid2.mp4'],
-            images: ['food_truck_img1.jpg', 'food_truck_img2.jpg']
-        },
-        '2025-05-20': {
-            videos: ['spring_workshop_vid1.mp4'],
-            images: ['spring_workshop_img1.jpg', 'spring_workshop_img2.jpg']
-        }
-        // Add more event media as needed
-    };
-
-    function filterEvents(selectedDate) {
-        const eventSections = document.querySelectorAll('.event-section');
-        let visibleCount = 0;
-        let totalArtists = 0;
-
-        eventSections.forEach(section => {
-            const eventDate = section.getAttribute('data-date');
-            if (selectedDate === 'all' || eventDate === selectedDate) {
-                section.style.display = 'block';
-                visibleCount++;
-                // Count artists in visible events
-                const artistCards = section.querySelectorAll('.artist-card');
-                totalArtists += artistCards.length;
-            } else {
-                section.style.display = 'none';
-            }
-        });
-
-        document.getElementById('eventCount').textContent = `${visibleCount} events, ${totalArtists} artists`;
-
-        // Populate media scrollers for selected event
-        if (selectedDate !== 'all' && eventMedia[selectedDate]) {
-            currentEventVideos = eventMedia[selectedDate].videos || [];
-            currentEventImages = eventMedia[selectedDate].images || [];
-        } else {
-            currentEventVideos = [];
-            currentEventImages = [];
-        }
-        currentVideoIndex = 0;
-        currentImageIndex = 0;
-        updateVideoDisplay();
-        updateImageDisplay();
-    }
 
     function updateVideoDisplay() {
         const videoCounter = document.getElementById('videoCounter');
@@ -271,9 +146,8 @@
             videoCounter.textContent = '0 / 0';
             videoMediaContent.innerHTML = `
             <div class="text-center">
-                <i class="fas fa-video-slash fa-4x text-muted mb-2"></i>
                 <p class="text-muted mb-0">No videos available</p>
-                <small class="text-muted">Select an event to view videos</small>
+                <small class="text-muted">Videos Coming Soon</small>
             </div>
         `;
         }
@@ -296,9 +170,8 @@
             imageCounter.textContent = '0 / 0';
             imageMediaContent.innerHTML = `
             <div class="text-center">
-                <i class="fas fa-images fa-4x text-muted mb-2"></i>
                 <p class="text-muted mb-0">No photos available</p>
-                <small class="text-muted">Select an event to view photos</small>
+                <small class="text-muted">Photos Coming Soon</small>
             </div>
         `;
         }
@@ -332,9 +205,14 @@
         }
     }
 
-    // Initialize with "all" selected
     document.addEventListener('DOMContentLoaded', function () {
-        filterEvents('all');
+        currentEventVideos = [];
+        currentEventImages = [];
+        currentVideoIndex = 0;
+        currentImageIndex = 0;
+        updateVideoDisplay();
+        updateImageDisplay();
     });
+
 </script>
 {% endblock %}
