@@ -21,10 +21,15 @@
             </button>
             <div class="collapse navbar-collapse fw-bold " id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        {% if events_confirmed %}
+                        <a class="nav-link nav-link-lg" href="{{ url_for('admin_home') }}">Admin</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        {% if site_settings.events_confirmed %}
                         <li class="nav-item">
-                            <a class="nav-link nav-link-lg" href="https://posh.vip/e/get-plugged-mixer">Purchase Tickets</a>
+                            <a class="nav-link nav-link-lg" href="{{ site_settings.ticket_url }}">Purchase Tickets</a>
                         </li>
                         {% endif %}
                     </li>

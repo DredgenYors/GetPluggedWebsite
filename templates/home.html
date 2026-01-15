@@ -4,118 +4,162 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-12">
-        <!-- Title Banner -->
-        <div class="title-banner text-white rounded-3 text-center gp-title-banner">
-            <img src="{{ url_for('static', filename='GPLogo.png') }}" alt="Get Plugged" class="header-logo-img">
-        </div>
-
-        <!-- Next Event Section -->
-        <div class="row mt-5 justify-content-center mb-4">
-            <div class="col-6">
-                <div class="content-section bg-white p-4 rounded-3 shadow-sm">
-                    {% if events_confirmed and next_event %}
-                        <!-- Confirmed Event -->
-                        <header class="text-center">
-                            <h2 class="text-primary">Join us for our next event!</h2>
-                            <!-- Flyer image placeholder -->
-                            <div class="my-3 text-center">
-                                <img src="{{ url_for('static', filename='gp11-8flyer.PNG') }}" alt="Event Flyer" class="img-fluid rounded shadow">
-                            </div>
-                        </header>
-                    {% else %}
-                        <!-- Coming Soon -->
-                        <header id="coming-soon" class="text-center">
-                            <h1 class="text-success">Exciting Events Coming Soon!</h1>
-                            <p class="fs-5">We're currently planning our next amazing events and experiences.</p>
-                            <p>
-                                In the meantime, check out our 
-                                previous events
-                                to see what we've been up to, and follow us on social media for the latest updates!
-                            </p>
-                        </header>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Content Sections -->
-        <div class="row g-4">
-            <!-- What is GPNJ Section -->
-            <div class="col-lg-4 col-md-12">
-                <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
-                    <div class="text-center mb-3">
-                        <i class="fas fa-question-circle fa-3x text-primary mb-3"></i>
-                        <h3 class="text-primary">What is GPNJ?</h3>
-                    </div>
-                    <p class="text-muted">
-                        <strong>Get Plugged was built on a simple belief:</strong> the best moments are designed. The team connects emerging talent with real audiences through curated lineups, tight production, and clear communication. With every event we intend to build on artist-first practices and partnerships with DJs, creators, and vendors. Every show is mapped for flow, tuned for sound, and captured with content that extends the life of the night. From intimate rooms to high-energy pop-ups, community thrives and memories stick.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Our Story Section -->
-            <div class="col-lg-4 col-md-12">
-                <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
-                    <div class="text-center mb-3">
-                        <i class="fas fa-users fa-3x text-success mb-3"></i>
-                        <h3 class="text-success">The Team</h3>
-                    </div>
-                    
-                    <!-- Creators Section -->
-                    <div class="creators-section mb-3">
-                        <h5 class="text-success text-center mb-3">Meet Our Founders</h5>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <div class="creator-card text-center">
-                                    <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar"> 
-                                    </div>
-                                    <h6 class="text-muted mb-0">Jordan Scott-Young</h6>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="creator-card text-center">
-                                    <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar">
-                                    </div>
-                                    <h6 class="text-muted mb-0">Michael Christie</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <p class="text-muted">
-                        <strong>Our Mission:</strong> Connecting creatives and audiences through events that foster an intimate and uplifting environment.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Contact Us Section -->
-            <div class="col-lg-4 col-md-12">
-                <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
-                    <div class="text-center mb-3">
-                        <i class="fas fa-envelope fa-3x text-success mb-3"></i>
-                        <h3 class="text-success">Contact Us</h3>
-                    </div>
-                    <div class="contact-info text-muted">
-                        <div class="mb-3">
-                            <i class="fas fa-envelope me-2 text-primary"></i>
-                            <strong>Email:</strong>
-                            <span class="ms-0">getpluggednj@gmail.com</span>
-                        </div>
-                        <div class="mb-3">
-                            <i class="fas fa-phone me-2 text-primary"></i>
-                            <strong>Phone:</strong>
-                            <span class="ms-0">732-676-3120</span>
-                        </div>
-                        <div class="mb-3">
-                            <i class="fab fa-instagram me-2 text-primary"></i>
-                            <strong>Instagram:</strong>
-                            <a href="https://www.instagram.com/getpluggednj/" target="_blank" rel="noopener noreferrer" class="ms-0 text-success">getpluggednj</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="col-12">
+    <!-- Title Banner -->
+    <div class="title-banner text-white rounded-3 text-center gp-title-banner">
+      <img src="{{ url_for('static', filename='GPLogo.png') }}" alt="Get Plugged" class="header-logo-img">
     </div>
+
+    <!-- Next Event Section -->
+    <div class="row mt-5 justify-content-center mb-4">
+      <div class="col-6">
+        <div class="content-section bg-white p-4 rounded-3 shadow-sm">
+          {% if site_settings.events_confirmed and next_event %}
+            <!-- Confirmed Event -->
+            <header class="text-center">
+              <h2 class="text-primary">Join us for our next event!</h2>
+              <div class="my-3 text-center">
+                <img src="{{ url_for('static', filename='gp11-8flyer.PNG') }}"
+                     alt="Event Flyer"
+                     class="img-fluid rounded shadow">
+              </div>
+            </header>
+          {% else %}
+            <!-- Coming Soon -->
+            <header id="coming-soon" class="text-center">
+              <h1 class="text-success">
+                {{ site_settings.coming_soon_title or "Exciting Events Coming Soon!" }}
+              </h1>
+
+              <p class="fs-5">
+                {{ site_settings.coming_soon_body or "We're currently planning our next amazing events and experiences." }}
+              </p>
+
+              <p>
+                {{ site_settings.coming_soon_cta or
+                  "In the meantime, check out our previous events to see what we've been up to, and follow us on social media for the latest updates!" }}
+              </p>
+            </header>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Sections -->
+    <div class="row g-4">
+      <!-- What is GPNJ Section -->
+      <div class="col-lg-4 col-md-12">
+        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
+          <div class="text-center mb-3">
+            <i class="fas fa-question-circle fa-3x text-primary mb-3"></i>
+            <h3 class="text-primary">
+              {{ site_settings.what_is_title or "What is GPNJ?" }}
+            </h3>
+          </div>
+
+          <p class="text-muted">
+            {{ site_settings.what_is_body or
+              "Get Plugged was built on a simple belief: the best moments are designed. The team connects emerging talent with real audiences through curated lineups, tight production, and clear communication..." }}
+          </p>
+        </div>
+      </div>
+
+      <!-- The Team Section -->
+      <div class="col-lg-4 col-md-12">
+        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
+          <div class="text-center mb-3">
+            <i class="fas fa-users fa-3x text-success mb-3"></i>
+            <h3 class="text-success">
+              {{ site_settings.team_title or "The Team" }}
+            </h3>
+          </div>
+
+          <div class="creators-section mb-3">
+            <h5 class="text-success text-center mb-3">
+              {{ site_settings.team_subtitle or "Meet Our Founders" }}
+            </h5>
+
+            <div class="row g-2">
+              <!-- Founder 1 -->
+              <div class="col-6">
+                <div class="creator-card text-center">
+                  <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar d-flex align-items-center justify-content-center overflow-hidden">
+                    {% if site_settings.founder1_image %}
+                      <img src="{{ site_settings.founder1_image }}"
+                           alt="{{ site_settings.founder1_name }}"
+                           class="w-100 h-100"
+                           style="object-fit: cover;">
+                    {% endif %}
+                  </div>
+                  <h6 class="text-muted mb-0">
+                    {{ site_settings.founder1_name or "Founder 1" }}
+                  </h6>
+                </div>
+              </div>
+
+              <!-- Founder 2 -->
+              <div class="col-6">
+                <div class="creator-card text-center">
+                  <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar d-flex align-items-center justify-content-center overflow-hidden">
+                    {% if site_settings.founder2_image %}
+                      <img src="{{ site_settings.founder2_image }}"
+                           alt="{{ site_settings.founder2_name }}"
+                           class="w-100 h-100"
+                           style="object-fit: cover;">
+                    {% endif %}
+                  </div>
+                  <h6 class="text-muted mb-0">
+                    {{ site_settings.founder2_name or "Founder 2" }}
+                  </h6>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-muted">
+            <strong>Our Mission:</strong>
+            {{ site_settings.mission_statement or
+              "Connecting creatives and audiences through events that foster an intimate and uplifting environment." }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Contact Us Section -->
+      <div class="col-lg-4 col-md-12">
+        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
+          <div class="text-center mb-3">
+            <i class="fas fa-envelope fa-3x text-success mb-3"></i>
+            <h3 class="text-success">Contact Us</h3>
+          </div>
+
+          <div class="contact-info text-muted">
+            <div class="mb-3">
+              <i class="fas fa-envelope me-2 text-primary"></i>
+              <strong>Email:</strong>
+              <span class="ms-0">{{ site_settings.email }}</span>
+            </div>
+
+            <div class="mb-3">
+              <i class="fas fa-phone me-2 text-primary"></i>
+              <strong>Phone:</strong>
+              <span class="ms-0">{{ site_settings.phone }}</span>
+            </div>
+
+            <div class="mb-3">
+              <i class="fab fa-instagram me-2 text-primary"></i>
+              <strong>Instagram:</strong>
+              <a href="{{ site_settings.instagram_url }}"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="ms-0 text-success text-decoration-none">
+                getpluggednj
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 {% endblock %}

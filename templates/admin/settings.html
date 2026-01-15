@@ -1,0 +1,145 @@
+{% extends "admin/_layout.html" %}
+
+{% block title %}Admin Settings - GetPlugged{% endblock %}
+
+{% block admin_content %}
+<div class="container" style="max-width: 900px;">
+  <h2 class="mb-4">Admin Settings</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} mb-3">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <!-- Ticket Settings -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3">Tickets</h5>
+
+        <div class="form-check form-switch mb-3">
+          {{ form.events_confirmed(class="form-check-input") }}
+          {{ form.events_confirmed.label(class="form-check-label") }}
+        </div>
+
+        <div class="mb-0">
+          {{ form.ticket_url.label(class="form-label") }}
+          {{ form.ticket_url(class="form-control", placeholder="https://...") }}
+          {% for err in form.ticket_url.errors %}
+            <div class="text-danger small">{{ err }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Settings -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3">Contact Info</h5>
+
+        <div class="mb-3">
+          {{ form.email.label(class="form-label") }}
+          {{ form.email(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+          {{ form.phone.label(class="form-label") }}
+          {{ form.phone(class="form-control") }}
+        </div>
+
+        <div class="mb-0">
+          {{ form.instagram_url.label(class="form-label") }}
+          {{ form.instagram_url(class="form-control", placeholder="https://instagram.com/...") }}
+          {% for err in form.instagram_url.errors %}
+            <div class="text-danger small">{{ err }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Home Page Content -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3">Home Page Content</h5>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            {{ form.coming_soon_title.label(class="form-label") }}
+            {{ form.coming_soon_title(class="form-control") }}
+          </div>
+          <div class="col-md-6">
+            {{ form.what_is_title.label(class="form-label") }}
+            {{ form.what_is_title(class="form-control") }}
+          </div>
+
+          <div class="col-12">
+            {{ form.coming_soon_body.label(class="form-label") }}
+            {{ form.coming_soon_body(class="form-control", rows="3") }}
+          </div>
+
+          <div class="col-12">
+            {{ form.what_is_body.label(class="form-label") }}
+            {{ form.what_is_body(class="form-control", rows="6") }}
+          </div>
+
+          <div class="col-12">
+            {{ form.mission_statement.label(class="form-label") }}
+            {{ form.mission_statement(class="form-control", rows="3") }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3">The Team</h5>
+        <p class="text-muted small mb-3">
+          Tip: You can paste a full image URL (recommended) or a /static path (example: /static/founders/jordan.jpg)
+        </p>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="border rounded p-3 h-100">
+              <h6 class="mb-3">Founder 1</h6>
+
+              <div class="mb-3">
+                {{ form.founder1_name.label(class="form-label") }}
+                {{ form.founder1_name(class="form-control") }}
+              </div>
+
+              <div class="mb-0">
+                {{ form.founder1_image.label(class="form-label") }}
+                {{ form.founder1_image(class="form-control", placeholder="https://... or /static/...") }}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="border rounded p-3 h-100">
+              <h6 class="mb-3">Founder 2</h6>
+
+              <div class="mb-3">
+                {{ form.founder2_name.label(class="form-label") }}
+                {{ form.founder2_name(class="form-control") }}
+              </div>
+
+              <div class="mb-0">
+                {{ form.founder2_image.label(class="form-label") }}
+                {{ form.founder2_image(class="form-control", placeholder="https://... or /static/...") }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{ form.submit(class="btn btn-success") }}
+  </form>
+</div>
+{% endblock %}

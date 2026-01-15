@@ -1,0 +1,46 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block admin_content %}
+<h2 class="mb-3">Dashboard</h2>
+
+<div class="row g-3">
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted">Artists (Active)</div>
+        <div class="fs-2 fw-bold">{{ active_artists }}</div>
+        <a href="{{ url_for('admin_artists') }}">Manage Artists →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted">Artists (Total)</div>
+        <div class="fs-2 fw-bold">{{ total_artists }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted">Tickets Status</div>
+        <div class="fs-5 fw-bold">
+          {% if settings.events_confirmed %}ON{% else %}OFF{% endif %}
+        </div>
+        <a href="{{ url_for('admin_settings') }}">Edit Settings →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="my-4">
+
+<div class="d-flex gap-2 flex-wrap">
+  <a class="btn btn-success" href="{{ url_for('admin_artists_new') }}">+ Add Artist</a>
+  <a class="btn btn-outline-primary" href="{{ url_for('admin_settings') }}">Edit Site Settings</a>
+</div>
+{% endblock %}

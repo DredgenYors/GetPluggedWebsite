@@ -12,6 +12,27 @@
 
         <!-- Main Content Split Layout -->
         <div class="row g-4">
+            <form method="GET" class="d-flex justify-content-center mb-4">
+                <div style="max-width: 520px;" class="w-100">
+                    <select name="event" class="form-select" onchange="this.form.submit()">
+                    <option value="all" {% if selected_event_key == 'all' %}selected{% endif %}>
+                        All Events
+                    </option>
+                    {% for e in events %}
+                        <option value="{{ e.id }}" {% if selected_event and e.id == selected_event.id %}selected{% endif %}>
+                        {{ e.title }} — {{ e.date.strftime('%Y-%m-%d') }}
+                        </option>
+                    {% endfor %}
+                    </select>
+
+                    {% if selected_event %}
+                    <div class="text-center text-muted mt-2">
+                        Viewing: <strong>{{ selected_event.title }}</strong>
+                        {% if selected_event.location %} • {{ selected_event.location }}{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                </form>
             <!-- Left Side - Artist Profiles List -->
             <div class="col-lg-6">
                 <div class="artists-list-section">
@@ -24,27 +45,23 @@
                                 <div class="artist-card mb-3 p-3 rounded">
                                     <div class="d-flex justify-content-center align-items-center">
                                         <div class="artist-info text-center w-100">
-                                            <h6 class="text-light mb-0 lh-1 fs-5">
-                                                {% for platform, handle in artist.social_media.items() %}
-                                                    {% if platform == 'instagram' %}
-                                                        <a href="https://instagram.com/{{ handle.lstrip('@') }}"
-                                                        target="_blank"
-                                                        class="text-success text-decoration-none">
-                                                            {{ handle }}
-                                                        </a>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </h6>
+                                            <!-- Artist Name -->
+                                            <div class="text-light fs-5 fw-semibold">
+                                                {{ artist.display_name }}
+                                            </div>
+
+                                            <!-- Instagram Handle (optional) -->
+                                            {% if artist.instagram_handle %}
+                                                <a href="https://instagram.com/{{ artist.instagram_handle }}"
+                                                target="_blank"
+                                                class="text-success text-decoration-none">
+                                                    @{{ artist.instagram_handle }}
+                                                </a>
+                                            {% else %}
+                                                <div class="text-muted small">No Instagram provided</div>
+                                            {% endif %}
                                         </div>
                                     </div>
-
-                                    <ul class="list-unstyled mb-0 mt-2">
-                                        {% for platform, handle in artist.social_media.items() %}
-                                            {% if platform != 'instagram' %}
-                                                <li>{{ handle }}</li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
                                 </div>
                             {% endfor %}
                         {% else %}
@@ -72,10 +89,20 @@
                             </h5>
                             <div class="video-player-container position-relative">
                                 <div class="video-placeholder bg-secondary rounded d-flex align-items-center justify-content-center gp-media-placeholder">
-                                    <div class="text-center" id="videoMediaContent">
-                                        <i class="fas fa-play-circle fa-4x text-light mb-2"></i>
-                                        <p class="text-light mb-0">Videos coming soon</p>
-                                    </div>
+                                    {% if videos %}
+                                        <div class="text-muted mb-2">{{ videos|length }} videos</div>
+                                        <ul class="list-unstyled mb-0">
+                                            {% for v in videos %}
+                                                <li class="mb-2">
+                                                    <a href="{{ v.url }}" target="_blank" class="text-info text-decoration-none">
+                                                        {{ v.caption if v.caption else "Video " ~ loop.index }}
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="text-muted mb-0">No videos yet.</p>
+                                    {% endif %}
                                 </div>
                                 <div class="video-controls mt-3 d-flex justify-content-center">
                                     <button class="btn btn-outline-light me-3" id="prevVideo" onclick="previousVideo()">
@@ -98,10 +125,20 @@
                             </h5>
                             <div class="image-gallery-container position-relative">
                                 <div class="image-placeholder bg-secondary rounded d-flex align-items-center justify-content-center gp-media-placeholder">
-                                    <div class="text-center" id="imageMediaContent">
-                                        <i class="fas fa-camera fa-4x text-light mb-2"></i>
-                                        <p class="text-light mb-0">Photos coming soon</p>
-                                    </div>
+                                    {% if photos %}
+                                        <div class="text-muted mb-2">{{ photos|length }} photos</div>
+                                        <ul class="list-unstyled mb-0">
+                                            {% for p in photos %}
+                                                <li class="mb-2">
+                                                    <a href="{{ p.url }}" target="_blank" class="text-info text-decoration-none">
+                                                        {{ p.caption if p.caption else "Photo " ~ loop.index }}
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="text-muted mb-0">No photos yet.</p>
+                                    {% endif %}
                                 </div>
                                 <div class="image-controls mt-3 d-flex justify-content-center">
                                     <button class="btn btn-outline-light me-3" id="prevImage" onclick="previousImage()">

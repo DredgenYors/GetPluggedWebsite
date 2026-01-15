@@ -1,0 +1,35 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Artist - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="container" style="max-width: 720px;">
+  <h2 class="mb-4">
+    {% if mode == "new" %}Add Artist{% else %}Edit Artist{% endif %}
+  </h2>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.display_name.label(class="form-label") }}
+      {{ form.display_name(class="form-control") }}
+      {% for err in form.display_name.errors %}
+        <div class="text-danger small">{{ err }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.instagram_handle.label(class="form-label") }}
+      {{ form.instagram_handle(class="form-control", placeholder="getpluggednj") }}
+    </div>
+
+    <div class="form-check form-switch mb-4">
+      {{ form.active(class="form-check-input") }}
+      {{ form.active.label(class="form-check-label") }}
+    </div>
+
+    <button class="btn btn-success">{{ form.submit.label.text }}</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('admin_artists') }}">Cancel</a>
+  </form>
+</div>
+{% endblock %}
