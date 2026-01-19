@@ -23,11 +23,6 @@
       {{ form.instagram_handle(class="form-control", placeholder="getpluggednj") }}
     </div>
 
-    <div class="form-check form-switch mb-4">
-      {{ form.active(class="form-check-input") }}
-      {{ form.active.label(class="form-check-label") }}
-    </div>
-
     <button class="btn btn-success">{{ form.submit.label.text }}</button>
     <a class="btn btn-outline-secondary" href="{{ url_for('admin_artists') }}">Cancel</a>
   </form>

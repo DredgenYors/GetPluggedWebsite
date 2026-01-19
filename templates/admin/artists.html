@@ -2,7 +2,7 @@
 {% block title %}Artists - Admin{% endblock %}
 
 {% block admin_content %}
-<div class="container">
+<div class="gp-admin-content">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Artists</h2>
     <a class="btn btn-success" href="{{ url_for('admin_artists_new') }}">+ Add Artist</a>
@@ -16,51 +16,48 @@
     {% endif %}
   {% endwith %}
 
-  <div class="table-responsive">
-    <table class="table table-striped align-middle">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Instagram</th>
-          <th>Status</th>
-          <th style="width:180px;">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for a in artists %}
-        <tr>
-          <td>{{ a.display_name }}</td>
-          <td>
-            {% if a.instagram_handle %}
-              <a href="https://instagram.com/{{ a.instagram_handle }}" target="_blank">
-                @{{ a.instagram_handle }}
-              </a>
-            {% else %}
-              —
-            {% endif %}
-          </td>
-          <td>
+  {% if artists %}
+    {% for a in artists %}
+      <div class="card gp-admin-list-item mb-2 shadow-sm p-3 d-flex justify-content-between align-items-center flex-row">
+        <div class="me-3">
+          <div class="fw-bold d-flex align-items-center gap-2 flex-wrap">
+            <span>{{ a.display_name }}</span>
+
             {% if a.active %}
               <span class="badge bg-success">Active</span>
             {% else %}
               <span class="badge bg-secondary">Inactive</span>
             {% endif %}
-          </td>
-          <td>
-            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_artists_edit', artist_id=a.id) }}">Edit</a>
+          </div>
 
-            <form method="POST" action="{{ url_for('admin_artists_delete', artist_id=a.id) }}" class="d-inline"
-                  onsubmit="return confirm('Delete this artist?');">
-              <button class="btn btn-sm btn-outline-danger">Delete</button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-        {% if not artists %}
-        <tr><td colspan="4" class="text-muted text-center py-4">No artists yet.</td></tr>
-        {% endif %}
-      </tbody>
-    </table>
-  </div>
+          <div class="text-muted small">
+            {% if a.instagram_handle %}
+              <a href="https://instagram.com/{{ a.instagram_handle }}" target="_blank" class="text-decoration-none">
+                @{{ a.instagram_handle }}
+              </a>
+            {% else %}
+              No Instagram set
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 flex-shrink-0">
+          <a class="btn btn-outline-primary btn-sm"
+             href="{{ url_for('admin_artists_edit', artist_id=a.id) }}">
+            Edit
+          </a>
+
+          <form method="POST"
+                action="{{ url_for('admin_artists_delete', artist_id=a.id) }}"
+                onsubmit="return confirm('Delete this artist?');"
+                class="m-0">
+            <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-muted">No artists yet. Click “Add Artist”.</p>
+  {% endif %}
 </div>
 {% endblock %}

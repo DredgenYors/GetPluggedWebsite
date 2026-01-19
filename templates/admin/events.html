@@ -8,9 +8,9 @@
 </div>
 
 {% if events %}
-  <div class="list-group">
+  <div class="list-group list-group-flush">
     {% for e in events %}
-      <div class="list-group-item d-flex justify-content-between align-items-center">
+      <div class="card gp-admin-list-item mb-2 shadow-sm p-3 d-flex justify-content-between align-items-center flex-row">
         <div>
           <div class="fw-bold">{{ e.title }}</div>
           <div class="text-muted small">
@@ -18,14 +18,14 @@
           </div>
         </div>
         <div class="d-flex gap-2">
-          <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_events_edit', event_id=e.id) }}">Edit</a>
+          <a class="btn btn-outline-success btn-sm" href="{{ url_for('admin_events_edit', event_id=e.id) }}">Edit</a>
 
           <a class="btn btn-outline-light btn-sm"
              href="{{ url_for('admin_event_artists', event_id=e.id) }}">
              Artists
           </a>
 
-          <a class="btn btn-outline-info btn-sm"
+          <a class="btn btn-outline-light btn-sm"
              href="{{ url_for('admin_event_media', event_id=e.id) }}">
              Media
           </a>

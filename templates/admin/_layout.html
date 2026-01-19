@@ -2,23 +2,53 @@
 
 {% block content %}
 <div class="container-fluid">
-  <div class="row">
+  <div class="row flex-nowrap">
     <!-- Sidebar -->
-    <aside class="col-12 col-md-3 col-lg-2 mb-3">
+    <aside class="gp-admin-sidebar">
       <div class="bg-dark text-light rounded-3 p-3">
-        <div class="fw-bold mb-3">Admin</div>
+        <div class="fw-bold mb-3">Admin Directory</div>
 
         <div class="d-grid gap-2">
           <a class="btn btn-outline-light btn-sm" href="{{ url_for('admin_home') }}">Dashboard</a>
-          <a class="btn btn-outline-light btn-sm" href="{{ url_for('admin_settings') }}">Site Settings</a>
-          <a class="btn btn-outline-light btn-sm" href="{{ url_for('admin_artists') }}">Artists</a>
-          <a class="btn btn-outline-warning btn-sm" href="{{ url_for('logout') }}">Logout</a>
+          <a class="btn btn-outline-light btn-sm"
+            href="{{ url_for('admin_artists') }}"
+            {% if request.endpoint == 'admin_home' %}
+              data-bs-toggle="tooltip"
+              data-bs-placement="bottom"
+              data-bs-custom-class="gp-tooltip gp-tooltip--sidebar"
+              title="View, add, edit, or remove artists"
+            {% endif %}>
+            Artists
+          </a>
+
+          <a class="btn btn-outline-light btn-sm"
+            href="{{ url_for('admin_events') }}"
+            {% if request.endpoint == 'admin_home' %}
+              data-bs-toggle="tooltip"
+              data-bs-placement="bottom"
+              data-bs-custom-class="gp-tooltip gp-tooltip--sidebar"
+              title="Create and manage events"
+            {% endif %}>
+            Events
+          </a>
+
+          <a class="btn btn-outline-light btn-sm"
+            href="{{ url_for('admin_settings') }}"
+            {% if request.endpoint == 'admin_home' %}
+              data-bs-toggle="tooltip"
+              data-bs-placement="bottom"
+              data-bs-custom-class="gp-tooltip gp-tooltip--sidebar"
+              title="Edit homepage text, contact info, and ticket settings"
+            {% endif %}>
+            Settings
+          </a>
+          <a class="btn btn-outline-danger btn-sm" href="{{ url_for('logout') }}">Logout</a>
         </div>
       </div>
     </aside>
 
     <!-- Main -->
-    <main class="col-12 col-md-9 col-lg-10">
+    <main class="gp-admin-main">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}

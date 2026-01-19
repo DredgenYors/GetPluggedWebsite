@@ -84,11 +84,24 @@
               <div class="col-6">
                 <div class="creator-card text-center">
                   <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar d-flex align-items-center justify-content-center overflow-hidden">
-                    {% if site_settings.founder1_image %}
-                      <img src="{{ site_settings.founder1_image }}"
-                           alt="{{ site_settings.founder1_name }}"
-                           class="w-100 h-100"
-                           style="object-fit: cover;">
+                    {% set img1 = site_settings.founder1_image %}
+                    {% if img1 %}
+                      {% if img1.startswith('http') %}
+                        <img src="{{ img1 }}"
+                            alt="{{ site_settings.founder1_name }}"
+                            class="w-100 h-100"
+                            style="object-fit: cover;">
+                      {% else %}
+                        <img src="{{ url_for('static', filename=img1.lstrip('/static/')) }}"
+                            alt="{{ site_settings.founder1_name }}"
+                            class="w-100 h-100"
+                            style="object-fit: cover;">
+                      {% endif %}
+                    {% else %}
+                      <img src="{{ url_for('static', filename='default-avatar.png') }}"
+                          alt="Default avatar"
+                          class="w-100 h-100"
+                          style="object-fit: cover;">
                     {% endif %}
                   </div>
                   <h6 class="text-muted mb-0">
@@ -101,11 +114,24 @@
               <div class="col-6">
                 <div class="creator-card text-center">
                   <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar d-flex align-items-center justify-content-center overflow-hidden">
-                    {% if site_settings.founder2_image %}
-                      <img src="{{ site_settings.founder2_image }}"
-                           alt="{{ site_settings.founder2_name }}"
-                           class="w-100 h-100"
-                           style="object-fit: cover;">
+                    {% set img2 = site_settings.founder2_image %}
+                    {% if img2 %}
+                      {% if img2.startswith('http') %}
+                        <img src="{{ img2 }}"
+                            alt="{{ site_settings.founder2_name }}"
+                            class="w-100 h-100"
+                            style="object-fit: cover;">
+                      {% else %}
+                        <img src="{{ url_for('static', filename=img2.lstrip('/static/')) }}"
+                            alt="{{ site_settings.founder2_name }}"
+                            class="w-100 h-100"
+                            style="object-fit: cover;">
+                      {% endif %}
+                    {% else %}
+                      <img src="{{ url_for('static', filename='default-avatar.png') }}"
+                          alt="Default avatar"
+                          class="w-100 h-100"
+                          style="object-fit: cover;">
                     {% endif %}
                   </div>
                   <h6 class="text-muted mb-0">

@@ -679,4 +679,84 @@ h1, h2, h3, h4, h5, h6,
   box-shadow: none;
 }
 
+/* Base tooltip styling for our custom tooltips */
+.gp-tooltip .tooltip-inner {
+  background: rgba(20, 20, 20, 100);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  max-width: 260px;
+  box-shadow: 0 10px 30px rgba(0,0,0,100);
+}
+
+/* Make the arrow match the tooltip background */
+.gp-tooltip.bs-tooltip-end .tooltip-arrow::before {
+  border-right-color: rgba(20, 20, 20, 100);
+}
+/* Base tooltip styling for our custom tooltips */
+.gp-tooltip .tooltip-inner {
+  background: rgba(20, 20, 20, 0.95);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  max-width: 260px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+/* Make the arrow match the tooltip background */
+.gp-tooltip.bs-tooltip-end .tooltip-arrow::before {
+  border-right-color: rgba(20, 20, 20, 0.95);
+}
+
+/* Sidebar-specific variant (optional tweaks) */
+.gp-tooltip--sidebar .tooltip-inner {
+  background: rgba(0, 0, 0, 100);
+  border-color: rgba(25, 135, 84, 100);
+}
+
+.gp-tooltip--sidebar.bs-tooltip-end .tooltip-arrow::before {
+  border-right-color: rgba(0, 0, 0, 100);
+}
+
+/* Disable card hover "bounce" ONLY on the admin dashboard */
+.gp-admin-dashboard .card {
+  transition: none !important;
+}
+
+.gp-admin-dashboard .card:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Admin layout */
+.gp-admin-sidebar {
+  width: 240px;              /* fixed sidebar width */
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.gp-admin-main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;        /* keeps content readable */
+}
+
+.gp-admin-content {
+  max-width: 900px;
+}
+
+.gp-admin-list-item {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.gp-admin-list-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25) !important;
+}
+
+
+
 

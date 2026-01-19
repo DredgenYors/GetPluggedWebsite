@@ -3,24 +3,23 @@
 {% block title %}Admin Settings - GetPlugged{% endblock %}
 
 {% block admin_content %}
-<div class="container" style="max-width: 900px;">
-  <h2 class="mb-4">Admin Settings</h2>
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }} mb-3">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
+<div class="gp-admin-content">
 
   <form method="POST">
     {{ form.hidden_tag() }}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0">Settings</h2>
+      {{ form.submit(class="btn btn-success") }}
+    </div>
 
     <!-- Ticket Settings -->
     <div class="card mb-4 shadow-sm">
       <div class="card-body">
         <h5 class="mb-3">Tickets</h5>
+        <p class="text-muted small mb-3">
+          Toggle next event confirmation, controlling the display of a link to purchase tickets and a flyer on the home page 
+        </p>
 
         <div class="form-check form-switch mb-3">
           {{ form.events_confirmed(class="form-check-input") }}
@@ -31,31 +30,6 @@
           {{ form.ticket_url.label(class="form-label") }}
           {{ form.ticket_url(class="form-control", placeholder="https://...") }}
           {% for err in form.ticket_url.errors %}
-            <div class="text-danger small">{{ err }}</div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-
-    <!-- Contact Settings -->
-    <div class="card mb-4 shadow-sm">
-      <div class="card-body">
-        <h5 class="mb-3">Contact Info</h5>
-
-        <div class="mb-3">
-          {{ form.email.label(class="form-label") }}
-          {{ form.email(class="form-control") }}
-        </div>
-
-        <div class="mb-3">
-          {{ form.phone.label(class="form-label") }}
-          {{ form.phone(class="form-control") }}
-        </div>
-
-        <div class="mb-0">
-          {{ form.instagram_url.label(class="form-label") }}
-          {{ form.instagram_url(class="form-control", placeholder="https://instagram.com/...") }}
-          {% for err in form.instagram_url.errors %}
             <div class="text-danger small">{{ err }}</div>
           {% endfor %}
         </div>
@@ -100,7 +74,7 @@
       <div class="card-body">
         <h5 class="mb-3">The Team</h5>
         <p class="text-muted small mb-3">
-          Tip: You can paste a full image URL (recommended) or a /static path (example: /static/founders/jordan.jpg)
+          Paste a full image URL or a 'path' to an image 
         </p>
 
         <div class="row g-3">
@@ -139,7 +113,31 @@
       </div>
     </div>
 
-    {{ form.submit(class="btn btn-success") }}
+    <!-- Contact Settings -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3">Contact Info</h5>
+
+        <div class="mb-3">
+          {{ form.email.label(class="form-label") }}
+          {{ form.email(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+          {{ form.phone.label(class="form-label") }}
+          {{ form.phone(class="form-control") }}
+        </div>
+
+        <div class="mb-0">
+          {{ form.instagram_url.label(class="form-label") }}
+          {{ form.instagram_url(class="form-control", placeholder="https://instagram.com/...") }}
+          {% for err in form.instagram_url.errors %}
+            <div class="text-danger small">{{ err }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
   </form>
 </div>
 {% endblock %}

@@ -216,11 +216,16 @@ def admin_settings():
 
     if form.validate_on_submit():
         settings.events_confirmed = form.events_confirmed.data
-        settings.ticket_url = form.ticket_url.data.strip()
 
-        settings.email = form.email.data.strip()
-        settings.phone = form.phone.data.strip()
-        settings.instagram_url = form.instagram_url.data.strip()
+        # Only update ticket_url if user typed something.
+        new_url = (form.ticket_url.data or "").strip()
+        if new_url:
+            settings.ticket_url = new_url
+        # else: keep existing settings.ticket_url unchanged
+
+        settings.email = (form.email.data or "").strip()
+        settings.phone = (form.phone.data or "").strip()
+        settings.instagram_url = (form.instagram_url.data or "").strip()
 
         # NEW
         settings.coming_soon_title = (form.coming_soon_title.data or "").strip()
@@ -238,7 +243,7 @@ def admin_settings():
 
         db.session.commit()
 
-        flash("Settings saved!", "success")
+        flash("Settings Saved!", "success")
         return redirect(url_for("admin_settings"))
 
     return render_template("admin/settings.html", form=form)
@@ -264,13 +269,14 @@ def login():
 @app.route("/admin")
 @login_required
 def admin_home():
-    active_artists = Artist.query.filter_by(active=True).count()
     total_artists = Artist.query.count()
+    total_events = Event.query.count()
+
     settings = get_settings()
     return render_template(
         "admin/home.html",
-        active_artists=active_artists,
         total_artists=total_artists,
+        total_events=total_events,
         settings=settings
     )
 
