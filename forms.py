@@ -30,7 +30,6 @@ class SiteSettingsForm(FlaskForm):
 class ArtistForm(FlaskForm):
     display_name = StringField("Artist Name", validators=[DataRequired()])
     instagram_handle = StringField("Instagram Handle (no @)", validators=[Optional()])
-    active = BooleanField("Active")
     submit = SubmitField("Save Artist")
 
 class EventForm(FlaskForm):
@@ -46,5 +45,5 @@ class MediaForm(FlaskForm):
         validators=[DataRequired()],
     )
     url = StringField("Media URL", validators=[DataRequired(), URL()])
-    caption = StringField("Caption (optional)", validators=[Optional()])
+    caption = StringField("Caption", validators=[Optional()])
     submit = SubmitField("Add Media")

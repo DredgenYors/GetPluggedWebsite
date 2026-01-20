@@ -16,7 +16,7 @@
   <div class="mb-3">
     {{ form.date.label(class="form-label") }}
     {{ form.date(class="form-control") }}
-    <div class="form-text">Format: YYYY-MM-DD</div>
+    <div class="form-text">Format: MM-DD-YYYY</div>
     {% for err in form.date.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
   </div>
 

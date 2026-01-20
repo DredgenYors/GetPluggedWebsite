@@ -8,26 +8,12 @@
     <a class="btn btn-success" href="{{ url_for('admin_artists_new') }}">+ Add Artist</a>
   </div>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }} mb-3">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
-
   {% if artists %}
     {% for a in artists %}
       <div class="card gp-admin-list-item mb-2 shadow-sm p-3 d-flex justify-content-between align-items-center flex-row">
         <div class="me-3">
           <div class="fw-bold d-flex align-items-center gap-2 flex-wrap">
             <span>{{ a.display_name }}</span>
-
-            {% if a.active %}
-              <span class="badge bg-success">Active</span>
-            {% else %}
-              <span class="badge bg-secondary">Inactive</span>
-            {% endif %}
           </div>
 
           <div class="text-muted small">
@@ -42,16 +28,17 @@
         </div>
 
         <div class="d-flex gap-2 flex-shrink-0">
-          <a class="btn btn-outline-primary btn-sm"
+          <a class="btn btn-outline-success btn-sm"
              href="{{ url_for('admin_artists_edit', artist_id=a.id) }}">
             Edit
           </a>
 
           <form method="POST"
                 action="{{ url_for('admin_artists_delete', artist_id=a.id) }}"
-                onsubmit="return confirm('Delete this artist?');"
-                class="m-0">
-            <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                class="d-inline gp-delete-form"
+                data-item-type="artist"
+                data-item-name="{{ a.display_name }}">
+            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
           </form>
         </div>
       </div>

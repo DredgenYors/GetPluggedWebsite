@@ -31,6 +31,12 @@ footer {
   display: block;
 }
 
+.navbar-logo {
+  image-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  transform: translateZ(0); /* forces GPU rendering */
+}
+
 .nav-link-lg {
     font-size: 1.5rem;
     padding-top: 1rem !important;

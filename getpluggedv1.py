@@ -53,7 +53,6 @@ class Artist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     display_name = db.Column(db.String(200), nullable=False)
     instagram_handle = db.Column(db.String(200), default="", nullable=False)  # store without @, e.g. "getpluggednj"
-    active = db.Column(db.Boolean, default=True, nullable=False)
 
     def ig_url(self):
         handle = self.instagram_handle.lstrip("@").strip()
@@ -176,7 +175,6 @@ def previous():
         all_artists = (
             Artist.query
             .join(event_artists, Artist.id == event_artists.c.artist_id)
-            .filter(Artist.active == True)
             .distinct()
             .order_by(Artist.display_name.asc())
             .all()
@@ -191,7 +189,6 @@ def previous():
             Artist.query
             .join(event_artists, Artist.id == event_artists.c.artist_id)
             .filter(event_artists.c.event_id == selected_event.id)
-            .filter(Artist.active == True)
             .order_by(Artist.display_name.asc())
             .all()
         )
@@ -294,7 +291,6 @@ def admin_artists_new():
         artist = Artist(
             display_name=form.display_name.data.strip(),
             instagram_handle=form.instagram_handle.data.strip().lstrip("@"),
-            active=form.active.data if form.active.data is not None else True
         )
         db.session.add(artist)
         db.session.commit()
@@ -311,7 +307,6 @@ def admin_artists_edit(artist_id):
     if form.validate_on_submit():
         artist.display_name = form.display_name.data.strip()
         artist.instagram_handle = form.instagram_handle.data.strip().lstrip("@")
-        artist.active = form.active.data
         db.session.commit()
         flash("Artist updated.", "success")
         return redirect(url_for("admin_artists"))
