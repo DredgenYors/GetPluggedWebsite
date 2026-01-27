@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, SubmitField, DateField, SelectField, TextAreaField
+from wtforms import BooleanField, StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField
 from wtforms.validators import Optional, URL, DataRequired, Length
 
 class SiteSettingsForm(FlaskForm):
@@ -47,3 +47,8 @@ class MediaForm(FlaskForm):
     url = StringField("Media URL", validators=[DataRequired(), URL()])
     caption = StringField("Caption", validators=[Optional()])
     submit = SubmitField("Add Media")
+
+class LoginForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Log in")

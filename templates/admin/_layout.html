@@ -42,6 +42,9 @@
             {% endif %}>
             Settings
           </a>
+          {% if current_user.is_authenticated and current_user.is_super_admin() %}
+            <a class="btn btn-outline-light btn-sm" href="{{ url_for('admin_users') }}">User Access</a>
+          {% endif %}
           <a class="btn btn-outline-danger btn-sm" href="{{ url_for('logout') }}">Logout</a>
         </div>
       </div>

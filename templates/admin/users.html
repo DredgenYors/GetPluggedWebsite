@@ -1,0 +1,52 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Manage Users{% endblock %}
+
+{% block admin_content %}
+<div class="gp-admin-content">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">User Access</h2>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th style="width:220px;">Role</th>
+              <th style="width:140px;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u.username }}</td>
+              <td>
+                <form method="POST" class="d-flex gap-2">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="user_id" value="{{ u.id }}">
+
+                  <select class="form-select form-select-sm" name="role">
+                    <option value="user" {% if u.role=='user' %}selected{% endif %}>User</option>
+                    <option value="admin" {% if u.role=='admin' %}selected{% endif %}>Admin</option>
+                    <option value="super_admin" {% if u.role=='super_admin' %}selected{% endif %}>Super Admin</option>
+                  </select>
+              </td>
+              <td>
+                  <button class="btn btn-success btn-sm" type="submit">Update</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-muted small mb-0">
+        Admins can manage events/artists/settings. Only Super Admins can change roles.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

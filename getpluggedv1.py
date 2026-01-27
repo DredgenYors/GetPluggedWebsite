@@ -1,16 +1,20 @@
 from flask import Flask, render_template, redirect, url_for, flash, request, abort
 import os 
 from flask_sqlalchemy import SQLAlchemy # Access database connection, instead of writing raw SQL
-from forms import SiteSettingsForm, ArtistForm, EventForm, MediaForm
+from forms import LoginForm, SiteSettingsForm, ArtistForm, EventForm, MediaForm
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms.validators import DataRequired
+from functools import wraps
+from flask_wtf import CSRFProtect
 
 app = Flask(__name__)
 
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-change-me")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///getplugged.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+csrf = CSRFProtect(app)
 
 db = SQLAlchemy(app)
 
@@ -38,16 +42,31 @@ class SiteSettings(db.Model):
     founder2_name = db.Column(db.String(200), default="Michael Christie", nullable=False)
     founder2_image = db.Column(db.String(500), default="", nullable=False)
 
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+
+    # keep username, but use it as an email/login identifier
     username = db.Column(db.String(80), unique=True, nullable=False)
+
     password_hash = db.Column(db.String(255), nullable=False)
+
+    # NEW
+    role = db.Column(db.String(20), nullable=False, default="user")  # user|admin|super_admin
 
     def set_password(self, password: str):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
+
+    def is_admin(self) -> bool:
+        return self.role in ("admin", "super_admin")
+
+    def is_super_admin(self) -> bool:
+        return self.role == "super_admin"
     
 class Artist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -98,21 +117,39 @@ with app.app_context():
     db.create_all()
     get_settings()
 
-    # Create admin user if missing (change these!)
-    if not User.query.filter_by(username="admin").first():
-        u = User(username="admin")
-        u.set_password(os.environ.get("ADMIN_PASSWORD", "change-me-now"))
-        db.session.add(u)
-        db.session.commit()
+login_manager = LoginManager()
+login_manager.login_view = "login"   # route name
+login_manager.login_message_category = "warning"
 
-login_manager = LoginManager(app)
-login_manager.login_view = "login"  # where to send people if not logged in
+login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 EVENTS_CONFIRMED = False # Set to False if no confirmed events
+
+def admin_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for("login", next=request.path))
+        if not current_user.is_admin():
+            flash("You do not have permission to access admin pages.", "danger")
+            return redirect(url_for("home"))
+        return f(*args, **kwargs)
+    return wrapper
+
+def super_admin_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for("login", next=request.path))
+        if not current_user.is_super_admin():
+            flash("Super Admin access required.", "danger")
+            return redirect(url_for("admin_home"))
+        return f(*args, **kwargs)
+    return wrapper
 
 upcoming_events = [
     {
@@ -206,7 +243,7 @@ def previous():
     )
 
 @app.route("/admin/settings", methods=["GET", "POST"])
-@login_required
+@admin_required
 def admin_settings():
     settings = get_settings()  # your helper that guarantees 1 row exists
     form = SiteSettingsForm(obj=settings)  # pre-fill form from DB row
@@ -247,24 +284,28 @@ def admin_settings():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for("admin_settings"))
+    form = LoginForm()
+    if form.validate_on_submit():
+        print("LOGIN SUBMIT OK:", form.username.data)  # debug
+        user = User.query.filter_by(username=form.username.data.strip()).first()
+        print("USER FOUND:", bool(user), "ROLE:", getattr(user, "role", None))  # debug
+        if user:
+            print("PW CHECK:", user.check_password(form.password.data))  # debug
 
-    if request.method == "POST":
-        username = request.form.get("username", "")
-        password = request.form.get("password", "")
-
-        user = User.query.filter_by(username=username).first()
-        if user and user.check_password(password):
+        if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for("admin_settings"))
+            next_url = request.args.get("next")
+            return redirect(next_url or url_for("admin_home"))
+        flash("Invalid username or password.", "danger")
+    else:
+        if request.method == "POST":
+            print("FORM ERRORS:", form.errors)  # debug
+            flash("Form invalid (see console).", "danger")
 
-        flash("Invalid username or password", "danger")
-
-    return render_template("admin/login.html")
+    return render_template("login.html", form=form)
 
 @app.route("/admin")
-@login_required
+@admin_required
 def admin_home():
     total_artists = Artist.query.count()
     total_events = Event.query.count()
@@ -326,7 +367,8 @@ def admin_artists_delete(artist_id):
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("login"))
+    flash("Logged out.", "success")
+    return redirect(url_for("home"))
 
 @app.route("/admin/events")
 @login_required
@@ -434,5 +476,38 @@ def admin_media_delete(media_id):
     flash("Media deleted.", "warning")
     return redirect(url_for("admin_event_media", event_id=event_id))
 
+@app.route("/admin/users", methods=["GET", "POST"])
+@super_admin_required
+def admin_users():
+    users = User.query.order_by(User.username.asc()).all()
+
+    if request.method == "POST":
+        user_id = int(request.form.get("user_id"))
+        new_role = request.form.get("role")
+
+        u = User.query.get_or_404(user_id)
+
+        # Safety: don't let super admin demote themselves
+        if u.id == current_user.id and new_role != "super_admin":
+            flash("You cannot remove your own Super Admin access.", "danger")
+            return redirect(url_for("admin_users"))
+
+        u.role = new_role
+        db.session.commit()
+        flash("Role updated.", "success")
+        return redirect(url_for("admin_users"))
+
+    return render_template("admin/users.html", users=users)
+
+def ensure_default_admin():
+    with app.app_context():
+        u = User.query.filter_by(username="admin").first()
+        if not u:
+            u = User(username="admin", role="super_admin")
+            u.set_password(os.environ.get("ADMIN_PASSWORD", "change-me-now"))
+            db.session.add(u)
+            db.session.commit()
+
 if __name__ == '__main__':
+    ensure_default_admin()
     app.run(debug=True, host='0.0.0.0', port=5000)
