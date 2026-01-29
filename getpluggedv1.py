@@ -477,27 +477,141 @@ def admin_media_delete(media_id):
     return redirect(url_for("admin_event_media", event_id=event_id))
 
 @app.route("/admin/users", methods=["GET", "POST"])
-@super_admin_required
+@admin_required   # <-- allow admin + super_admin
 def admin_users():
     users = User.query.order_by(User.username.asc()).all()
 
     if request.method == "POST":
-        user_id = int(request.form.get("user_id"))
-        new_role = request.form.get("role")
+        action = (request.form.get("action") or "").strip()
 
-        u = User.query.get_or_404(user_id)
+        allowed_roles = {"user", "admin", "super_admin"}
 
-        # Safety: don't let super admin demote themselves
-        if u.id == current_user.id and new_role != "super_admin":
-            flash("You cannot remove your own Super Admin access.", "danger")
+        # -------------------------
+        # ACTION: CREATE USER
+        # -------------------------
+        if action == "create_user":
+            if not current_user.is_super_admin():
+                abort(403)
+
+            username = (request.form.get("username") or "").strip()
+            password = (request.form.get("password") or "").strip()
+            role = (request.form.get("role") or "").strip()
+
+            allowed_roles = {"user", "admin", "super_admin"}
+
+            if not username or not password:
+                flash("Username and password are required.", "danger")
+                return redirect(url_for("admin_users", add=1))
+
+            if role not in allowed_roles:
+                flash("Invalid role selection.", "danger")
+                return redirect(url_for("admin_users", add=1))
+
+            # Username must be unique
+            if User.query.filter_by(username=username).first():
+                flash("That username is already in use.", "danger")
+                return redirect(url_for("admin_users", add=1))
+
+            # Create user
+            new_user = User(username=username, role=role)
+            new_user.set_password(password)
+
+            db.session.add(new_user)
+            db.session.commit()
+
+            flash("New user created.", "success")
             return redirect(url_for("admin_users"))
 
-        u.role = new_role
-        db.session.commit()
-        flash("Role updated.", "success")
+        # -------------------------
+        # ACTION: UPDATE ROLE (super_admin ONLY, never self)
+        # -------------------------
+        if action == "update_role":
+            if not current_user.is_super_admin():
+                abort(403)
+
+            user_id_raw = (request.form.get("user_id") or "").strip()
+            new_role = (request.form.get("role") or "").strip()
+
+            if not user_id_raw.isdigit():
+                flash("Invalid user id.", "danger")
+                return redirect(url_for("admin_users"))
+
+            if new_role not in allowed_roles:
+                flash("Invalid role selection.", "danger")
+                return redirect(url_for("admin_users"))
+
+            u = User.query.get_or_404(int(user_id_raw))
+
+            # Hard rule: never allow changing your own role
+            if u.id == current_user.id:
+                flash("You cannot change your own role.", "danger")
+                return redirect(url_for("admin_users"))
+
+            u.role = new_role
+            db.session.commit()
+            flash("Role updated.", "success")
+            return redirect(url_for("admin_users"))
+
+        # -------------------------
+        # ACTION: CHANGE PASSWORD (admins + super_admin, SELF ONLY)
+        # -------------------------
+        if action == "change_password":
+            user_id_raw = (request.form.get("user_id") or "").strip()
+            current_pw = (request.form.get("current_password") or "").strip()
+            new_pw = (request.form.get("new_password") or "").strip()
+            confirm_pw = (request.form.get("confirm_password") or "").strip()
+
+            if not user_id_raw.isdigit():
+                flash("Invalid user id.", "danger")
+                return redirect(url_for("admin_users"))
+
+            target_id = int(user_id_raw)
+
+            # Hard rule: can only change YOUR OWN password
+            if target_id != current_user.id:
+                abort(403)
+
+            if not current_pw or not new_pw or not confirm_pw:
+                flash("Please fill out all password fields.", "danger")
+                return redirect(url_for("admin_users"))
+
+            if not current_user.check_password(current_pw):
+                flash("Current password is incorrect.", "danger")
+                return redirect(url_for("admin_users"))
+
+            if new_pw != confirm_pw:
+                flash("New passwords do not match.", "danger")
+                return redirect(url_for("admin_users"))
+
+            # Optional: basic policy
+            if len(new_pw) < 8:
+                flash("New password must be at least 8 characters.", "danger")
+                return redirect(url_for("admin_users"))
+
+            current_user.set_password(new_pw)
+            db.session.commit()
+            flash("Password updated.", "success")
+            return redirect(url_for("admin_users"))
+
+        flash("Unknown action.", "danger")
         return redirect(url_for("admin_users"))
 
     return render_template("admin/users.html", users=users)
+
+@app.route("/admin/users/<int:user_id>/delete", methods=["POST"])
+@super_admin_required
+def admin_users_delete(user_id):
+    u = User.query.get_or_404(user_id)
+
+    # Never allow deleting yourself
+    if u.id == current_user.id:
+        flash("You cannot delete your own account.", "danger")
+        return redirect(url_for("admin_users"))
+
+    db.session.delete(u)
+    db.session.commit()
+    flash("User deleted.", "warning")
+    return redirect(url_for("admin_users"))
 
 def ensure_default_admin():
     with app.app_context():
