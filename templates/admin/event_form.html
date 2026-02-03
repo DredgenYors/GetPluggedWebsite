@@ -15,8 +15,7 @@
 
   <div class="mb-3">
     {{ form.date.label(class="form-label") }}
-    {{ form.date(class="form-control") }}
-    <div class="form-text">Format: MM-DD-YYYY</div>
+    {{ form.date(class="form-control", required = True) }}
     {% for err in form.date.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
   </div>
 
@@ -30,4 +29,26 @@
     <a class="btn btn-outline-secondary" href="{{ url_for('admin_events') }}">Cancel</a>
   </div>
 </form>
+
+<style>
+/* Hide the native mm/dd/yyyy pieces when empty */
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: transparent;
+}
+
+/* Show them when the user focuses the field or a date is chosen */
+input[type="date"]:focus::-webkit-datetime-edit-text,
+input[type="date"]:focus::-webkit-datetime-edit-month-field,
+input[type="date"]:focus::-webkit-datetime-edit-day-field,
+input[type="date"]:focus::-webkit-datetime-edit-year-field,
+input[type="date"]:valid::-webkit-datetime-edit-text,
+input[type="date"]:valid::-webkit-datetime-edit-month-field,
+input[type="date"]:valid::-webkit-datetime-edit-day-field,
+input[type="date"]:valid::-webkit-datetime-edit-year-field {
+  color: inherit;
+}
+</style>
 {% endblock %}

@@ -1,6 +1,13 @@
 {% extends "admin/_layout.html" %}
 {% block title %}Manage Users{% endblock %}
 
+{% set role_labels = {
+  "user": "User",
+  "admin": "Admin",
+  "super_admin": "Super Admin"
+} %}
+
+
 {% block admin_content %}
 <div class="gp-admin-content">
   {% set is_super = (current_user.is_authenticated and current_user.is_super_admin()) %}
@@ -30,21 +37,20 @@
 
         <div class="row g-2">
           <div class="col-md-4">
-            <label class="form-label small text-muted mb-1">Username (email)</label>
+            <label class="form-label small text-muted mb-1">Username</label>
             <input class="form-control bg-dark text-light border-secondary"
-                  type="text" name="username" placeholder="person@email.com" required>
+                  type="text" name="username" required>
           </div>
 
           <div class="col-md-4">
             <label class="form-label small text-muted mb-1">Temporary Password</label>
             <input class="form-control bg-dark text-light border-secondary"
-                  type="password" name="password" placeholder="Set a temp password" required>
+                  type="password" name="password"  required>
           </div>
 
           <div class="col-md-3">
             <label class="form-label small text-muted mb-1">Role</label>
             <select class="form-select bg-dark text-light border-secondary" name="role" required>
-              <option value="user">User</option>
               <option value="admin">Admin</option>
               <option value="super_admin">Super Admin</option>
             </select>
@@ -52,12 +58,7 @@
 
           <div class="col-md-2 d-flex align-items-end">
             <button class="btn btn-success" type="submit">Add</button>
-            <button type="button" class="btn btn-outline-light" id="gpCancelAddUserBtn">Cancel</button>
           </div>
-        </div>
-
-        <div class="text-muted small mt-2">
-          Tip: give them a temporary password and have them change it after first login (recommended).
         </div>
       </form>
     </div>
@@ -84,23 +85,22 @@
           </div>
 
           <div class="text-muted small">
-            Current role: <span class="text-light-emphasis">{{ u.role }}</span>
+            Current role: <span class="text-light-emphasis">{{ role_labels.get(u.role, u.role) }}</span>
           </div>
         </div>
 
         <!-- Right -->
-        <div class="d-flex gap-2 flex-shrink-0 align-items-center">
+        <div class="d-flex gap-2 flex-shrink-0 align-items-center flex-wrap">
 
           {% if can_edit %}
-            <!-- Super Admin: can change other users' roles -->
+            <!-- Super Admin: update role (visible) -->
             <form method="POST" class="d-flex gap-2 align-items-center mb-0">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <input type="hidden" name="action" value="update_role">
               <input type="hidden" name="user_id" value="{{ u.id }}">
 
               <select class="form-select form-select-sm bg-dark text-light border-secondary"
-                      name="role"
-                      style="min-width: 170px;">
+                      name="role" style="min-width: 170px;">
                 <option value="user" {% if u.role=='user' %}selected{% endif %}>User</option>
                 <option value="admin" {% if u.role=='admin' %}selected{% endif %}>Admin</option>
                 <option value="super_admin" {% if u.role=='super_admin' %}selected{% endif %}>Super Admin</option>
@@ -109,6 +109,29 @@
               <button class="btn btn-success btn-sm" type="submit">Update</button>
             </form>
 
+            <!-- Toggle + hidden password reset form (for THIS user) -->
+            <button type="button"
+                    class="btn btn-sm btn-outline-light gp-toggle-password">
+              Reset Password
+            </button>
+
+            <div class="gp-password-panel d-none">
+              <form method="POST" class="d-flex gap-2 align-items-center mb-0 flex-wrap">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="reset_password">
+                <input type="hidden" name="user_id" value="{{ u.id }}">
+
+                <input class="form-control form-control-sm bg-dark text-light border-secondary"
+                      type="password" name="new_password" placeholder="New" required style="width:140px;">
+
+                <input class="form-control form-control-sm bg-dark text-light border-secondary"
+                      type="password" name="confirm_password" placeholder="Confirm" required style="width:140px;">
+
+                <button class="btn btn-outline-success btn-sm" type="submit">Save</button>
+              </form>
+            </div>
+
+            <!-- Delete (far right) -->
             <form method="POST"
                   action="{{ url_for('admin_users_delete', user_id=u.id) }}"
                   class="gp-delete-form mb-0"
@@ -119,23 +142,30 @@
             </form>
 
           {% elif is_me %}
-            <!-- Admin/Super Admin: can change ONLY their own password -->
-            <form method="POST" class="d-flex gap-2 align-items-center mb-0 flex-wrap">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <input type="hidden" name="action" value="change_password">
-              <input type="hidden" name="user_id" value="{{ u.id }}">
+            <!-- Admin/Super Admin: toggle their OWN password change -->
+            <button type="button"
+                    class="btn btn-sm btn-outline-light gp-toggle-password">
+              Change Password
+            </button>
 
-              <input class="form-control form-control-sm bg-dark text-light border-secondary"
-                    type="password" name="current_password" placeholder="Current" required style="width:140px;">
+            <div class="gp-password-panel d-none">
+              <form method="POST" class="d-flex gap-2 align-items-center mb-0 flex-wrap">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="change_password">
+                <input type="hidden" name="user_id" value="{{ u.id }}">
 
-              <input class="form-control form-control-sm bg-dark text-light border-secondary"
-                    type="password" name="new_password" placeholder="New" required style="width:140px;">
+                <input class="form-control form-control-sm bg-dark text-light border-secondary"
+                      type="password" name="current_password" placeholder="Current" required style="width:140px;">
 
-              <input class="form-control form-control-sm bg-dark text-light border-secondary"
-                    type="password" name="confirm_password" placeholder="Confirm" required style="width:140px;">
+                <input class="form-control form-control-sm bg-dark text-light border-secondary"
+                      type="password" name="new_password" placeholder="New" required style="width:140px;">
 
-              <button class="btn btn-outline-success btn-sm" type="submit">Change</button>
-            </form>
+                <input class="form-control form-control-sm bg-dark text-light border-secondary"
+                      type="password" name="confirm_password" placeholder="Confirm" required style="width:140px;">
+
+                <button class="btn btn-outline-success btn-sm" type="submit">Save</button>
+              </form>
+            </div>
 
           {% else %}
             {# blank on purpose #}
@@ -164,7 +194,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const setOpen = (open) => {
     panel.classList.toggle("d-none", !open);
-    btn.textContent = open ? "Close" : "Add User";
+    btn.classList.toggle("btn-outline-light", open);
+    btn.classList.toggle("btn-success", !open);
+
+    btn.textContent = open ? "Cancel" : "+ Add User";
   };
 
   // Initial state (server can force open with ?add=1)
@@ -177,6 +210,40 @@ document.addEventListener("DOMContentLoaded", () => {
   if (cancelBtn) {
     cancelBtn.addEventListener("click", () => setOpen(false));
   }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggles = document.querySelectorAll(".gp-toggle-password");
+
+  // Store each button's original label once
+  toggles.forEach(btn => {
+    btn.dataset.label = btn.textContent.trim();
+  });
+
+  toggles.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const card = btn.closest(".gp-admin-list-item");
+      if (!card) return;
+
+      const panel = card.querySelector(".gp-password-panel");
+      if (!panel) return;
+
+      const isOpen = !panel.classList.contains("d-none");
+
+      // Close all other panels + restore their labels
+      document.querySelectorAll(".gp-password-panel").forEach(p => p.classList.add("d-none"));
+      toggles.forEach(b => b.textContent = b.dataset.label);
+
+      // Toggle this one
+      if (isOpen) {
+        panel.classList.add("d-none");
+        btn.textContent = btn.dataset.label;   // back to original: "Change Password" or "Reset Password"
+      } else {
+        panel.classList.remove("d-none");
+        btn.textContent = "Cancel";
+      }
+    });
+  });
 });
 </script>
 

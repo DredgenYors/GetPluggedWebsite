@@ -293,9 +293,15 @@ def login():
             print("PW CHECK:", user.check_password(form.password.data))  # debug
 
         if user and user.check_password(form.password.data):
+            # Only admin/super_admin can log in
+            if not user.is_admin():
+                flash("Your account does not have admin access.", "danger")
+                return redirect(url_for("login"))
+
             login_user(user)
             next_url = request.args.get("next")
             return redirect(next_url or url_for("admin_home"))
+        
         flash("Invalid username or password.", "danger")
     else:
         if request.method == "POST":
@@ -484,7 +490,7 @@ def admin_users():
     if request.method == "POST":
         action = (request.form.get("action") or "").strip()
 
-        allowed_roles = {"user", "admin", "super_admin"}
+        allowed_roles = {"admin", "super_admin"}
 
         # -------------------------
         # ACTION: CREATE USER
@@ -496,8 +502,6 @@ def admin_users():
             username = (request.form.get("username") or "").strip()
             password = (request.form.get("password") or "").strip()
             role = (request.form.get("role") or "").strip()
-
-            allowed_roles = {"user", "admin", "super_admin"}
 
             if not username or not password:
                 flash("Username and password are required.", "danger")

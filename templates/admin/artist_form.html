@@ -20,7 +20,8 @@
 
     <div class="mb-3">
       {{ form.instagram_handle.label(class="form-label") }}
-      {{ form.instagram_handle(class="form-control", placeholder="getpluggednj") }}
+      {{ form.instagram_handle(class="form-control") }}
+      <div class="form-text">Do not include the '@'</div>
     </div>
 
     <button class="btn btn-success">{{ form.submit.label.text }}</button>
