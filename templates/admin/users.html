@@ -134,7 +134,7 @@
             <!-- Delete (far right) -->
             <form method="POST"
                   action="{{ url_for('admin_users_delete', user_id=u.id) }}"
-                  class="gp-delete-form mb-0"
+                  class="gp-delete-form gp-user-delete mb-0"
                   data-item-type="user"
                   data-item-name="{{ u.username }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -220,6 +220,14 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.dataset.label = btn.textContent.trim();
   });
 
+  const closeCard = (card) => {
+    const panel = card.querySelector(".gp-password-panel");
+    if (panel) panel.classList.add("d-none");
+
+    const del = card.querySelector(".gp-user-delete");
+    if (del) del.classList.remove("d-none");
+  };
+
   toggles.forEach(btn => {
     btn.addEventListener("click", () => {
       const card = btn.closest(".gp-admin-list-item");
@@ -228,18 +236,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const panel = card.querySelector(".gp-password-panel");
       if (!panel) return;
 
+      const del = card.querySelector(".gp-user-delete");
       const isOpen = !panel.classList.contains("d-none");
 
-      // Close all other panels + restore their labels
-      document.querySelectorAll(".gp-password-panel").forEach(p => p.classList.add("d-none"));
+      // Close all other panels + restore their labels + show their delete buttons
+      document.querySelectorAll(".gp-admin-list-item").forEach(c => closeCard(c));
       toggles.forEach(b => b.textContent = b.dataset.label);
 
       // Toggle this one
       if (isOpen) {
+        // closing
         panel.classList.add("d-none");
-        btn.textContent = btn.dataset.label;   // back to original: "Change Password" or "Reset Password"
+        if (del) del.classList.remove("d-none");
+        btn.textContent = btn.dataset.label;
       } else {
+        // opening
         panel.classList.remove("d-none");
+        if (del) del.classList.add("d-none");
         btn.textContent = "Cancel";
       }
     });
