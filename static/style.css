@@ -763,6 +763,84 @@ h1, h2, h3, h4, h5, h6,
   box-shadow: 0 8px 25px rgba(0,0,0,0.25) !important;
 }
 
+#gp-intro-overlay{
+  position: fixed;
+  inset: 0;
+  background: #000;       /* full black screen */
+  z-index: 9999;
+  pointer-events: none;
+  overflow: hidden;       /* important so circle doesn’t cause scrollbars */
+}
+
+#gp-intro-white{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 140px;
+  height: 140px;
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 9999px;
+  background: #fff;       /* solid white circle */
+  opacity: 0;             /* appears after delay */
+  will-change: transform, opacity;
+}
+
+/* Prevent “flash” before GSAP runs (only hide when JS is enabled) */
+html.js .gp-hero-card.gp-anim-init,
+html.js .gp-home-card.gp-anim-init {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+html.js #gp-nav-logo.gp-anim-init,
+html.js .gp-nav-item.gp-anim-init {
+  opacity: 0;
+  transform: translateY(-14px);
+}
+
+/* Clip reveal wrapper */
+.gp-hero-title-wrap{
+  overflow: hidden;
+  display: block;
+  line-height: 1;          /* prevents extra vertical space */
+  padding-top: 2px;        /* tiny buffer to hide antialias "peek" */
+}
+
+/* Ensure transform works cleanly */
+.gp-hero-title,
+.gp-hero-flyer {
+  will-change: transform, opacity, filter;
+}
+
+.gp-hero-body { will-change: transform, opacity, filter; }
+
+.gp-card-icon, .gp-card-title, .gp-card-body{
+  will-change: transform, opacity, filter;
+}
+
+/* Hide card inner content until GSAP reveals it (only when JS is enabled) */
+/* Hide card inner content ONLY before reveal (when gp-anim-init is present) */
+html.js .gp-home-card.gp-anim-init .gp-card-icon,
+html.js .gp-home-card.gp-anim-init .gp-card-body{
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+/* Mask wrapper */
+.gp-card-title-wrap{
+  overflow: hidden;
+  display: block;
+  line-height: 1;
+  padding-top: 6px;
+}
+
+.gp-founders-title-wrap{
+  overflow: hidden;
+  display: hidden;
+  line-height: 1;
+  padding-top: 2px;
+  will-change: transform;
+}
 
 
 

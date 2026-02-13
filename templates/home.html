@@ -2,40 +2,49 @@
 
 {% block title %}Home - GetPlugged{% endblock %}
 
+{% block intro_overlay %}
+<div id="gp-intro-overlay" aria-hidden="true">
+  <div id="gp-intro-white"></div>
+</div>
+{% endblock %}
+
 {% block content %}
+
 <div class="row">
   <div class="col-12">
-    <!-- Title Banner -->
-    <div class="title-banner text-white rounded-3 text-center gp-title-banner">
-      <img src="{{ url_for('static', filename='GPLogo.png') }}" alt="Get Plugged" class="header-logo-img">
-    </div>
-
     <!-- Next Event Section -->
     <div class="row mt-5 justify-content-center mb-4">
       <div class="col-6">
-        <div class="content-section bg-white p-4 rounded-3 shadow-sm">
+        <div id="gp-hero-card" class="content-section bg-white p-4 rounded-3 shadow-sm gp-hero-card gp-anim-init">
           {% if site_settings.events_confirmed and next_event %}
             <!-- Confirmed Event -->
             <header class="text-center">
-              <h2 class="text-primary">Join us for our next event!</h2>
+              <div class="gp-hero-title-wrap">
+                <h2 class="text-primary gp-hero-title">
+                  Join us for our next event!
+                </h2>
+              </div>
+
               <div class="my-3 text-center">
                 <img src="{{ url_for('static', filename='gp11-8flyer.PNG') }}"
-                     alt="Event Flyer"
-                     class="img-fluid rounded shadow">
+                    alt="Event Flyer"
+                    class="img-fluid rounded shadow gp-hero-flyer">
               </div>
             </header>
           {% else %}
             <!-- Coming Soon -->
             <header id="coming-soon" class="text-center">
-              <h1 class="text-success">
-                {{ site_settings.coming_soon_title or "Exciting Events Coming Soon!" }}
-              </h1>
+              <div class="gp-hero-title-wrap">
+                <h1 class="text-success gp-hero-title">
+                  {{ site_settings.coming_soon_title or "Exciting Events Coming Soon!" }}
+                </h1>
+              </div>
 
-              <p class="fs-5">
+              <p class="fs-5 gp-hero-body">
                 {{ site_settings.coming_soon_body or "We're currently planning our next amazing events and experiences." }}
               </p>
 
-              <p>
+              <p class="gp-hero-body">
                 {{ site_settings.coming_soon_cta or
                   "In the meantime, check out our previous events to see what we've been up to, and follow us on social media for the latest updates!" }}
               </p>
@@ -46,44 +55,52 @@
     </div>
 
     <!-- Content Sections -->
-    <div class="row g-4">
+    <div id="gp-home-cards" class="row g-4">
       <!-- What is GPNJ Section -->
       <div class="col-lg-4 col-md-12">
-        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
+        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100 gp-home-card gp-anim-init">
           <div class="text-center mb-3">
-            <i class="fas fa-question-circle fa-3x text-primary mb-3"></i>
-            <h3 class="text-primary">
-              {{ site_settings.what_is_title or "What is GPNJ?" }}
-            </h3>
+            <i class="fas fa-question-circle fa-3x text-primary mb-3 gp-card-icon"></i>
+
+            <div class="gp-card-title-wrap">
+              <h3 class="text-primary gp-card-title">
+                {{ site_settings.what_is_title or "What is GPNJ?" }}
+              </h3>
+            </div>
           </div>
 
-          <p class="text-muted">
+          <p class="text-muted gp-card-body">
             {{ site_settings.what_is_body or
-              "Get Plugged was built on a simple belief: the best moments are designed. The team connects emerging talent with real audiences through curated lineups, tight production, and clear communication..." }}
+              "Get Plugged was built on a simple belief: the best moments are designed. ..." }}
           </p>
         </div>
       </div>
 
       <!-- The Team Section -->
       <div class="col-lg-4 col-md-12">
-        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
+        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100 gp-home-card gp-anim-init">
           <div class="text-center mb-3">
-            <i class="fas fa-users fa-3x text-success mb-3"></i>
-            <h3 class="text-success">
-              {{ site_settings.team_title or "The Team" }}
-            </h3>
+            <i class="fas fa-users fa-3x text-success mb-3 gp-card-icon"></i>
+
+            <div class="gp-card-title-wrap">
+              <h3 class="text-success gp-card-title">
+                {{ site_settings.team_title or "The Team" }}
+              </h3>
+            </div>
           </div>
 
-          <div class="creators-section mb-3">
-            <h5 class="text-success text-center mb-3">
-              {{ site_settings.team_subtitle or "Meet Our Founders" }}
-            </h5>
+          <div class="creators-section mb-3 gp-founders-card">
+            <div class="gp-founders-title-wrap">
+              <h5 class="text-success text-center mb-3 gp-founders-title">
+                {{ site_settings.team_subtitle or "Meet Our Founders" }}
+              </h5>
+            </div>
 
-            <div class="row g-2">
+            <div class="row g-2 gp-founders-avatars">
               <!-- Founder 1 -->
               <div class="col-6">
                 <div class="creator-card text-center">
-                  <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar d-flex align-items-center justify-content-center overflow-hidden">
+                  <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar d-flex align-items-center justify-content-center overflow-hidden gp-creator-avatar">
                     {% set img1 = site_settings.founder1_image %}
                     {% if img1 %}
                       {% if img1.startswith('http') %}
@@ -104,7 +121,7 @@
                           style="object-fit: cover;">
                     {% endif %}
                   </div>
-                  <h6 class="text-muted mb-0">
+                  <h6 class="text-muted mb-0 gp-founder-name">
                     {{ site_settings.founder1_name or "Founder 1" }}
                   </h6>
                 </div>
@@ -113,7 +130,7 @@
               <!-- Founder 2 -->
               <div class="col-6">
                 <div class="creator-card text-center">
-                  <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar d-flex align-items-center justify-content-center overflow-hidden">
+                  <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar d-flex align-items-center justify-content-center overflow-hidden gp-creator-avatar">
                     {% set img2 = site_settings.founder2_image %}
                     {% if img2 %}
                       {% if img2.startswith('http') %}
@@ -134,7 +151,7 @@
                           style="object-fit: cover;">
                     {% endif %}
                   </div>
-                  <h6 class="text-muted mb-0">
+                  <h6 class="text-muted mb-0 gp-founder-name">
                     {{ site_settings.founder2_name or "Founder 2" }}
                   </h6>
                 </div>
@@ -142,7 +159,7 @@
             </div>
           </div>
 
-          <p class="text-muted">
+          <p class="text-muted gp-card-body">
             <strong>Our Mission:</strong>
             {{ site_settings.mission_statement or
               "Connecting creatives and audiences through events that foster an intimate and uplifting environment." }}
@@ -152,13 +169,16 @@
 
       <!-- Contact Us Section -->
       <div class="col-lg-4 col-md-12">
-        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100">
+        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100 gp-home-card gp-anim-init">
           <div class="text-center mb-3">
-            <i class="fas fa-envelope fa-3x text-success mb-3"></i>
-            <h3 class="text-success">Contact Us</h3>
+            <i class="fas fa-envelope fa-3x text-success mb-3 gp-card-icon"></i>
+
+            <div class="gp-card-title-wrap">
+              <h3 class="text-success gp-card-title">Contact Us</h3>
+            </div>
           </div>
 
-          <div class="contact-info text-muted">
+          <div class="contact-info text-muted gp-card-body">
             <div class="mb-3">
               <i class="fas fa-envelope me-2 text-primary"></i>
               <strong>Email:</strong>
@@ -189,3 +209,346 @@
   </div>
 </div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("GSAP:", typeof gsap);
+  console.log("ScrollTrigger:", typeof ScrollTrigger);
+
+  const overlay = document.getElementById("gp-intro-overlay");
+  const white = document.getElementById("gp-intro-white");
+  if (typeof gsap === "undefined") return;
+
+  console.log("DOM loaded");
+  console.log("overlay exists:", !!document.getElementById("gp-intro-overlay"));
+  console.log("white exists:", !!document.getElementById("gp-intro-white"));
+
+  const heroCard = document.getElementById("gp-hero-card");
+  console.log("heroCard exists:", !!heroCard);
+
+  if (heroCard) {
+    const cs = getComputedStyle(heroCard);
+    console.log("hero computed opacity:", cs.opacity, "transform:", cs.transform);
+  }
+
+  function playNav() {
+    const logo = document.getElementById("gp-nav-logo");
+    const items = gsap.utils.toArray(".gp-nav-item");
+
+    // If nothing found, just return null and continue
+    if (!logo && items.length === 0) return null;
+
+    // Remove init class so they won't snap back
+    if (logo) logo.classList.remove("gp-anim-init");
+    items.forEach(el => el.classList.remove("gp-anim-init"));
+
+    // Force start hidden (so CSS isn't the only dependency)
+    if (logo) gsap.set(logo, { opacity: 0, y: -14 });
+    if (items.length) gsap.set(items, { opacity: 0, y: -12 });
+
+    const tl = gsap.timeline();
+
+    // 1) Logo first
+    if (logo) {
+      tl.to(logo, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", clearProps: "transform" }, 0);
+    }
+
+    // 2) Then nav items (stagger)
+    if (items.length) {
+      tl.to(items, {
+        opacity: 1,
+        y: 0,
+        duration: 0.55,
+        ease: "power2.out",
+        stagger: 0.08,
+        clearProps: "transform"
+      }, logo ? ">+=0.05" : 0);
+    }
+
+    return tl;
+  }
+
+  // ---- HERO: Coming Soon animation (runs AFTER intro) ----
+  function playHero() {
+    const heroCard = document.getElementById("gp-hero-card");
+    if (!heroCard) return null;
+
+    heroCard.classList.remove("gp-anim-init");
+
+    const title = heroCard.querySelector(".gp-hero-title");
+    const bodies = heroCard.querySelectorAll(".gp-hero-body");
+    const flyer = heroCard.querySelector(".gp-hero-flyer");
+
+    // Prevent “peeking” before animation
+    if (title) gsap.set(title, { yPercent: 120 });
+
+    const tl = gsap.timeline();
+
+    // Card entrance
+    tl.fromTo(heroCard,
+      { opacity: 0, y: 14 },
+      { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }
+    );
+
+    // Title clip reveal (works for BOTH h2 and h1)
+    if (title) {
+      tl.fromTo(title,
+        { yPercent: 120 },
+        { yPercent: 0, duration: 0.7, ease: "power3.out" },
+        "-=0.45"
+      );
+    }
+
+    // Flyer blur->sharp (confirmed version)
+    if (flyer) {
+      tl.fromTo(flyer,
+        { opacity: 0, y: 16, filter: "blur(6px)" },
+        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: "power2.out" },
+        "-=0.45"
+      );
+    }
+
+    // Body text blur->sharp (not-confirmed version)
+    if (bodies.length) {
+      tl.fromTo(bodies,
+        { opacity: 0, y: 10, filter: "blur(4px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 0.7,
+          ease: "power2.out",
+          stagger: 0.08
+        },
+        flyer ? "-=0.55" : "-=0.35"
+      );
+    }
+
+    return tl;
+  }
+
+  function setupCardsScrollReveal() {
+    console.log("setupCardsScrollReveal() called");
+
+    if (typeof ScrollTrigger === "undefined") {
+      console.log("ScrollTrigger missing");
+      return;
+    }
+
+    const row = document.getElementById("gp-home-cards");
+    const cards = gsap.utils.toArray(".gp-home-card");
+
+    // Hide inner content immediately to prevent flash before ScrollTrigger
+    cards.forEach(card => {
+      const foundersCard = card.querySelector(".gp-founders-card");
+      const foundersTitle = card.querySelector(".gp-founders-title");
+      const founderAvatars = card.querySelectorAll(".gp-creator-avatar");
+
+      if (foundersCard) gsap.set(foundersCard, { opacity: 0, y: 10 });
+      if (foundersTitle) gsap.set(foundersTitle, { yPercent: 140, opacity: 1 }); // clip reveal style
+      if (founderAvatars.length) gsap.set(founderAvatars, { opacity: 0, y: 10, scale: 0.98 });
+
+      const icon = card.querySelector(".gp-card-icon");
+      const title = card.querySelector(".gp-card-title");
+      const bodies = card.querySelectorAll(".gp-card-body");
+
+      if (icon) gsap.set(icon, { opacity: 0, y: 12, scale: 0.96 });
+      if (title) gsap.set(title, { opacity: 1, yPercent: 120 }); // visible but clipped by wrapper
+      if (bodies.length) gsap.set(bodies, { opacity: 0, y: 10, filter: "blur(4px)" });
+
+      const founderNames = card.querySelectorAll(".gp-founder-name");
+      if (founderNames.length) gsap.set(founderNames, { opacity: 0, y: 8, filter: "blur(3px)" });
+    });
+
+    console.log("row found:", !!row, "cards found:", cards.length);
+
+    if (!row || cards.length === 0) return;
+
+    // Force-hide start via GSAP (so CSS is not a dependency)
+    gsap.set(cards, { opacity: 0, y: 18 });
+
+    const run = () => {
+      // ✅ first: remove init class (optional now)
+      cards.forEach(c => c.classList.remove("gp-anim-init"));
+
+      // 1) Reveal card containers
+      gsap.to(cards, {
+        opacity: 1,
+        y: 0,
+        duration: 0.75,
+        ease: "power2.out",
+        stagger: 0.12,
+        clearProps: "transform",
+        onComplete: () => {
+
+          // 2) Animate inner content
+          cards.forEach((card, i) => {
+            const icon = card.querySelector(".gp-card-icon");
+            const title = card.querySelector(".gp-card-title");
+            const bodies = card.querySelectorAll(".gp-card-body");
+
+            const innerTl = gsap.timeline({ delay: i * 0.10 });
+
+            if (icon) {
+              innerTl.to(icon, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power2.out" }, 0);
+            }
+
+            if (title) {
+              // ✅ animate from the already-prepped yPercent:120
+              innerTl.to(title, { yPercent: 0, duration: 0.55, ease: "power3.out" }, 0.06);
+            }
+
+            if (bodies.length) {
+              innerTl.to(bodies, {
+                opacity: 1,
+                y: 0,
+                filter: "blur(0px)",
+                duration: 0.55,
+                ease: "power2.out",
+                stagger: 0.06
+              }, 0.10);
+            }
+
+            const foundersCard = card.querySelector(".gp-founders-card");
+            const foundersTitle = card.querySelector(".gp-founders-title");
+            const founderAvatars = card.querySelectorAll(".gp-creator-avatar");
+
+            if (foundersCard) {
+              // 1) founders container fades in
+              innerTl.to(foundersCard, {
+                opacity: 1,
+                y: 0,
+                duration: 0.55,
+                ease: "power2.out",
+                clearProps: "transform"
+              }, ">-=0.10"); // starts right after card body finishes (slight overlap)
+
+              // 2) founders header clip reveal
+              if (foundersTitle) {
+                innerTl.to(foundersTitle, {
+                  yPercent: 0,
+                  duration: 0.55,
+                  ease: "power3.out",
+                  clearProps: "transform"
+                }, ">-=0.25");
+              }
+
+              // 3) avatars reveal (left -> right)
+              if (founderAvatars.length) {
+                innerTl.to(founderAvatars, {
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                  duration: 0.55,
+                  ease: "power2.out",
+                  stagger: 0.10,
+                  clearProps: "transform"
+                }, ">-=0.25");
+              }
+
+              const founderNames = card.querySelectorAll(".gp-founder-name");
+
+              if (founderNames.length) {
+                innerTl.to(founderNames, {
+                  opacity: 1,
+                  y: 0,
+                  filter: "blur(0px)",
+                  duration: 0.45,
+                  ease: "power2.out",
+                  stagger: 0.08,
+                  clearProps: "transform,filter"
+                }, ">-=0.25");
+              }
+            }
+          });
+        }
+      });
+    };
+
+    const st = ScrollTrigger.create({
+      trigger: row,
+      start: "top 85%",
+      once: true,
+      onEnter: run
+    });
+
+    console.log("ScrollTrigger created. isActive:", st.isActive);
+
+    // If it's already in view at load, run immediately
+    if (st.isActive) run();
+
+    // And refresh triggers after layout/images settle
+    ScrollTrigger.refresh();
+  }
+
+  function runEntrance() {
+    const navTl = playNav();
+
+    const startHero = () => {
+      const heroTl = playHero();
+
+      if (heroTl) {
+        heroTl.eventCallback("onComplete", () => {
+          setupCardsScrollReveal();
+        });
+      } else {
+        setupCardsScrollReveal();
+      }
+    };
+
+    if (navTl) navTl.eventCallback("onComplete", startHero);
+    else startHero();
+  }
+  
+  // ---- INTRO: only on first visit this session ----
+  const KEY = "gp_home_intro_played_v1";
+
+  // If overlay elements aren't present, just play hero.
+  if (!overlay || !white) {
+    runEntrance();
+    return;
+  }
+
+  // If already played, remove overlay immediately and play hero right away.
+  if (sessionStorage.getItem(KEY) === "1") {
+    overlay.remove();
+    runEntrance();
+    return;
+  }
+
+  // Mark as played now
+  sessionStorage.setItem(KEY, "1");
+
+  // Compute final scale for the white “wipe”
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const finalRadius = Math.ceil(Math.sqrt(w*w + h*h));
+  const baseSize = 140;
+  const finalScale = finalRadius / baseSize;
+
+  gsap.set(overlay, { opacity: 1 });
+  gsap.set(white, { opacity: 0, scale: 0 });
+
+  const intro = gsap.timeline({ defaults: { ease: "power2.inOut" } });
+
+  intro
+    .to({}, { duration: 1.5 }) // black hold
+    .to(white, { opacity: 1, scale: 1, duration: 1.0, ease: "power2.out" })
+    .to(white, { scale: 2.2, duration: 0.55 })
+    .to(white, { scale: finalScale, duration: 0.9 }, "<")
+    .to(overlay, { opacity: 0, duration: 0.35, ease: "power1.out" }, "-=0.25")
+    .add(() => {
+      overlay.remove();
+      runEntrance();
+    });
+
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
