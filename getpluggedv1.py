@@ -1,5 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, flash, request, abort
-import os 
+import os
+import uuid
+from datetime import datetime
+from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy # Access database connection, instead of writing raw SQL
 from forms import LoginForm, SiteSettingsForm, ArtistForm, EventForm, MediaForm
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
@@ -14,9 +17,33 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-change-me")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///getplugged.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+# Admin-uploaded images (logo, founder photos, services placeholder, etc.)
+app.config["UPLOAD_FOLDER"] = os.path.join(app.static_folder, "uploads")
+app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024  # 8 MB request cap
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
 csrf = CSRFProtect(app)
 
 db = SQLAlchemy(app)
+
+
+def save_uploaded_image(file_storage, prefix):
+    """Save an uploaded image under static/uploads and return its static-relative path.
+
+    Returns None if no file was provided (caller should then leave the existing value alone).
+    """
+    if not file_storage or not getattr(file_storage, "filename", None):
+        return None
+
+    ext = file_storage.filename.rsplit(".", 1)[-1].lower()
+    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+        return None
+
+    filename = secure_filename(f"{prefix}-{uuid.uuid4().hex[:8]}.{ext}")
+    file_storage.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+    return f"uploads/{filename}"
 
 class SiteSettings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -29,9 +56,58 @@ class SiteSettings(db.Model):
     twitter_url = db.Column(db.String(500), default="https://twitter.com/getpluggednj", nullable=False)
     tiktok_url = db.Column(db.String(500), default="https://www.tiktok.com/@getpluggednj", nullable=False)
 
-    # Drives the "Stay Plugged In" section when no event is confirmed
+    # ---- Navigation ----
+    nav_label_mission = db.Column(db.String(50), default="Mission", nullable=False)
+    nav_label_services = db.Column(db.String(50), default="Services", nullable=False)
+    nav_label_gallery = db.Column(db.String(50), default="Gallery", nullable=False)
+    nav_label_stay_plugged = db.Column(db.String(50), default="Stay Plugged In", nullable=False)
+    nav_label_our_story = db.Column(db.String(50), default="Our Story", nullable=False)
+    nav_label_contact = db.Column(db.String(50), default="Contact", nullable=False)
+    nav_cta_label = db.Column(db.String(50), default="Get Plugged", nullable=False)
+    logo_image = db.Column(db.String(500), default="", nullable=False)  # empty = use default static logo
+
+    # ---- Hero ----
+    hero_eyebrow = db.Column(db.String(200), default="Creativity • Connection • Access", nullable=False)
+    hero_headline = db.Column(db.String(100), default="Get Plugged", nullable=False)
+    hero_subhead = db.Column(db.String(300), default="Where momentum meets opportunity.", nullable=False)
+    hero_cta_primary_label = db.Column(db.String(50), default="Get Plugged", nullable=False)
+    hero_cta_secondary_label = db.Column(db.String(50), default="Stay Plugged In", nullable=False)
+
+    # ---- Mission ----
+    mission_eyebrow = db.Column(db.String(100), default="Our Mission", nullable=False)
+    mission_statement = db.Column(db.Text, default="Get Plugged exists to bridge the gap between potential and access. We connect emerging artists, creators, and local brands with the people, resources, and opportunities they need to reach their next level.", nullable=False)
+
+    # ---- Services ----
+    services_eyebrow = db.Column(db.String(100), default="What We Do", nullable=False)
+    services_heading = db.Column(db.String(200), default="Services & Experiences", nullable=False)
+    services_image = db.Column(db.String(500), default="", nullable=False)  # empty = show placeholder
+
+    service1_title = db.Column(db.String(200), default="Events & Experiences", nullable=False)
+    service1_body = db.Column(db.Text, default="Curated events and activations that create space for connection, visibility, and opportunity.", nullable=False)
+    service2_title = db.Column(db.String(200), default="Creative Connections", nullable=False)
+    service2_body = db.Column(db.Text, default="Connecting artists, creators, and brands with trusted people and resources across our network.", nullable=False)
+    service3_title = db.Column(db.String(200), default="Artist & Creative Support", nullable=False)
+    service3_body = db.Column(db.Text, default="Helping creatives identify what they need next and connect with the right resources and opportunities.", nullable=False)
+    service4_title = db.Column(db.String(200), default="Partnerships & Collaborations", nullable=False)
+    service4_body = db.Column(db.Text, default="Creating thoughtful connections between creatives, brands, businesses, venues, and organizations.", nullable=False)
+
+    # ---- Gallery preview ----
+    gallery_eyebrow = db.Column(db.String(100), default="Our Work", nullable=False)
+    gallery_heading = db.Column(db.String(200), default="Gallery", nullable=False)
+    gallery_note = db.Column(db.String(300), default="Hover to preview. Click any experience to explore the full recap.", nullable=False)
+
+    # ---- Stay Plugged In (drives the section chrome; coming_soon_* below drive the no-event row) ----
+    stay_plugged_eyebrow = db.Column(db.String(100), default="What's Next", nullable=False)
+    stay_plugged_heading = db.Column(db.String(200), default="Stay Plugged In", nullable=False)
+    stay_plugged_lede = db.Column(db.String(300), default="Events, collaborations, content drops, community opportunities — follow along.", nullable=False)
+    stay_plugged_footer_text = db.Column(db.String(200), default="Get notified about future drops", nullable=False)
+
+    # Drives the "Stay Plugged In" row when no event is confirmed
     coming_soon_title = db.Column(db.String(200), default="More on the way", nullable=False)
     coming_soon_body = db.Column(db.Text, default="We're lining up our next event, collab, or drop. Follow along so you don't miss it.", nullable=False)
+
+    # ---- Our Story ----
+    our_story_eyebrow = db.Column(db.String(100), default="Our Story", nullable=False)
 
     # Drives the "Our Story" section heading + blurb (paired with founder cards below)
     what_is_title = db.Column(db.String(200), default="Born In NJ, Made To Connect.", nullable=False)
@@ -42,14 +118,30 @@ class SiteSettings(db.Model):
         "What started with live music events has grown into a larger vision for Get Plugged. Today we create access, experiences and connections that help emerging talent and brands build momentum, expand their network and move toward what comes next."
     ), nullable=False)
 
-    mission_statement = db.Column(db.Text, default="Get Plugged exists to bridge the gap between potential and access. We connect emerging artists, creators, and local brands with the people, resources, and opportunities they need to reach their next level.", nullable=False)
+    stat1_value = db.Column(db.String(50), default="2024", nullable=False)
+    stat1_label = db.Column(db.String(50), default="Founded", nullable=False)
+    stat2_value = db.Column(db.String(50), default="NJ", nullable=False)
+    stat2_label = db.Column(db.String(50), default="Based", nullable=False)
+    stat3_value = db.Column(db.String(50), default="Independent", nullable=False)
+    stat3_label = db.Column(db.String(50), default="Built", nullable=False)
 
     # NEW: Team images + names
     founder1_name = db.Column(db.String(200), default="Jordan Scott-Young", nullable=False)
-    founder1_image = db.Column(db.String(500), default="", nullable=False)  # URL or /static path
+    founder1_image = db.Column(db.String(500), default="", nullable=False)  # uploaded file path or URL
 
     founder2_name = db.Column(db.String(200), default="Michael Christie", nullable=False)
     founder2_image = db.Column(db.String(500), default="", nullable=False)
+
+    # ---- Contact ----
+    contact_eyebrow = db.Column(db.String(100), default="Connect", nullable=False)
+    contact_heading_line1 = db.Column(db.String(100), default="Ready to Get", nullable=False)
+    contact_heading_line2 = db.Column(db.String(100), default="Plugged In?", nullable=False)
+    contact_lede = db.Column(db.String(400), default="Whether you're an artist looking for access, a brand seeking authentic reach, or a venue wanting to be part of the ecosystem — we want to hear from you.", nullable=False)
+    contact_cta_email_label = db.Column(db.String(50), default="Email Us", nullable=False)
+    contact_cta_follow_label = db.Column(db.String(50), default="Follow @getpluggednj", nullable=False)
+
+    # ---- Footer ----
+    footer_text = db.Column(db.String(200), default="Get Plugged NJ. All rights reserved.", nullable=False)
 
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -197,11 +289,21 @@ artists = [
 
 @app.context_processor
 def inject_globals():
-    return dict(events_confirmed=EVENTS_CONFIRMED)
+    return dict(events_confirmed=EVENTS_CONFIRMED, current_year=datetime.now().year)
 
 @app.context_processor
 def inject_settings():
     return {"site_settings": get_settings()}
+
+@app.template_global()
+def site_image(value, fallback=None):
+    """Resolve a stored image value (empty / full URL / uploaded static path) to a src URL."""
+    value = (value or "").strip()
+    if not value:
+        return url_for("static", filename=fallback) if fallback else ""
+    if value.startswith("http://") or value.startswith("https://"):
+        return value
+    return url_for("static", filename=value.removeprefix("/static/").lstrip("/"))
 
 @app.route('/')
 def home():
@@ -329,26 +431,100 @@ def admin_settings():
         settings.twitter_url = (form.twitter_url.data or "").strip()
         settings.tiktok_url = (form.tiktok_url.data or "").strip()
 
-        # NEW
+        # ---- Navigation ----
+        settings.nav_label_mission = (form.nav_label_mission.data or "").strip()
+        settings.nav_label_services = (form.nav_label_services.data or "").strip()
+        settings.nav_label_gallery = (form.nav_label_gallery.data or "").strip()
+        settings.nav_label_stay_plugged = (form.nav_label_stay_plugged.data or "").strip()
+        settings.nav_label_our_story = (form.nav_label_our_story.data or "").strip()
+        settings.nav_label_contact = (form.nav_label_contact.data or "").strip()
+        settings.nav_cta_label = (form.nav_cta_label.data or "").strip()
+
+        logo_path = save_uploaded_image(form.logo_image.data, "logo")
+        if logo_path:
+            settings.logo_image = logo_path
+
+        # ---- Hero ----
+        settings.hero_eyebrow = (form.hero_eyebrow.data or "").strip()
+        settings.hero_headline = (form.hero_headline.data or "").strip()
+        settings.hero_subhead = (form.hero_subhead.data or "").strip()
+        settings.hero_cta_primary_label = (form.hero_cta_primary_label.data or "").strip()
+        settings.hero_cta_secondary_label = (form.hero_cta_secondary_label.data or "").strip()
+
+        # ---- Mission ----
+        settings.mission_eyebrow = (form.mission_eyebrow.data or "").strip()
+        settings.mission_statement = (form.mission_statement.data or "").strip()
+
+        # ---- Services ----
+        settings.services_eyebrow = (form.services_eyebrow.data or "").strip()
+        settings.services_heading = (form.services_heading.data or "").strip()
+
+        services_image_path = save_uploaded_image(form.services_image.data, "services")
+        if services_image_path:
+            settings.services_image = services_image_path
+
+        settings.service1_title = (form.service1_title.data or "").strip()
+        settings.service1_body = (form.service1_body.data or "").strip()
+        settings.service2_title = (form.service2_title.data or "").strip()
+        settings.service2_body = (form.service2_body.data or "").strip()
+        settings.service3_title = (form.service3_title.data or "").strip()
+        settings.service3_body = (form.service3_body.data or "").strip()
+        settings.service4_title = (form.service4_title.data or "").strip()
+        settings.service4_body = (form.service4_body.data or "").strip()
+
+        # ---- Gallery preview ----
+        settings.gallery_eyebrow = (form.gallery_eyebrow.data or "").strip()
+        settings.gallery_heading = (form.gallery_heading.data or "").strip()
+        settings.gallery_note = (form.gallery_note.data or "").strip()
+
+        # ---- Stay Plugged In ----
+        settings.stay_plugged_eyebrow = (form.stay_plugged_eyebrow.data or "").strip()
+        settings.stay_plugged_heading = (form.stay_plugged_heading.data or "").strip()
+        settings.stay_plugged_lede = (form.stay_plugged_lede.data or "").strip()
+        settings.stay_plugged_footer_text = (form.stay_plugged_footer_text.data or "").strip()
+
         settings.coming_soon_title = (form.coming_soon_title.data or "").strip()
         settings.coming_soon_body = (form.coming_soon_body.data or "").strip()
 
+        # ---- Our Story ----
+        settings.our_story_eyebrow = (form.our_story_eyebrow.data or "").strip()
         settings.what_is_title = (form.what_is_title.data or "").strip()
         settings.what_is_body = (form.what_is_body.data or "").strip()
 
-        settings.mission_statement = (form.mission_statement.data or "").strip()
+        settings.stat1_value = (form.stat1_value.data or "").strip()
+        settings.stat1_label = (form.stat1_label.data or "").strip()
+        settings.stat2_value = (form.stat2_value.data or "").strip()
+        settings.stat2_label = (form.stat2_label.data or "").strip()
+        settings.stat3_value = (form.stat3_value.data or "").strip()
+        settings.stat3_label = (form.stat3_label.data or "").strip()
 
         settings.founder1_name = (form.founder1_name.data or "").strip()
-        settings.founder1_image = (form.founder1_image.data or "").strip()
+        founder1_path = save_uploaded_image(form.founder1_image.data, "founder1")
+        if founder1_path:
+            settings.founder1_image = founder1_path
+
         settings.founder2_name = (form.founder2_name.data or "").strip()
-        settings.founder2_image = (form.founder2_image.data or "").strip()
+        founder2_path = save_uploaded_image(form.founder2_image.data, "founder2")
+        if founder2_path:
+            settings.founder2_image = founder2_path
+
+        # ---- Contact ----
+        settings.contact_eyebrow = (form.contact_eyebrow.data or "").strip()
+        settings.contact_heading_line1 = (form.contact_heading_line1.data or "").strip()
+        settings.contact_heading_line2 = (form.contact_heading_line2.data or "").strip()
+        settings.contact_lede = (form.contact_lede.data or "").strip()
+        settings.contact_cta_email_label = (form.contact_cta_email_label.data or "").strip()
+        settings.contact_cta_follow_label = (form.contact_cta_follow_label.data or "").strip()
+
+        # ---- Footer ----
+        settings.footer_text = (form.footer_text.data or "").strip()
 
         db.session.commit()
 
         flash("Settings Saved!", "success")
         return redirect(url_for("admin_settings"))
 
-    return render_template("admin/settings.html", form=form)
+    return render_template("admin/settings.html", form=form, settings=settings)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

@@ -21,7 +21,7 @@
             <a class="gp-nav-brand" href="{{ url_for('home') }}">
                 <img id="gp-nav-logo"
                      class="gp-nav-logo {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
-                     src="{{ url_for('static', filename='gplogotext.png') }}"
+                     src="{{ site_image(site_settings.logo_image, 'gplogotext.png') }}"
                      alt="Get Plugged NJ">
             </a>
 
@@ -33,27 +33,27 @@
                 <ul class="gp-nav-links">
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
-                           href="{{ url_for('home') }}#mission">Mission</a>
+                           href="{{ url_for('home') }}#mission">{{ site_settings.nav_label_mission }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
-                           href="{{ url_for('home') }}#services">Services</a>
+                           href="{{ url_for('home') }}#services">{{ site_settings.nav_label_services }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %} {% if request.endpoint == 'previous' %}active{% endif %}"
-                           href="{{ url_for('previous') }}">Gallery</a>
+                           href="{{ url_for('previous') }}">{{ site_settings.nav_label_gallery }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
-                           href="{{ url_for('home') }}#stay-plugged-in">Stay Plugged In</a>
+                           href="{{ url_for('home') }}#stay-plugged-in">{{ site_settings.nav_label_stay_plugged }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
-                           href="{{ url_for('home') }}#our-story">Our Story</a>
+                           href="{{ url_for('home') }}#our-story">{{ site_settings.nav_label_our_story }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
-                           href="{{ url_for('home') }}#contact">Contact</a>
+                           href="{{ url_for('home') }}#contact">{{ site_settings.nav_label_contact }}</a>
                     </li>
 
                     {% if site_settings.events_confirmed %}
@@ -76,7 +76,7 @@
                 </ul>
 
                 <a class="gp-nav-cta {% if request.endpoint == 'home' %}gp-anim-init{% endif %}" href="{{ url_for('home') }}#contact">
-                    Get Plugged <span class="gp-arrow">&#8599;</span>
+                    {{ site_settings.nav_cta_label }} <span class="gp-arrow">&#8599;</span>
                 </a>
             </div>
         </div>
@@ -91,8 +91,8 @@
     <footer class="gp-footer">
         <div class="gp-footer-inner">
             <div class="gp-footer-brand">
-                <img src="{{ url_for('static', filename='gplogotext.png') }}" alt="Get Plugged NJ" class="gp-footer-logo">
-                <span class="gp-footer-copy">&copy; 2026 Get Plugged NJ. All rights reserved.</span>
+                <img src="{{ site_image(site_settings.logo_image, 'gplogotext.png') }}" alt="Get Plugged NJ" class="gp-footer-logo">
+                <span class="gp-footer-copy">&copy; {{ current_year }} {{ site_settings.footer_text }}</span>
             </div>
             <div class="gp-footer-links">
                 {% if site_settings.instagram_url %}

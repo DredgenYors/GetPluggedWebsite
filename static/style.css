@@ -765,6 +765,23 @@ h1, h2, h3, h4, h5, h6,
   max-width: 900px;
 }
 
+.gp-admin-image-field{
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.gp-admin-image-preview{
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #404040;
+  flex-shrink: 0;
+}
+
+.gp-admin-image-preview-round{ border-radius: 50%; }
+
 .gp-admin-list-item {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -1350,6 +1367,11 @@ body > footer{
 }
 
 .gp-services-image i{ font-size: 1.5rem; }
+
+.gp-services-image-real{
+  object-fit: cover;
+  border: none;
+}
 
 @media (min-width: 768px){
   .gp-services-image{ display: flex; }

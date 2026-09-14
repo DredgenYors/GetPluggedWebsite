@@ -15,21 +15,21 @@
   <div class="gp-section-inner gp-hero-inner">
     <div class="gp-eyebrow-row">
       <span class="gp-eyebrow-rule"></span>
-      <span class="gp-eyebrow">Creativity &bull; Connection &bull; Access</span>
+      <span class="gp-eyebrow">{{ site_settings.hero_eyebrow }}</span>
     </div>
 
     <div class="gp-hero-title-wrap">
-      <h1 class="gp-hero-title">GET<br>PLUGGED</h1>
+      <h1 class="gp-hero-title">{{ site_settings.hero_headline }}</h1>
     </div>
 
-    <p class="gp-hero-body gp-hero-sub">Where momentum meets opportunity.</p>
+    <p class="gp-hero-body gp-hero-sub">{{ site_settings.hero_subhead }}</p>
 
     <div class="gp-hero-ctas">
       <a class="gp-btn gp-btn-solid gp-hero-body" href="#contact">
-        Get Plugged <span class="gp-arrow">&#8599;</span>
+        {{ site_settings.hero_cta_primary_label }} <span class="gp-arrow">&#8599;</span>
       </a>
       <a class="gp-btn gp-btn-outline gp-hero-body" href="#stay-plugged-in">
-        Stay Plugged In <span class="gp-chevron">&rsaquo;</span>
+        {{ site_settings.hero_cta_secondary_label }} <span class="gp-chevron">&rsaquo;</span>
       </a>
     </div>
   </div>
@@ -39,7 +39,7 @@
 <section id="mission" class="gp-section gp-section-tint">
   <div class="gp-section-inner gp-mission-grid">
     <div class="gp-mission-label">
-      <span class="gp-eyebrow">Our Mission</span>
+      <span class="gp-eyebrow">{{ site_settings.mission_eyebrow }}</span>
       <div class="gp-rule"></div>
     </div>
     <div>
@@ -56,42 +56,46 @@
   <div class="gp-section-inner">
     <div class="gp-section-head">
       <div>
-        <span class="gp-eyebrow">What We Do</span>
-        <h2 class="gp-section-title">Services &amp; Experiences</h2>
+        <span class="gp-eyebrow">{{ site_settings.services_eyebrow }}</span>
+        <h2 class="gp-section-title">{{ site_settings.services_heading }}</h2>
       </div>
-      <div class="gp-services-image" role="img" aria-label="Placeholder image">
-        <i class="fas fa-image"></i>
-        <span>Add photo</span>
-      </div>
+      {% if site_settings.services_image %}
+        <img class="gp-services-image gp-services-image-real" src="{{ site_image(site_settings.services_image) }}" alt="">
+      {% else %}
+        <div class="gp-services-image" role="img" aria-label="Placeholder image">
+          <i class="fas fa-image"></i>
+          <span>Add photo</span>
+        </div>
+      {% endif %}
     </div>
 
     <div class="gp-services-grid">
       <div class="gp-service">
         <span class="gp-service-num">01</span>
         <div>
-          <h3>Events &amp; Experiences</h3>
-          <p>Curated events and activations that create space for connection, visibility, and opportunity.</p>
+          <h3>{{ site_settings.service1_title }}</h3>
+          <p>{{ site_settings.service1_body }}</p>
         </div>
       </div>
       <div class="gp-service">
         <span class="gp-service-num">02</span>
         <div>
-          <h3>Creative Connections</h3>
-          <p>Connecting artists, creators, and brands with trusted people and resources across our network.</p>
+          <h3>{{ site_settings.service2_title }}</h3>
+          <p>{{ site_settings.service2_body }}</p>
         </div>
       </div>
       <div class="gp-service">
         <span class="gp-service-num">03</span>
         <div>
-          <h3>Artist &amp; Creative Support</h3>
-          <p>Helping creatives identify what they need next and connect with the right resources and opportunities.</p>
+          <h3>{{ site_settings.service3_title }}</h3>
+          <p>{{ site_settings.service3_body }}</p>
         </div>
       </div>
       <div class="gp-service">
         <span class="gp-service-num">04</span>
         <div>
-          <h3>Partnerships &amp; Collaborations</h3>
-          <p>Creating thoughtful connections between creatives, brands, businesses, venues, and organizations.</p>
+          <h3>{{ site_settings.service4_title }}</h3>
+          <p>{{ site_settings.service4_body }}</p>
         </div>
       </div>
     </div>
@@ -103,10 +107,10 @@
   <div class="gp-section-inner">
     <div class="gp-section-head">
       <div>
-        <span class="gp-eyebrow">Our Work</span>
-        <h2 class="gp-section-title">Gallery</h2>
+        <span class="gp-eyebrow">{{ site_settings.gallery_eyebrow }}</span>
+        <h2 class="gp-section-title">{{ site_settings.gallery_heading }}</h2>
       </div>
-      <p class="gp-section-lede">Hover to preview. Click any experience to explore the full recap.</p>
+      <p class="gp-section-lede">{{ site_settings.gallery_note }}</p>
     </div>
 
     {% if gallery_preview %}
@@ -141,10 +145,10 @@
   <div class="gp-section-inner">
     <div class="gp-section-head">
       <div>
-        <span class="gp-eyebrow">What's Next</span>
-        <h2 class="gp-section-title">Stay<br>Plugged In</h2>
+        <span class="gp-eyebrow">{{ site_settings.stay_plugged_eyebrow }}</span>
+        <h2 class="gp-section-title">{{ site_settings.stay_plugged_heading }}</h2>
       </div>
-      <p class="gp-section-lede">Events, collaborations, content drops, community opportunities &mdash; follow along.</p>
+      <p class="gp-section-lede">{{ site_settings.stay_plugged_lede }}</p>
     </div>
 
     <div class="gp-next-rows">
@@ -165,7 +169,7 @@
     </div>
 
     <div class="gp-section-foot">
-      <a class="gp-textlink" href="#contact">Get notified about future drops <span class="gp-arrow">&#8599;</span></a>
+      <a class="gp-textlink" href="#contact">{{ site_settings.stay_plugged_footer_text }} <span class="gp-arrow">&#8599;</span></a>
     </div>
   </div>
 </section>
@@ -173,7 +177,7 @@
 <!-- ===== OUR STORY ===== -->
 <section id="our-story" class="gp-section gp-section-tint">
   <div class="gp-section-inner gp-story-inner">
-    <span class="gp-eyebrow gp-eyebrow-accent">Our Story</span>
+    <span class="gp-eyebrow gp-eyebrow-accent">{{ site_settings.our_story_eyebrow }}</span>
     <h2 class="gp-story-title">{{ site_settings.what_is_title or "Born In NJ, Made To Connect." }}</h2>
 
     <div class="gp-story-paragraphs">
@@ -183,21 +187,16 @@
     </div>
 
     <div class="gp-story-stats">
-      <div><div class="gp-story-stat-value">2024</div><div class="gp-story-stat-label">Founded</div></div>
-      <div><div class="gp-story-stat-value">NJ</div><div class="gp-story-stat-label">Based</div></div>
-      <div><div class="gp-story-stat-value">Independent</div><div class="gp-story-stat-label">Built</div></div>
+      <div><div class="gp-story-stat-value">{{ site_settings.stat1_value }}</div><div class="gp-story-stat-label">{{ site_settings.stat1_label }}</div></div>
+      <div><div class="gp-story-stat-value">{{ site_settings.stat2_value }}</div><div class="gp-story-stat-label">{{ site_settings.stat2_label }}</div></div>
+      <div><div class="gp-story-stat-value">{{ site_settings.stat3_value }}</div><div class="gp-story-stat-label">{{ site_settings.stat3_label }}</div></div>
     </div>
 
     <div class="gp-founders">
       <div class="gp-founder">
         <div class="gp-founder-avatar">
-          {% set img1 = site_settings.founder1_image %}
-          {% if img1 %}
-            {% if img1.startswith('http') %}
-              <img src="{{ img1 }}" alt="{{ site_settings.founder1_name }}">
-            {% else %}
-              <img src="{{ url_for('static', filename=img1.lstrip('/static/')) }}" alt="{{ site_settings.founder1_name }}">
-            {% endif %}
+          {% if site_settings.founder1_image %}
+            <img src="{{ site_image(site_settings.founder1_image) }}" alt="{{ site_settings.founder1_name }}">
           {% endif %}
         </div>
         <h6 class="gp-founder-name">{{ site_settings.founder1_name or "Founder 1" }}</h6>
@@ -205,13 +204,8 @@
 
       <div class="gp-founder">
         <div class="gp-founder-avatar">
-          {% set img2 = site_settings.founder2_image %}
-          {% if img2 %}
-            {% if img2.startswith('http') %}
-              <img src="{{ img2 }}" alt="{{ site_settings.founder2_name }}">
-            {% else %}
-              <img src="{{ url_for('static', filename=img2.lstrip('/static/')) }}" alt="{{ site_settings.founder2_name }}">
-            {% endif %}
+          {% if site_settings.founder2_image %}
+            <img src="{{ site_image(site_settings.founder2_image) }}" alt="{{ site_settings.founder2_name }}">
           {% endif %}
         </div>
         <h6 class="gp-founder-name">{{ site_settings.founder2_name or "Founder 2" }}</h6>
@@ -223,22 +217,21 @@
 <!-- ===== CONTACT ===== -->
 <section id="contact" class="gp-section gp-section-grid">
   <div class="gp-section-inner">
-    <span class="gp-eyebrow gp-eyebrow-accent">Connect</span>
-    <h2 class="gp-contact-title">Ready to Get<br><span class="gp-accent-text">Plugged In?</span></h2>
+    <span class="gp-eyebrow gp-eyebrow-accent">{{ site_settings.contact_eyebrow }}</span>
+    <h2 class="gp-contact-title">{{ site_settings.contact_heading_line1 }}<br><span class="gp-accent-text">{{ site_settings.contact_heading_line2 }}</span></h2>
     <p class="gp-contact-lede">
-      Whether you're an artist looking for access, a brand seeking authentic reach, or a venue wanting to be
-      part of the ecosystem &mdash; we want to hear from you.
+      {{ site_settings.contact_lede }}
     </p>
 
     <div class="gp-contact-ctas">
       {% if site_settings.email %}
       <a class="gp-btn gp-btn-solid" href="mailto:{{ site_settings.email }}">
-        Email Us <span class="gp-arrow">&#8599;</span>
+        {{ site_settings.contact_cta_email_label }} <span class="gp-arrow">&#8599;</span>
       </a>
       {% endif %}
       {% if site_settings.instagram_url %}
       <a class="gp-btn gp-btn-ghost" href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer">
-        Follow @getpluggednj
+        {{ site_settings.contact_cta_follow_label }}
       </a>
       {% endif %}
     </div>
