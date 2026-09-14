@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} - Get Plugged NJ{% endblock %}
+
+{% block content %}
+
+<!-- ===== EVENT HERO ===== -->
+<section class="gp-event-hero">
+  {% if cover %}
+    <img src="{{ cover.url }}" alt="{{ event.title }}" class="gp-event-hero-img">
+  {% else %}
+    <div class="gp-event-hero-placeholder"></div>
+  {% endif %}
+  <div class="gp-event-hero-gradient"></div>
+
+  <div class="gp-event-hero-content">
+    <span class="gp-event-hero-date">{{ event.date.strftime('%b %d, %Y') }}</span>
+    <h1 class="gp-event-hero-title">{{ event.title }}</h1>
+    {% if event.location %}<p class="gp-event-hero-venue">{{ event.location }}</p>{% endif %}
+  </div>
+</section>
+
+<!-- ===== EVENT BODY ===== -->
+<section class="gp-section">
+  <div class="gp-section-inner">
+    <div class="gp-event-body-grid">
+      <div>
+        <p class="gp-label-accent gp-event-type">Event</p>
+        {% if artists %}
+          <p class="gp-event-description">
+            Featuring
+            {% for artist in artists %}{{ artist.display_name }}{% if not loop.last %}, {% endif %}{% endfor %}.
+          </p>
+        {% else %}
+          <p class="gp-event-description">More details on this event coming soon.</p>
+        {% endif %}
+      </div>
+
+      <div class="gp-event-meta">
+        <div>
+          <div class="gp-event-meta-label">Date</div>
+          <div class="gp-event-meta-value">{{ event.date.strftime('%b %d, %Y') }}</div>
+        </div>
+        {% if event.location %}
+        <div>
+          <div class="gp-event-meta-label">Venue</div>
+          <div class="gp-event-meta-value">{{ event.location }}</div>
+        </div>
+        {% endif %}
+        <div>
+          <div class="gp-event-meta-label">Type</div>
+          <div class="gp-event-meta-value">Event</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recap: Photos -->
+    <div class="gp-event-recap">
+      <p class="gp-event-recap-label">Recap &mdash; Photos</p>
+      {% if photos %}
+        <div class="gp-event-recap-grid">
+          {% for p in photos %}
+            <a class="gp-event-recap-item" href="{{ p.url }}" target="_blank" rel="noopener noreferrer">
+              <img src="{{ p.url }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="gp-empty-note">No photos added yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Recap: Videos -->
+    {% if videos %}
+    <div class="gp-event-recap">
+      <p class="gp-event-recap-label">Recap &mdash; Videos</p>
+      <div class="gp-event-recap-grid">
+        {% for v in videos %}
+          <a class="gp-event-recap-item gp-event-recap-video" href="{{ v.url }}" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-play"></i>
+            <span>{{ v.caption if v.caption else "Video " ~ loop.index }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="gp-event-footer">
+      <a class="gp-textlink" href="{{ url_for('home') }}#gallery-preview">
+        <span class="gp-chevron">&lsaquo;</span> Back to Gallery
+      </a>
+      <a class="gp-textlink" href="{{ url_for('home') }}#contact">
+        Connect with us <span class="gp-arrow">&#8599;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
