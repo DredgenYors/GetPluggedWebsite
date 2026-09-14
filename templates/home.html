@@ -57,7 +57,11 @@
     <div class="gp-section-head">
       <div>
         <span class="gp-eyebrow">What We Do</span>
-        <h2 class="gp-section-title">How We<br>Plug In</h2>
+        <h2 class="gp-section-title">Services &amp; Experiences</h2>
+      </div>
+      <div class="gp-services-image" role="img" aria-label="Placeholder image">
+        <i class="fas fa-image"></i>
+        <span>Add photo</span>
       </div>
     </div>
 
@@ -102,7 +106,7 @@
         <span class="gp-eyebrow">Our Work</span>
         <h2 class="gp-section-title">Gallery</h2>
       </div>
-      <a class="gp-textlink" href="{{ url_for('previous') }}">View full gallery <span class="gp-arrow">&#8599;</span></a>
+      <p class="gp-section-lede">Hover to preview. Click any experience to explore the full recap.</p>
     </div>
 
     {% if gallery_preview %}
@@ -114,10 +118,14 @@
           {% else %}
             <div class="gp-gallery-card-placeholder"></div>
           {% endif %}
+          <span class="gp-gallery-card-date">{{ item.event.date.strftime('%b %Y') }}</span>
           <div class="gp-gallery-card-overlay">
-            <span class="gp-label-accent">{{ item.event.date.strftime('%b %Y') }}</span>
+            <span class="gp-label-accent">Event</span>
             <h3>{{ item.event.title }}</h3>
-            {% if item.event.location %}<p>{{ item.event.location }}</p>{% endif %}
+            <div class="gp-gallery-card-hover">
+              {% if item.event.location %}<p>{{ item.event.location }}</p>{% endif %}
+              <span class="gp-gallery-card-hint">View recap <span class="gp-arrow">&#8599;</span></span>
+            </div>
           </div>
         </a>
       {% endfor %}
@@ -139,30 +147,22 @@
       <p class="gp-section-lede">Events, collaborations, content drops, community opportunities &mdash; follow along.</p>
     </div>
 
-    {% if site_settings.events_confirmed and next_event %}
-      <div class="gp-next-event">
-        <div class="gp-next-event-media">
-          <img src="{{ url_for('static', filename='gp11-8flyer.PNG') }}" alt="Event flyer" class="gp-plugged-flyer">
+    <div class="gp-next-rows">
+      {% for row in stay_plugged_rows %}
+        <div class="gp-next-row">
+          <span class="gp-next-row-num">{{ "%02d"|format(loop.index) }}</span>
+          <div class="gp-next-row-body">
+            <span class="gp-label-accent">{{ row.label }}</span>
+            <h3 class="gp-next-row-title">{{ row.title }}</h3>
+            {% if row.detail %}<p class="gp-next-row-detail">{{ row.detail }}</p>{% endif %}
+          </div>
+          <div class="gp-next-row-meta">
+            {% if row.date %}<div class="gp-next-row-date">{{ row.date }}</div>{% endif %}
+            <span class="gp-next-row-badge">{{ row.status }}</span>
+          </div>
         </div>
-        <div class="gp-next-event-info">
-          <span class="gp-label-accent">Upcoming Event</span>
-          <h3 class="gp-next-event-title">{{ next_event.title }}</h3>
-          <p class="gp-next-event-detail">{{ next_event.date }}{% if next_event.location %} &middot; {{ next_event.location }}{% endif %}</p>
-          {% if site_settings.ticket_url %}
-          <a class="gp-btn gp-btn-solid" href="{{ site_settings.ticket_url }}" target="_blank" rel="noopener noreferrer">
-            Get Tickets <span class="gp-arrow">&#8599;</span>
-          </a>
-          {% endif %}
-        </div>
-      </div>
-    {% else %}
-      <div class="gp-coming-soon">
-        <h3 class="gp-coming-soon-title">{{ site_settings.coming_soon_title or "More on the way" }}</h3>
-        <p class="gp-coming-soon-body">
-          {{ site_settings.coming_soon_body or "We're lining up our next event, collab, or drop. Follow along so you don't miss it." }}
-        </p>
-      </div>
-    {% endif %}
+      {% endfor %}
+    </div>
 
     <div class="gp-section-foot">
       <a class="gp-textlink" href="#contact">Get notified about future drops <span class="gp-arrow">&#8599;</span></a>
@@ -174,10 +174,19 @@
 <section id="our-story" class="gp-section gp-section-tint">
   <div class="gp-section-inner gp-story-inner">
     <span class="gp-eyebrow gp-eyebrow-accent">Our Story</span>
-    <h2 class="gp-story-title">{{ site_settings.what_is_title or "Our Story" }}</h2>
-    <p class="gp-story-body">
-      {{ site_settings.what_is_body }}
-    </p>
+    <h2 class="gp-story-title">{{ site_settings.what_is_title or "Born In NJ, Made To Connect." }}</h2>
+
+    <div class="gp-story-paragraphs">
+      {% for para in (site_settings.what_is_body or "").split('\n\n') %}
+        {% if para.strip() %}<p>{{ para.strip() }}</p>{% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="gp-story-stats">
+      <div><div class="gp-story-stat-value">2024</div><div class="gp-story-stat-label">Founded</div></div>
+      <div><div class="gp-story-stat-value">NJ</div><div class="gp-story-stat-label">Based</div></div>
+      <div><div class="gp-story-stat-value">Independent</div><div class="gp-story-stat-label">Built</div></div>
+    </div>
 
     <div class="gp-founders">
       <div class="gp-founder">

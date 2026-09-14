@@ -32,8 +32,13 @@ class SiteSettings(db.Model):
     coming_soon_body = db.Column(db.Text, default="We're lining up our next event, collab, or drop. Follow along so you don't miss it.", nullable=False)
 
     # Drives the "Our Story" section heading + blurb (paired with founder cards below)
-    what_is_title = db.Column(db.String(200), default="Our Story", nullable=False)
-    what_is_body = db.Column(db.Text, default="Get Plugged started with a simple idea: creativity moves faster with the right people around it. What began with a single event has grown into an ongoing effort to connect emerging artists, creators, and local brands with the access, resources, and collaborators they need for their next step.", nullable=False)
+    what_is_title = db.Column(db.String(200), default="Born In NJ, Made To Connect.", nullable=False)
+    what_is_body = db.Column(db.Text, default=(
+        "Get Plugged was founded by Jordan Scott-Young and MCP, two lifelong music lovers whose connection to the industry started before they ever met.\n\n"
+        "Jordan and MCP both developed a connection to music from an early age, with Jordan immersed in singing and performance and MCP in production and engineering.\n\n"
+        "Together, they discovered a shared love for marketing, bringing ideas to life and creating the kinds of spaces and opportunities that can give emerging talent an early point of access into creative and professional spaces. By combining their different skills and perspectives, they began producing events from the ground up and creating opportunities for artists, creators and local brands to connect in ways that felt genuine.\n\n"
+        "What started with live music events has grown into a larger vision for Get Plugged. Today we create access, experiences and connections that help emerging talent and brands build momentum, expand their network and move toward what comes next."
+    ), nullable=False)
 
     mission_statement = db.Column(db.Text, default="Get Plugged exists to bridge the gap between potential and access. We connect emerging artists, creators, and local brands with the people, resources, and opportunities they need to reach their next level.", nullable=False)
 
@@ -200,6 +205,7 @@ def inject_settings():
 def home():
     """Home page route"""
     next_event = upcoming_events[0] if upcoming_events else None
+    settings = get_settings()
 
     # Small "Gallery" preview: most recent events, each with one cover photo if available
     gallery_preview = []
@@ -207,7 +213,32 @@ def home():
         cover = Media.query.filter_by(event_id=ev.id, media_type="photo").order_by(Media.id.desc()).first()
         gallery_preview.append({"event": ev, "cover": cover})
 
-    return render_template('home.html', next_event=next_event, gallery_preview=gallery_preview)
+    # "Stay Plugged In" rows. Ticket status is shown as a visual badge only (not a
+    # link) for now, per current design direction.
+    stay_plugged_rows = []
+    if settings.events_confirmed and next_event:
+        stay_plugged_rows.append({
+            "label": "Upcoming Event",
+            "title": next_event["title"],
+            "detail": next_event["location"],
+            "date": next_event["date"],
+            "status": "Get Tickets" if settings.ticket_url else "More Info Soon",
+        })
+    else:
+        stay_plugged_rows.append({
+            "label": "Announcement",
+            "title": settings.coming_soon_title or "More on the way",
+            "detail": settings.coming_soon_body or "",
+            "date": "",
+            "status": "Follow for Updates",
+        })
+
+    return render_template(
+        'home.html',
+        next_event=next_event,
+        gallery_preview=gallery_preview,
+        stay_plugged_rows=stay_plugged_rows,
+    )
 
 @app.route("/previous")
 def previous():
