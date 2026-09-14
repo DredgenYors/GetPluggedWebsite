@@ -128,10 +128,26 @@
           {{ form.phone(class="form-control") }}
         </div>
 
-        <div class="mb-0">
+        <div class="mb-3">
           {{ form.instagram_url.label(class="form-label") }}
           {{ form.instagram_url(class="form-control", placeholder="https://instagram.com/...") }}
           {% for err in form.instagram_url.errors %}
+            <div class="text-danger small">{{ err }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.twitter_url.label(class="form-label") }}
+          {{ form.twitter_url(class="form-control", placeholder="https://twitter.com/...") }}
+          {% for err in form.twitter_url.errors %}
+            <div class="text-danger small">{{ err }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-0">
+          {{ form.tiktok_url.label(class="form-label") }}
+          {{ form.tiktok_url(class="form-control", placeholder="https://tiktok.com/@...") }}
+          {% for err in form.tiktok_url.errors %}
             <div class="text-danger small">{{ err }}</div>
           {% endfor %}
         </div>

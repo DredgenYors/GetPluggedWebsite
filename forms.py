@@ -10,6 +10,8 @@ class SiteSettingsForm(FlaskForm):
     email = StringField("Email", validators=[Optional()])
     phone = StringField("Phone", validators=[Optional()])
     instagram_url = StringField("Instagram", validators=[Optional(), URL(message="Enter a valid URL")])
+    twitter_url = StringField("Twitter / X", validators=[Optional(), URL(message="Enter a valid URL")])
+    tiktok_url = StringField("TikTok", validators=[Optional(), URL(message="Enter a valid URL")])
 
     coming_soon_title = StringField("'Stay Plugged In' Title (shown when no event is confirmed)", validators=[Optional(), Length(max=200)])
     coming_soon_body = TextAreaField("'Stay Plugged In' Message (shown when no event is confirmed)", validators=[Optional()])

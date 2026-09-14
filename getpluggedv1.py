@@ -26,6 +26,8 @@ class SiteSettings(db.Model):
     email = db.Column(db.String(200), default="getpluggednj@gmail.com", nullable=False)
     phone = db.Column(db.String(50), default="", nullable=False)
     instagram_url = db.Column(db.String(500), default="https://www.instagram.com/getpluggednj/", nullable=False)
+    twitter_url = db.Column(db.String(500), default="https://twitter.com/getpluggednj", nullable=False)
+    tiktok_url = db.Column(db.String(500), default="https://www.tiktok.com/@getpluggednj", nullable=False)
 
     # Drives the "Stay Plugged In" section when no event is confirmed
     coming_soon_title = db.Column(db.String(200), default="More on the way", nullable=False)
@@ -300,6 +302,8 @@ def admin_settings():
         settings.email = (form.email.data or "").strip()
         settings.phone = (form.phone.data or "").strip()
         settings.instagram_url = (form.instagram_url.data or "").strip()
+        settings.twitter_url = (form.twitter_url.data or "").strip()
+        settings.tiktok_url = (form.tiktok_url.data or "").strip()
 
         # NEW
         settings.coming_soon_title = (form.coming_soon_title.data or "").strip()
