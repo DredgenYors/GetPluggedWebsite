@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Home - GetPlugged{% endblock %}
+{% block title %}Home - Get Plugged NJ{% endblock %}
 
 {% block intro_overlay %}
 <div id="gp-intro-overlay" aria-hidden="true">
@@ -10,251 +10,263 @@
 
 {% block content %}
 
-<div class="row">
-  <div class="col-12">
-    <!-- Next Event Section -->
-    <div class="row mt-5 justify-content-center mb-4">
-      <div class="col-6">
-        <div id="gp-hero-card" class="content-section bg-white p-4 rounded-3 shadow-sm gp-hero-card gp-anim-init">
-          {% if site_settings.events_confirmed and next_event %}
-            <!-- Confirmed Event -->
-            <header class="text-center">
-              <div class="gp-hero-title-wrap">
-                <h2 class="text-primary gp-hero-title">
-                  Join us for our next event!
-                </h2>
-              </div>
+<!-- ===== HERO ===== -->
+<section id="gp-hero-card" class="gp-hero gp-anim-init">
+  <div class="gp-section-inner gp-hero-inner">
+    <div class="gp-eyebrow-row">
+      <span class="gp-eyebrow-rule"></span>
+      <span class="gp-eyebrow">Creativity &bull; Connection &bull; Access</span>
+    </div>
 
-              <div class="my-3 text-center">
-                <img src="{{ url_for('static', filename='gp11-8flyer.PNG') }}"
-                    alt="Event Flyer"
-                    class="img-fluid rounded shadow gp-hero-flyer">
-              </div>
-            </header>
+    <div class="gp-hero-title-wrap">
+      <h1 class="gp-hero-title">GET<br>PLUGGED</h1>
+    </div>
+
+    <p class="gp-hero-body gp-hero-sub">Where momentum meets opportunity.</p>
+
+    <div class="gp-hero-ctas">
+      <a class="gp-btn gp-btn-solid gp-hero-body" href="#contact">
+        Get Plugged <span class="gp-arrow">&#8599;</span>
+      </a>
+      <a class="gp-btn gp-btn-outline gp-hero-body" href="#stay-plugged-in">
+        Stay Plugged In <span class="gp-chevron">&rsaquo;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MISSION ===== -->
+<section id="mission" class="gp-section gp-section-tint">
+  <div class="gp-section-inner gp-mission-grid">
+    <div class="gp-mission-label">
+      <span class="gp-eyebrow">Our Mission</span>
+      <div class="gp-rule"></div>
+    </div>
+    <div>
+      <p class="gp-mission-statement">
+        {{ site_settings.mission_statement }}
+      </p>
+      <a class="gp-textlink" href="#our-story">Our Story <span class="gp-arrow">&#8599;</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SERVICES ===== -->
+<section id="services" class="gp-section">
+  <div class="gp-section-inner">
+    <div class="gp-section-head">
+      <div>
+        <span class="gp-eyebrow">What We Do</span>
+        <h2 class="gp-section-title">How We<br>Plug In</h2>
+      </div>
+    </div>
+
+    <div class="gp-services-grid">
+      <div class="gp-service">
+        <span class="gp-service-num">01</span>
+        <div>
+          <h3>Events &amp; Experiences</h3>
+          <p>Curated events and activations that create space for connection, visibility, and opportunity.</p>
+        </div>
+      </div>
+      <div class="gp-service">
+        <span class="gp-service-num">02</span>
+        <div>
+          <h3>Creative Connections</h3>
+          <p>Connecting artists, creators, and brands with trusted people and resources across our network.</p>
+        </div>
+      </div>
+      <div class="gp-service">
+        <span class="gp-service-num">03</span>
+        <div>
+          <h3>Artist &amp; Creative Support</h3>
+          <p>Helping creatives identify what they need next and connect with the right resources and opportunities.</p>
+        </div>
+      </div>
+      <div class="gp-service">
+        <span class="gp-service-num">04</span>
+        <div>
+          <h3>Partnerships &amp; Collaborations</h3>
+          <p>Creating thoughtful connections between creatives, brands, businesses, venues, and organizations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GALLERY PREVIEW ===== -->
+<section id="gallery-preview" class="gp-section gp-section-tint">
+  <div class="gp-section-inner">
+    <div class="gp-section-head">
+      <div>
+        <span class="gp-eyebrow">Our Work</span>
+        <h2 class="gp-section-title">Gallery</h2>
+      </div>
+      <a class="gp-textlink" href="{{ url_for('previous') }}">View full gallery <span class="gp-arrow">&#8599;</span></a>
+    </div>
+
+    {% if gallery_preview %}
+    <div class="gp-gallery-grid">
+      {% for item in gallery_preview %}
+        <a class="gp-gallery-card" href="{{ url_for('previous', event=item.event.id) }}">
+          {% if item.cover %}
+            <img src="{{ item.cover.url }}" alt="{{ item.event.title }}" loading="lazy">
           {% else %}
-            <!-- Coming Soon -->
-            <header id="coming-soon" class="text-center">
-              <div class="gp-hero-title-wrap">
-                <h1 class="text-success gp-hero-title">
-                  {{ site_settings.coming_soon_title or "Exciting Events Coming Soon!" }}
-                </h1>
-              </div>
+            <div class="gp-gallery-card-placeholder"></div>
+          {% endif %}
+          <div class="gp-gallery-card-overlay">
+            <span class="gp-label-accent">{{ item.event.date.strftime('%b %Y') }}</span>
+            <h3>{{ item.event.title }}</h3>
+            {% if item.event.location %}<p>{{ item.event.location }}</p>{% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    {% else %}
+      <p class="gp-empty-note">No events yet &mdash; check back soon.</p>
+    {% endif %}
+  </div>
+</section>
 
-              <p class="fs-5 gp-hero-body">
-                {{ site_settings.coming_soon_body or "We're currently planning our next amazing events and experiences." }}
-              </p>
+<!-- ===== STAY PLUGGED IN ===== -->
+<section id="stay-plugged-in" class="gp-section">
+  <div class="gp-section-inner">
+    <div class="gp-section-head">
+      <div>
+        <span class="gp-eyebrow">What's Next</span>
+        <h2 class="gp-section-title">Stay<br>Plugged In</h2>
+      </div>
+      <p class="gp-section-lede">Events, collaborations, content drops, community opportunities &mdash; follow along.</p>
+    </div>
 
-              <p class="gp-hero-body">
-                {{ site_settings.coming_soon_cta or
-                  "In the meantime, check out our previous events to see what we've been up to, and follow us on social media for the latest updates!" }}
-              </p>
-            </header>
+    {% if site_settings.events_confirmed and next_event %}
+      <div class="gp-next-event">
+        <div class="gp-next-event-media">
+          <img src="{{ url_for('static', filename='gp11-8flyer.PNG') }}" alt="Event flyer" class="gp-plugged-flyer">
+        </div>
+        <div class="gp-next-event-info">
+          <span class="gp-label-accent">Upcoming Event</span>
+          <h3 class="gp-next-event-title">{{ next_event.title }}</h3>
+          <p class="gp-next-event-detail">{{ next_event.date }}{% if next_event.location %} &middot; {{ next_event.location }}{% endif %}</p>
+          {% if site_settings.ticket_url %}
+          <a class="gp-btn gp-btn-solid" href="{{ site_settings.ticket_url }}" target="_blank" rel="noopener noreferrer">
+            Get Tickets <span class="gp-arrow">&#8599;</span>
+          </a>
           {% endif %}
         </div>
       </div>
+    {% else %}
+      <div class="gp-coming-soon">
+        <h3 class="gp-coming-soon-title">{{ site_settings.coming_soon_title or "More on the way" }}</h3>
+        <p class="gp-coming-soon-body">
+          {{ site_settings.coming_soon_body or "We're lining up our next event, collab, or drop. Follow along so you don't miss it." }}
+        </p>
+      </div>
+    {% endif %}
+
+    <div class="gp-section-foot">
+      <a class="gp-textlink" href="#contact">Get notified about future drops <span class="gp-arrow">&#8599;</span></a>
     </div>
-
-    <!-- Content Sections -->
-    <div id="gp-home-cards" class="row g-4">
-      <!-- What is GPNJ Section -->
-      <div class="col-lg-4 col-md-12">
-        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100 gp-home-card gp-anim-init">
-          <div class="text-center mb-3">
-            <i class="fas fa-question-circle fa-3x text-primary mb-3 gp-card-icon"></i>
-
-            <div class="gp-card-title-wrap">
-              <h3 class="text-primary gp-card-title">
-                {{ site_settings.what_is_title or "What is GPNJ?" }}
-              </h3>
-            </div>
-          </div>
-
-          <p class="text-muted gp-card-body">
-            {{ site_settings.what_is_body or
-              "Get Plugged was built on a simple belief: the best moments are designed. ..." }}
-          </p>
-        </div>
-      </div>
-
-      <!-- The Team Section -->
-      <div class="col-lg-4 col-md-12">
-        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100 gp-home-card gp-anim-init">
-          <div class="text-center mb-3">
-            <i class="fas fa-users fa-3x text-success mb-3 gp-card-icon"></i>
-
-            <div class="gp-card-title-wrap">
-              <h3 class="text-success gp-card-title">
-                {{ site_settings.team_title or "The Team" }}
-              </h3>
-            </div>
-          </div>
-
-          <div class="creators-section mb-3 gp-founders-card">
-            <div class="gp-founders-title-wrap">
-              <h5 class="text-success text-center mb-3 gp-founders-title">
-                {{ site_settings.team_subtitle or "Meet Our Founders" }}
-              </h5>
-            </div>
-
-            <div class="row g-2 gp-founders-avatars">
-              <!-- Founder 1 -->
-              <div class="col-6">
-                <div class="creator-card text-center">
-                  <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar d-flex align-items-center justify-content-center overflow-hidden gp-creator-avatar">
-                    {% set img1 = site_settings.founder1_image %}
-                    {% if img1 %}
-                      {% if img1.startswith('http') %}
-                        <img src="{{ img1 }}"
-                            alt="{{ site_settings.founder1_name }}"
-                            class="w-100 h-100"
-                            style="object-fit: cover;">
-                      {% else %}
-                        <img src="{{ url_for('static', filename=img1.lstrip('/static/')) }}"
-                            alt="{{ site_settings.founder1_name }}"
-                            class="w-100 h-100"
-                            style="object-fit: cover;">
-                      {% endif %}
-                    {% else %}
-                      <img src="{{ url_for('static', filename='default-avatar.png') }}"
-                          alt="Default avatar"
-                          class="w-100 h-100"
-                          style="object-fit: cover;">
-                    {% endif %}
-                  </div>
-                  <h6 class="text-muted mb-0 gp-founder-name">
-                    {{ site_settings.founder1_name or "Founder 1" }}
-                  </h6>
-                </div>
-              </div>
-
-              <!-- Founder 2 -->
-              <div class="col-6">
-                <div class="creator-card text-center">
-                  <div class="creator-image-placeholder bg-light rounded-circle mx-auto mb-2 gp-creator-avatar d-flex align-items-center justify-content-center overflow-hidden gp-creator-avatar">
-                    {% set img2 = site_settings.founder2_image %}
-                    {% if img2 %}
-                      {% if img2.startswith('http') %}
-                        <img src="{{ img2 }}"
-                            alt="{{ site_settings.founder2_name }}"
-                            class="w-100 h-100"
-                            style="object-fit: cover;">
-                      {% else %}
-                        <img src="{{ url_for('static', filename=img2.lstrip('/static/')) }}"
-                            alt="{{ site_settings.founder2_name }}"
-                            class="w-100 h-100"
-                            style="object-fit: cover;">
-                      {% endif %}
-                    {% else %}
-                      <img src="{{ url_for('static', filename='default-avatar.png') }}"
-                          alt="Default avatar"
-                          class="w-100 h-100"
-                          style="object-fit: cover;">
-                    {% endif %}
-                  </div>
-                  <h6 class="text-muted mb-0 gp-founder-name">
-                    {{ site_settings.founder2_name or "Founder 2" }}
-                  </h6>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <p class="text-muted gp-card-body">
-            <strong>Our Mission:</strong>
-            {{ site_settings.mission_statement or
-              "Connecting creatives and audiences through events that foster an intimate and uplifting environment." }}
-          </p>
-        </div>
-      </div>
-
-      <!-- Contact Us Section -->
-      <div class="col-lg-4 col-md-12">
-        <div class="content-section bg-white p-4 rounded-3 shadow-sm h-100 gp-home-card gp-anim-init">
-          <div class="text-center mb-3">
-            <i class="fas fa-envelope fa-3x text-success mb-3 gp-card-icon"></i>
-
-            <div class="gp-card-title-wrap">
-              <h3 class="text-success gp-card-title">Contact Us</h3>
-            </div>
-          </div>
-
-          <div class="contact-info text-muted gp-card-body">
-            <div class="mb-3">
-              <i class="fas fa-envelope me-2 text-primary"></i>
-              <strong>Email:</strong>
-              <span class="ms-0">{{ site_settings.email }}</span>
-            </div>
-
-            <div class="mb-3">
-              <i class="fas fa-phone me-2 text-primary"></i>
-              <strong>Phone:</strong>
-              <span class="ms-0">{{ site_settings.phone }}</span>
-            </div>
-
-            <div class="mb-3">
-              <i class="fab fa-instagram me-2 text-primary"></i>
-              <strong>Instagram:</strong>
-              <a href="{{ site_settings.instagram_url }}"
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 class="ms-0 text-success text-decoration-none">
-                getpluggednj
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
-</div>
+</section>
+
+<!-- ===== OUR STORY ===== -->
+<section id="our-story" class="gp-section gp-section-tint">
+  <div class="gp-section-inner gp-story-inner">
+    <span class="gp-eyebrow gp-eyebrow-accent">Our Story</span>
+    <h2 class="gp-story-title">{{ site_settings.what_is_title or "Our Story" }}</h2>
+    <p class="gp-story-body">
+      {{ site_settings.what_is_body }}
+    </p>
+
+    <div class="gp-founders">
+      <div class="gp-founder">
+        <div class="gp-founder-avatar">
+          {% set img1 = site_settings.founder1_image %}
+          {% if img1 %}
+            {% if img1.startswith('http') %}
+              <img src="{{ img1 }}" alt="{{ site_settings.founder1_name }}">
+            {% else %}
+              <img src="{{ url_for('static', filename=img1.lstrip('/static/')) }}" alt="{{ site_settings.founder1_name }}">
+            {% endif %}
+          {% endif %}
+        </div>
+        <h6 class="gp-founder-name">{{ site_settings.founder1_name or "Founder 1" }}</h6>
+      </div>
+
+      <div class="gp-founder">
+        <div class="gp-founder-avatar">
+          {% set img2 = site_settings.founder2_image %}
+          {% if img2 %}
+            {% if img2.startswith('http') %}
+              <img src="{{ img2 }}" alt="{{ site_settings.founder2_name }}">
+            {% else %}
+              <img src="{{ url_for('static', filename=img2.lstrip('/static/')) }}" alt="{{ site_settings.founder2_name }}">
+            {% endif %}
+          {% endif %}
+        </div>
+        <h6 class="gp-founder-name">{{ site_settings.founder2_name or "Founder 2" }}</h6>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact" class="gp-section gp-section-grid">
+  <div class="gp-section-inner">
+    <span class="gp-eyebrow gp-eyebrow-accent">Connect</span>
+    <h2 class="gp-contact-title">Ready to Get<br><span class="gp-accent-text">Plugged In?</span></h2>
+    <p class="gp-contact-lede">
+      Whether you're an artist looking for access, a brand seeking authentic reach, or a venue wanting to be
+      part of the ecosystem &mdash; we want to hear from you.
+    </p>
+
+    <div class="gp-contact-ctas">
+      {% if site_settings.email %}
+      <a class="gp-btn gp-btn-solid" href="mailto:{{ site_settings.email }}">
+        Email Us <span class="gp-arrow">&#8599;</span>
+      </a>
+      {% endif %}
+      {% if site_settings.instagram_url %}
+      <a class="gp-btn gp-btn-ghost" href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer">
+        Follow @getpluggednj
+      </a>
+      {% endif %}
+    </div>
+
+    {% if site_settings.phone %}
+    <p class="gp-contact-phone">{{ site_settings.phone }}</p>
+    {% endif %}
+  </div>
+</section>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("GSAP:", typeof gsap);
-  console.log("ScrollTrigger:", typeof ScrollTrigger);
-
   const overlay = document.getElementById("gp-intro-overlay");
   const white = document.getElementById("gp-intro-white");
   if (typeof gsap === "undefined") return;
-
-  console.log("DOM loaded");
-  console.log("overlay exists:", !!document.getElementById("gp-intro-overlay"));
-  console.log("white exists:", !!document.getElementById("gp-intro-white"));
-
-  const heroCard = document.getElementById("gp-hero-card");
-  console.log("heroCard exists:", !!heroCard);
-
-  if (heroCard) {
-    const cs = getComputedStyle(heroCard);
-    console.log("hero computed opacity:", cs.opacity, "transform:", cs.transform);
-  }
 
   function playNav() {
     const logo = document.getElementById("gp-nav-logo");
     const items = gsap.utils.toArray(".gp-nav-item");
 
-    // If nothing found, just return null and continue
     if (!logo && items.length === 0) return null;
 
-    // Remove init class so they won't snap back
     if (logo) logo.classList.remove("gp-anim-init");
     items.forEach(el => el.classList.remove("gp-anim-init"));
 
-    // Force start hidden (so CSS isn't the only dependency)
     if (logo) gsap.set(logo, { opacity: 0, y: -14 });
     if (items.length) gsap.set(items, { opacity: 0, y: -12 });
 
     const tl = gsap.timeline();
 
-    // 1) Logo first
     if (logo) {
       tl.to(logo, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", clearProps: "transform" }, 0);
     }
 
-    // 2) Then nav items (stagger)
     if (items.length) {
       tl.to(items, {
         opacity: 1,
@@ -269,7 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return tl;
   }
 
-  // ---- HERO: Coming Soon animation (runs AFTER intro) ----
+  // ---- HERO entrance (runs AFTER intro) ----
   function playHero() {
     const heroCard = document.getElementById("gp-hero-card");
     if (!heroCard) return null;
@@ -278,20 +290,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const title = heroCard.querySelector(".gp-hero-title");
     const bodies = heroCard.querySelectorAll(".gp-hero-body");
-    const flyer = heroCard.querySelector(".gp-hero-flyer");
 
-    // Prevent “peeking” before animation
     if (title) gsap.set(title, { yPercent: 120 });
 
     const tl = gsap.timeline();
 
-    // Card entrance
     tl.fromTo(heroCard,
       { opacity: 0, y: 14 },
       { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }
     );
 
-    // Title clip reveal (works for BOTH h2 and h1)
     if (title) {
       tl.fromTo(title,
         { yPercent: 120 },
@@ -300,16 +308,6 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-    // Flyer blur->sharp (confirmed version)
-    if (flyer) {
-      tl.fromTo(flyer,
-        { opacity: 0, y: 16, filter: "blur(6px)" },
-        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: "power2.out" },
-        "-=0.45"
-      );
-    }
-
-    // Body text blur->sharp (not-confirmed version)
     if (bodies.length) {
       tl.fromTo(bodies,
         { opacity: 0, y: 10, filter: "blur(4px)" },
@@ -321,209 +319,50 @@ document.addEventListener("DOMContentLoaded", () => {
           ease: "power2.out",
           stagger: 0.08
         },
-        flyer ? "-=0.55" : "-=0.35"
+        "-=0.35"
       );
     }
 
     return tl;
   }
 
-  function setupCardsScrollReveal() {
-    console.log("setupCardsScrollReveal() called");
-
-    if (typeof ScrollTrigger === "undefined") {
-      console.log("ScrollTrigger missing");
-      return;
-    }
-
-    const row = document.getElementById("gp-home-cards");
-    const cards = gsap.utils.toArray(".gp-home-card");
-
-    // Hide inner content immediately to prevent flash before ScrollTrigger
-    cards.forEach(card => {
-      const foundersCard = card.querySelector(".gp-founders-card");
-      const foundersTitle = card.querySelector(".gp-founders-title");
-      const founderAvatars = card.querySelectorAll(".gp-creator-avatar");
-
-      if (foundersCard) gsap.set(foundersCard, { opacity: 0, y: 10 });
-      if (foundersTitle) gsap.set(foundersTitle, { yPercent: 140, opacity: 1 }); // clip reveal style
-      if (founderAvatars.length) gsap.set(founderAvatars, { opacity: 0, y: 10, scale: 0.98 });
-
-      const icon = card.querySelector(".gp-card-icon");
-      const title = card.querySelector(".gp-card-title");
-      const bodies = card.querySelectorAll(".gp-card-body");
-
-      if (icon) gsap.set(icon, { opacity: 0, y: 12, scale: 0.96 });
-      if (title) gsap.set(title, { opacity: 1, yPercent: 120 }); // visible but clipped by wrapper
-      if (bodies.length) gsap.set(bodies, { opacity: 0, y: 10, filter: "blur(4px)" });
-
-      const founderNames = card.querySelectorAll(".gp-founder-name");
-      if (founderNames.length) gsap.set(founderNames, { opacity: 0, y: 8, filter: "blur(3px)" });
-    });
-
-    console.log("row found:", !!row, "cards found:", cards.length);
-
-    if (!row || cards.length === 0) return;
-
-    // Force-hide start via GSAP (so CSS is not a dependency)
-    gsap.set(cards, { opacity: 0, y: 18 });
-
-    const run = () => {
-      // ✅ first: remove init class (optional now)
-      cards.forEach(c => c.classList.remove("gp-anim-init"));
-
-      // 1) Reveal card containers
-      gsap.to(cards, {
-        opacity: 1,
-        y: 0,
-        duration: 0.75,
-        ease: "power2.out",
-        stagger: 0.12,
-        clearProps: "transform",
-        onComplete: () => {
-
-          // 2) Animate inner content
-          cards.forEach((card, i) => {
-            const icon = card.querySelector(".gp-card-icon");
-            const title = card.querySelector(".gp-card-title");
-            const bodies = card.querySelectorAll(".gp-card-body");
-
-            const innerTl = gsap.timeline({ delay: i * 0.10 });
-
-            if (icon) {
-              innerTl.to(icon, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power2.out" }, 0);
-            }
-
-            if (title) {
-              // ✅ animate from the already-prepped yPercent:120
-              innerTl.to(title, { yPercent: 0, duration: 0.55, ease: "power3.out" }, 0.06);
-            }
-
-            if (bodies.length) {
-              innerTl.to(bodies, {
-                opacity: 1,
-                y: 0,
-                filter: "blur(0px)",
-                duration: 0.55,
-                ease: "power2.out",
-                stagger: 0.06
-              }, 0.10);
-            }
-
-            const foundersCard = card.querySelector(".gp-founders-card");
-            const foundersTitle = card.querySelector(".gp-founders-title");
-            const founderAvatars = card.querySelectorAll(".gp-creator-avatar");
-
-            if (foundersCard) {
-              // 1) founders container fades in
-              innerTl.to(foundersCard, {
-                opacity: 1,
-                y: 0,
-                duration: 0.55,
-                ease: "power2.out",
-                clearProps: "transform"
-              }, ">-=0.10"); // starts right after card body finishes (slight overlap)
-
-              // 2) founders header clip reveal
-              if (foundersTitle) {
-                innerTl.to(foundersTitle, {
-                  yPercent: 0,
-                  duration: 0.55,
-                  ease: "power3.out",
-                  clearProps: "transform"
-                }, ">-=0.25");
-              }
-
-              // 3) avatars reveal (left -> right)
-              if (founderAvatars.length) {
-                innerTl.to(founderAvatars, {
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  duration: 0.55,
-                  ease: "power2.out",
-                  stagger: 0.10,
-                  clearProps: "transform"
-                }, ">-=0.25");
-              }
-
-              const founderNames = card.querySelectorAll(".gp-founder-name");
-
-              if (founderNames.length) {
-                innerTl.to(founderNames, {
-                  opacity: 1,
-                  y: 0,
-                  filter: "blur(0px)",
-                  duration: 0.45,
-                  ease: "power2.out",
-                  stagger: 0.08,
-                  clearProps: "transform,filter"
-                }, ">-=0.25");
-              }
-            }
-          });
-        }
-      });
-    };
-
-    const st = ScrollTrigger.create({
-      trigger: row,
-      start: "top 85%",
-      once: true,
-      onEnter: run
-    });
-
-    console.log("ScrollTrigger created. isActive:", st.isActive);
-
-    // If it's already in view at load, run immediately
-    if (st.isActive) run();
-
-    // And refresh triggers after layout/images settle
-    ScrollTrigger.refresh();
-  }
-
   function runEntrance() {
     const navTl = playNav();
 
     const startHero = () => {
-      const heroTl = playHero();
-
-      if (heroTl) {
-        heroTl.eventCallback("onComplete", () => {
-          setupCardsScrollReveal();
-        });
-      } else {
-        setupCardsScrollReveal();
-      }
+      playHero();
     };
 
     if (navTl) navTl.eventCallback("onComplete", startHero);
     else startHero();
   }
-  
+
   // ---- INTRO: only on first visit this session ----
   const KEY = "gp_home_intro_played_v1";
 
-  // If overlay elements aren't present, just play hero.
   if (!overlay || !white) {
     runEntrance();
     return;
   }
 
-  // If already played, remove overlay immediately and play hero right away.
+  // Dev/QA convenience: ?nointro=1 skips the intro overlay entirely
+  if (new URLSearchParams(location.search).get("nointro") === "1") {
+    overlay.remove();
+    runEntrance();
+    return;
+  }
+
   if (sessionStorage.getItem(KEY) === "1") {
     overlay.remove();
     runEntrance();
     return;
   }
 
-  // Mark as played now
   sessionStorage.setItem(KEY, "1");
 
-  // Compute final scale for the white “wipe”
   const w = window.innerWidth;
   const h = window.innerHeight;
-  const finalRadius = Math.ceil(Math.sqrt(w*w + h*h));
+  const finalRadius = Math.ceil(Math.sqrt(w * w + h * h));
   const baseSize = 140;
   const finalScale = finalRadius / baseSize;
 
@@ -533,7 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const intro = gsap.timeline({ defaults: { ease: "power2.inOut" } });
 
   intro
-    .to({}, { duration: 1.5 }) // black hold
+    .to({}, { duration: 1.5 })
     .to(white, { opacity: 1, scale: 1, duration: 1.0, ease: "power2.out" })
     .to(white, { scale: 2.2, duration: 0.55 })
     .to(white, { scale: finalScale, duration: 0.9 }, "<")
@@ -542,13 +381,6 @@ document.addEventListener("DOMContentLoaded", () => {
       overlay.remove();
       runEntrance();
     });
-
 });
 </script>
 {% endblock %}
-
-
-
-
-
-

@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,700;1,900&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
+@import 'tailwindcss';
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-surface: var(--surface);
+
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-editorial: 'Bricolage Grotesque', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
+
+:root {
+  --background: #F1ECE3;
+  --foreground: #262321;
+  --card: #F1ECE3;
+  --card-foreground: #262321;
+  --surface: #E4DDD3;
+  --primary: #40B648;
+  --primary-foreground: #ffffff;
+  --muted: #DDD8CE;
+  --muted-foreground: #6B6560;
+  --accent: #40B648;
+  --accent-foreground: #ffffff;
+  --border: #D0C9BF;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  letter-spacing: 0;
+  font-weight: 100;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--background); }
+::-webkit-scrollbar-thumb { background: var(--border); }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* Subtle grid texture */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(38,35,33,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(38,35,33,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Dark invert sections (story, footer CTA) */
+.section-dark {
+  background-color: #262321;
+  color: #F1ECE3;
+}
+
+/* Ticker */
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-ticker { animation: ticker 30s linear infinite; }
+
+/* Modal */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeUp { animation: fadeUp 0.28s ease forwards; }

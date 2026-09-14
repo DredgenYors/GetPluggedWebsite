@@ -1,0 +1,10 @@
+{
+  "description": "Engage with a vibrant cultural community through a polished website showcasing events, services, and collaborations, designed for music and culture enthusiasts.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

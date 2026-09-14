@@ -11,11 +11,11 @@ class SiteSettingsForm(FlaskForm):
     phone = StringField("Phone", validators=[Optional()])
     instagram_url = StringField("Instagram", validators=[Optional(), URL(message="Enter a valid URL")])
 
-    coming_soon_title = StringField("'Coming Soon' Title", validators=[Optional(), Length(max=200)])
-    coming_soon_body = TextAreaField("'Coming Soon' Message", validators=[Optional()])
+    coming_soon_title = StringField("'Stay Plugged In' Title (shown when no event is confirmed)", validators=[Optional(), Length(max=200)])
+    coming_soon_body = TextAreaField("'Stay Plugged In' Message (shown when no event is confirmed)", validators=[Optional()])
 
-    what_is_title = StringField("'What is GPNJ' Title", validators=[Optional(), Length(max=200)])
-    what_is_body = TextAreaField("'What is GPNJ' Message", validators=[Optional()])
+    what_is_title = StringField("'Our Story' Title", validators=[Optional(), Length(max=200)])
+    what_is_body = TextAreaField("'Our Story' Blurb", validators=[Optional()])
 
     mission_statement = TextAreaField("Mission Statement", validators=[Optional()])
 

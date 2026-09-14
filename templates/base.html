@@ -7,65 +7,141 @@
     <script> document.documentElement.classList.add("js"); </script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Serif:wght@400;600&family=Chivo:wght@400;700&family=Merriweather:wght@400;700&family=Spectral:wght@400;700&family=Be+Vietnam+Pro:wght@400;600&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,700;1,900&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
+    <div class="gp-bg-top" aria-hidden="true"></div>
+    <div class="gp-bg-noise" aria-hidden="true"></div>
     {% block intro_overlay %}{% endblock %}
+
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand fw-bold p-0 m-0" href="{{ url_for('home') }}">
+    <nav class="gp-nav" id="gp-nav">
+        <div class="gp-nav-inner">
+            <a class="gp-nav-brand" href="{{ url_for('home') }}">
                 <img id="gp-nav-logo"
-                     class="navbar-logo {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                     class="gp-nav-logo {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
                      src="{{ url_for('static', filename='gplogotext.png') }}"
-                     alt="GetPlugged Logo">
+                     alt="Get Plugged NJ">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+
+            <button class="gp-nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#gpNavLinks" aria-controls="gpNavLinks" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
             </button>
-            <div class="collapse navbar-collapse fw-bold " id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-lg gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
-                            href="{{ url_for('admin_home') }}">Admin Settings</a>
+
+            <div class="collapse navbar-collapse gp-nav-collapse" id="gpNavLinks">
+                <ul class="gp-nav-links">
+                    <li>
+                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           href="{{ url_for('home') }}#mission">Mission</a>
+                    </li>
+                    <li>
+                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           href="{{ url_for('home') }}#services">Services</a>
+                    </li>
+                    <li>
+                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %} {% if request.endpoint == 'previous' %}active{% endif %}"
+                           href="{{ url_for('previous') }}">Gallery</a>
+                    </li>
+                    <li>
+                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           href="{{ url_for('home') }}#stay-plugged-in">Stay Plugged In</a>
+                    </li>
+                    <li>
+                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           href="{{ url_for('home') }}#our-story">Our Story</a>
+                    </li>
+                    <li>
+                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           href="{{ url_for('home') }}#contact">Contact</a>
+                    </li>
+
+                    {% if site_settings.events_confirmed %}
+                    <li>
+                        <a class="gp-nav-item gp-nav-item-utility {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           href="{{ site_settings.ticket_url }}" target="_blank" rel="noopener noreferrer">Tickets</a>
                     </li>
                     {% endif %}
-                    <li class="nav-item">
-                        {% if site_settings.events_confirmed %}
-                        <li class="nav-item">
-                        <a class="nav-link nav-link-lg gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
-                            href="{{ site_settings.ticket_url }}">Purchase Tickets</a>
-                        </li>
-                        {% endif %}
+
+                    {% if current_user.is_authenticated %}
+                    <li>
+                        <a class="gp-nav-item gp-nav-item-utility {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           href="{{ url_for('admin_home') }}">Admin</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-lg gp-nav-item
-                                    {% if request.endpoint == 'home' %}gp-anim-init{% endif %}
-                                    {% if request.endpoint == 'previous' %}active{% endif %}"
-                            href="{{ url_for('previous') }}">Previous Events</a>
+                    <li>
+                        <a class="gp-nav-item gp-nav-item-utility {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           href="{{ url_for('logout') }}">Log Out</a>
                     </li>
+                    {% endif %}
                 </ul>
+
+                <a class="gp-nav-cta {% if request.endpoint == 'home' %}gp-anim-init{% endif %}" href="{{ url_for('home') }}#contact">
+                    Get Plugged <span class="gp-arrow">&#8599;</span>
+                </a>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="container mt-4">
+    <main class="gp-main">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-light text-center py-3 mt-5">
-        <div class="container">
-            <p>&copy; 2026 GetPlugged. All rights reserved.</p>
+    <footer class="gp-footer">
+        <div class="gp-footer-inner">
+            <div class="gp-footer-brand">
+                <img src="{{ url_for('static', filename='gplogotext.png') }}" alt="Get Plugged NJ" class="gp-footer-logo">
+                <span class="gp-footer-copy">&copy; 2026 Get Plugged NJ. All rights reserved.</span>
+            </div>
+            <div class="gp-footer-links">
+                {% if site_settings.instagram_url %}
+                <a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer">Instagram</a>
+                {% endif %}
+                {% if site_settings.email %}
+                <a href="mailto:{{ site_settings.email }}">{{ site_settings.email }}</a>
+                {% endif %}
+            </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    if (typeof gsap === "undefined") return;
+
+    const noise = document.querySelector(".gp-bg-noise");
+    if (!noise) return;
+
+    // subtle continuous drift (so it's not static)
+    gsap.to(noise, {
+        backgroundPosition: "260px 260px",
+        duration: 18,
+        ease: "none",
+        repeat: -1
+    });
+
+    // tiny mouse parallax (optional, very subtle)
+    const strength = 6;
+    window.addEventListener("mousemove", (e) => {
+        const x = (e.clientX / window.innerWidth - 0.5) * strength;
+        const y = (e.clientY / window.innerHeight - 0.5) * strength;
+        gsap.to(noise, { x, y, duration: 0.6, ease: "power2.out" });
+    }, { passive: true });
+
+    // fixed nav: subtle "scrolled" state
+    const nav = document.getElementById("gp-nav");
+    if (nav) {
+        const onScroll = () => nav.classList.toggle("is-scrolled", window.scrollY > 40);
+        window.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+    }
+    });
+    </script>
+
 {% block scripts %}{% endblock %}
 </body>
 </html>

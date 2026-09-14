@@ -27,13 +27,15 @@ class SiteSettings(db.Model):
     phone = db.Column(db.String(50), default="", nullable=False)
     instagram_url = db.Column(db.String(500), default="https://www.instagram.com/getpluggednj/", nullable=False)
 
-    coming_soon_title = db.Column(db.String(200), default="Exciting Events Coming Soon!", nullable=False)
-    coming_soon_body = db.Column(db.Text, default="We're currently planning our next amazing events and experiences.", nullable=False)
+    # Drives the "Stay Plugged In" section when no event is confirmed
+    coming_soon_title = db.Column(db.String(200), default="More on the way", nullable=False)
+    coming_soon_body = db.Column(db.Text, default="We're lining up our next event, collab, or drop. Follow along so you don't miss it.", nullable=False)
 
-    what_is_title = db.Column(db.String(200), default="What is GPNJ?", nullable=False)
-    what_is_body = db.Column(db.Text, default="", nullable=False)
+    # Drives the "Our Story" section heading + blurb (paired with founder cards below)
+    what_is_title = db.Column(db.String(200), default="Our Story", nullable=False)
+    what_is_body = db.Column(db.Text, default="Get Plugged started with a simple idea: creativity moves faster with the right people around it. What began with a single event has grown into an ongoing effort to connect emerging artists, creators, and local brands with the access, resources, and collaborators they need for their next step.", nullable=False)
 
-    mission_statement = db.Column(db.Text, default="Connecting creatives and audiences through events that foster an intimate and uplifting environment.", nullable=False)
+    mission_statement = db.Column(db.Text, default="Get Plugged exists to bridge the gap between potential and access. We connect emerging artists, creators, and local brands with the people, resources, and opportunities they need to reach their next level.", nullable=False)
 
     # NEW: Team images + names
     founder1_name = db.Column(db.String(200), default="Jordan Scott-Young", nullable=False)
@@ -198,7 +200,14 @@ def inject_settings():
 def home():
     """Home page route"""
     next_event = upcoming_events[0] if upcoming_events else None
-    return render_template('home.html', next_event=next_event)
+
+    # Small "Gallery" preview: most recent events, each with one cover photo if available
+    gallery_preview = []
+    for ev in Event.query.order_by(Event.date.desc()).limit(4).all():
+        cover = Media.query.filter_by(event_id=ev.id, media_type="photo").order_by(Media.id.desc()).first()
+        gallery_preview.append({"event": ev, "cover": cover})
+
+    return render_template('home.html', next_event=next_event, gallery_preview=gallery_preview)
 
 @app.route("/previous")
 def previous():
