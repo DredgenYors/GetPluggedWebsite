@@ -26,8 +26,11 @@ by newer code. Nothing was deleted — this is a holding area.
   upcoming_coming_soon, upcoming_confirmed) — pages with no route in
   `getpluggedv1.py` pointing at them; not reachable from the live site.
 - `static/` (GPLogo.png, GPLogo_upscayl..., gplogotext.svg,
-  Portrait_Placeholder.png, updatedstyles.css) — assets/styles not
-  referenced by any current template.
+  updatedstyles.css) — assets/styles not referenced by any current
+  template. (`Portrait_Placeholder.png` was moved here by mistake in the
+  initial pass — it's actually referenced via the `SiteSettings.founder1_image`
+  / `founder2_image` DB fields, not a template, so it was moved back to
+  `static/`.)
 - `TestingHelloWorld.slnx` — a Visual Studio solution file unrelated to
   this Flask project; kept here in case it was intentional, but it looks
   like a stray file from something else.
