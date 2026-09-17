@@ -15,21 +15,21 @@
   <div class="gp-section-inner gp-hero-inner">
     <div class="gp-eyebrow-row">
       <span class="gp-eyebrow-rule"></span>
-      <span class="gp-eyebrow">{{ site_settings.hero_eyebrow }}</span>
+      <span class="gp-eyebrow" data-editable data-field="hero_eyebrow" data-type="text">{{ site_settings.hero_eyebrow }}</span>
     </div>
 
     <div class="gp-hero-title-wrap">
-      <h1 class="gp-hero-title">{{ site_settings.hero_headline }}</h1>
+      <h1 class="gp-hero-title" data-editable data-field="hero_headline" data-type="text">{{ site_settings.hero_headline }}</h1>
     </div>
 
-    <p class="gp-hero-body gp-hero-sub">{{ site_settings.hero_subhead }}</p>
+    <p class="gp-hero-body gp-hero-sub" data-editable data-field="hero_subhead" data-type="text">{{ site_settings.hero_subhead }}</p>
 
     <div class="gp-hero-ctas">
       <a class="gp-btn gp-btn-solid gp-hero-body" href="#contact">
-        {{ site_settings.hero_cta_primary_label }} <span class="gp-arrow">&#8599;</span>
+        <span data-editable data-field="hero_cta_primary_label" data-type="text">{{ site_settings.hero_cta_primary_label }}</span> <span class="gp-arrow">&#8599;</span>
       </a>
       <a class="gp-btn gp-btn-outline gp-hero-body" href="#stay-plugged-in">
-        {{ site_settings.hero_cta_secondary_label }} <span class="gp-chevron">&rsaquo;</span>
+        <span data-editable data-field="hero_cta_secondary_label" data-type="text">{{ site_settings.hero_cta_secondary_label }}</span> <span class="gp-chevron">&rsaquo;</span>
       </a>
     </div>
   </div>
@@ -39,11 +39,11 @@
 <section id="mission" class="gp-section gp-section-tint">
   <div class="gp-section-inner gp-mission-grid">
     <div class="gp-mission-label">
-      <span class="gp-eyebrow">{{ site_settings.mission_eyebrow }}</span>
+      <span class="gp-eyebrow" data-editable data-field="mission_eyebrow" data-type="text">{{ site_settings.mission_eyebrow }}</span>
       <div class="gp-rule"></div>
     </div>
     <div>
-      <p class="gp-mission-statement">
+      <p class="gp-mission-statement" data-editable data-field="mission_statement" data-type="textarea">
         {{ site_settings.mission_statement }}
       </p>
       <a class="gp-textlink" href="#our-story">Our Story <span class="gp-arrow">&#8599;</span></a>
@@ -56,46 +56,46 @@
   <div class="gp-section-inner">
     <div class="gp-section-head">
       <div>
-        <span class="gp-eyebrow">{{ site_settings.services_eyebrow }}</span>
-        <h2 class="gp-section-title">{{ site_settings.services_heading }}</h2>
+        <span class="gp-eyebrow" data-editable data-field="services_eyebrow" data-type="text">{{ site_settings.services_eyebrow }}</span>
+        <h2 class="gp-section-title" data-editable data-field="services_heading" data-type="text">{{ site_settings.services_heading }}</h2>
       </div>
-      {% if site_settings.services_image %}
-        <img class="gp-services-image gp-services-image-real" src="{{ site_image(site_settings.services_image) }}" alt="">
-      {% else %}
-        <div class="gp-services-image" role="img" aria-label="Placeholder image">
+      <div class="gp-services-image" data-editable-image data-field="services_image" role="img" aria-label="Placeholder image">
+        {% if site_settings.services_image %}
+          <img src="{{ site_image(site_settings.services_image) }}" alt="">
+        {% else %}
           <i class="fas fa-image"></i>
           <span>Add photo</span>
-        </div>
-      {% endif %}
+        {% endif %}
+      </div>
     </div>
 
     <div class="gp-services-grid">
       <div class="gp-service">
         <span class="gp-service-num">01</span>
         <div>
-          <h3>{{ site_settings.service1_title }}</h3>
-          <p>{{ site_settings.service1_body }}</p>
+          <h3 data-editable data-field="service1_title" data-type="text">{{ site_settings.service1_title }}</h3>
+          <p data-editable data-field="service1_body" data-type="textarea">{{ site_settings.service1_body }}</p>
         </div>
       </div>
       <div class="gp-service">
         <span class="gp-service-num">02</span>
         <div>
-          <h3>{{ site_settings.service2_title }}</h3>
-          <p>{{ site_settings.service2_body }}</p>
+          <h3 data-editable data-field="service2_title" data-type="text">{{ site_settings.service2_title }}</h3>
+          <p data-editable data-field="service2_body" data-type="textarea">{{ site_settings.service2_body }}</p>
         </div>
       </div>
       <div class="gp-service">
         <span class="gp-service-num">03</span>
         <div>
-          <h3>{{ site_settings.service3_title }}</h3>
-          <p>{{ site_settings.service3_body }}</p>
+          <h3 data-editable data-field="service3_title" data-type="text">{{ site_settings.service3_title }}</h3>
+          <p data-editable data-field="service3_body" data-type="textarea">{{ site_settings.service3_body }}</p>
         </div>
       </div>
       <div class="gp-service">
         <span class="gp-service-num">04</span>
         <div>
-          <h3>{{ site_settings.service4_title }}</h3>
-          <p>{{ site_settings.service4_body }}</p>
+          <h3 data-editable data-field="service4_title" data-type="text">{{ site_settings.service4_title }}</h3>
+          <p data-editable data-field="service4_body" data-type="textarea">{{ site_settings.service4_body }}</p>
         </div>
       </div>
     </div>
@@ -107,10 +107,10 @@
   <div class="gp-section-inner">
     <div class="gp-section-head">
       <div>
-        <span class="gp-eyebrow">{{ site_settings.gallery_eyebrow }}</span>
-        <h2 class="gp-section-title">{{ site_settings.gallery_heading }}</h2>
+        <span class="gp-eyebrow" data-editable data-field="gallery_eyebrow" data-type="text">{{ site_settings.gallery_eyebrow }}</span>
+        <h2 class="gp-section-title" data-editable data-field="gallery_heading" data-type="text">{{ site_settings.gallery_heading }}</h2>
       </div>
-      <p class="gp-section-lede">{{ site_settings.gallery_note }}</p>
+      <p class="gp-section-lede" data-editable data-field="gallery_note" data-type="text">{{ site_settings.gallery_note }}</p>
     </div>
 
     {% if gallery_preview %}
@@ -145,10 +145,10 @@
   <div class="gp-section-inner">
     <div class="gp-section-head">
       <div>
-        <span class="gp-eyebrow">{{ site_settings.stay_plugged_eyebrow }}</span>
-        <h2 class="gp-section-title">{{ site_settings.stay_plugged_heading }}</h2>
+        <span class="gp-eyebrow" data-editable data-field="stay_plugged_eyebrow" data-type="text">{{ site_settings.stay_plugged_eyebrow }}</span>
+        <h2 class="gp-section-title" data-editable data-field="stay_plugged_heading" data-type="text">{{ site_settings.stay_plugged_heading }}</h2>
       </div>
-      <p class="gp-section-lede">{{ site_settings.stay_plugged_lede }}</p>
+      <p class="gp-section-lede" data-editable data-field="stay_plugged_lede" data-type="text">{{ site_settings.stay_plugged_lede }}</p>
     </div>
 
     <div class="gp-next-rows">
@@ -157,8 +157,8 @@
           <span class="gp-next-row-num">{{ "%02d"|format(loop.index) }}</span>
           <div class="gp-next-row-body">
             <span class="gp-label-accent">{{ row.label }}</span>
-            <h3 class="gp-next-row-title">{{ row.title }}</h3>
-            {% if row.detail %}<p class="gp-next-row-detail">{{ row.detail }}</p>{% endif %}
+            <h3 class="gp-next-row-title"{% if row.title_field %} data-editable data-field="{{ row.title_field }}" data-type="text"{% endif %}>{{ row.title }}</h3>
+            {% if row.detail %}<p class="gp-next-row-detail"{% if row.detail_field %} data-editable data-field="{{ row.detail_field }}" data-type="textarea"{% endif %}>{{ row.detail }}</p>{% endif %}
           </div>
           <div class="gp-next-row-meta">
             {% if row.date %}<div class="gp-next-row-date">{{ row.date }}</div>{% endif %}
@@ -169,7 +169,7 @@
     </div>
 
     <div class="gp-section-foot">
-      <a class="gp-textlink" href="#contact">{{ site_settings.stay_plugged_footer_text }} <span class="gp-arrow">&#8599;</span></a>
+      <a class="gp-textlink" href="#contact"><span data-editable data-field="stay_plugged_footer_text" data-type="text">{{ site_settings.stay_plugged_footer_text }}</span> <span class="gp-arrow">&#8599;</span></a>
     </div>
   </div>
 </section>
@@ -177,8 +177,8 @@
 <!-- ===== OUR STORY ===== -->
 <section id="our-story" class="gp-section gp-section-tint">
   <div class="gp-section-inner gp-story-inner">
-    <span class="gp-eyebrow gp-eyebrow-accent">{{ site_settings.our_story_eyebrow }}</span>
-    <h2 class="gp-story-title">{{ site_settings.what_is_title or "Born In NJ, Made To Connect." }}</h2>
+    <span class="gp-eyebrow gp-eyebrow-accent" data-editable data-field="our_story_eyebrow" data-type="text">{{ site_settings.our_story_eyebrow }}</span>
+    <h2 class="gp-story-title" data-editable data-field="what_is_title" data-type="text">{{ site_settings.what_is_title or "Born In NJ, Made To Connect." }}</h2>
 
     <div class="gp-story-paragraphs">
       {% for para in (site_settings.what_is_body or "").split('\n\n') %}
@@ -187,28 +187,28 @@
     </div>
 
     <div class="gp-story-stats">
-      <div><div class="gp-story-stat-value">{{ site_settings.stat1_value }}</div><div class="gp-story-stat-label">{{ site_settings.stat1_label }}</div></div>
-      <div><div class="gp-story-stat-value">{{ site_settings.stat2_value }}</div><div class="gp-story-stat-label">{{ site_settings.stat2_label }}</div></div>
-      <div><div class="gp-story-stat-value">{{ site_settings.stat3_value }}</div><div class="gp-story-stat-label">{{ site_settings.stat3_label }}</div></div>
+      <div><div class="gp-story-stat-value" data-editable data-field="stat1_value" data-type="text">{{ site_settings.stat1_value }}</div><div class="gp-story-stat-label" data-editable data-field="stat1_label" data-type="text">{{ site_settings.stat1_label }}</div></div>
+      <div><div class="gp-story-stat-value" data-editable data-field="stat2_value" data-type="text">{{ site_settings.stat2_value }}</div><div class="gp-story-stat-label" data-editable data-field="stat2_label" data-type="text">{{ site_settings.stat2_label }}</div></div>
+      <div><div class="gp-story-stat-value" data-editable data-field="stat3_value" data-type="text">{{ site_settings.stat3_value }}</div><div class="gp-story-stat-label" data-editable data-field="stat3_label" data-type="text">{{ site_settings.stat3_label }}</div></div>
     </div>
 
     <div class="gp-founders">
       <div class="gp-founder">
-        <div class="gp-founder-avatar">
+        <div class="gp-founder-avatar" data-editable-image data-field="founder1_image">
           {% if site_settings.founder1_image %}
             <img src="{{ site_image(site_settings.founder1_image) }}" alt="{{ site_settings.founder1_name }}">
           {% endif %}
         </div>
-        <h6 class="gp-founder-name">{{ site_settings.founder1_name or "Founder 1" }}</h6>
+        <h6 class="gp-founder-name" data-editable data-field="founder1_name" data-type="text">{{ site_settings.founder1_name or "Founder 1" }}</h6>
       </div>
 
       <div class="gp-founder">
-        <div class="gp-founder-avatar">
+        <div class="gp-founder-avatar" data-editable-image data-field="founder2_image">
           {% if site_settings.founder2_image %}
             <img src="{{ site_image(site_settings.founder2_image) }}" alt="{{ site_settings.founder2_name }}">
           {% endif %}
         </div>
-        <h6 class="gp-founder-name">{{ site_settings.founder2_name or "Founder 2" }}</h6>
+        <h6 class="gp-founder-name" data-editable data-field="founder2_name" data-type="text">{{ site_settings.founder2_name or "Founder 2" }}</h6>
       </div>
     </div>
   </div>
@@ -217,21 +217,24 @@
 <!-- ===== CONTACT ===== -->
 <section id="contact" class="gp-section gp-section-grid">
   <div class="gp-section-inner">
-    <span class="gp-eyebrow gp-eyebrow-accent">{{ site_settings.contact_eyebrow }}</span>
-    <h2 class="gp-contact-title">{{ site_settings.contact_heading_line1 }}<br><span class="gp-accent-text">{{ site_settings.contact_heading_line2 }}</span></h2>
-    <p class="gp-contact-lede">
+    <span class="gp-eyebrow gp-eyebrow-accent" data-editable data-field="contact_eyebrow" data-type="text">{{ site_settings.contact_eyebrow }}</span>
+    <h2 class="gp-contact-title">
+      <span data-editable data-field="contact_heading_line1" data-type="text">{{ site_settings.contact_heading_line1 }}</span><br>
+      <span class="gp-accent-text" data-editable data-field="contact_heading_line2" data-type="text">{{ site_settings.contact_heading_line2 }}</span>
+    </h2>
+    <p class="gp-contact-lede" data-editable data-field="contact_lede" data-type="textarea">
       {{ site_settings.contact_lede }}
     </p>
 
     <div class="gp-contact-ctas">
       {% if site_settings.email %}
       <a class="gp-btn gp-btn-solid" href="mailto:{{ site_settings.email }}">
-        {{ site_settings.contact_cta_email_label }} <span class="gp-arrow">&#8599;</span>
+        <span data-editable data-field="contact_cta_email_label" data-type="text">{{ site_settings.contact_cta_email_label }}</span> <span class="gp-arrow">&#8599;</span>
       </a>
       {% endif %}
       {% if site_settings.instagram_url %}
       <a class="gp-btn gp-btn-ghost" href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer">
-        {{ site_settings.contact_cta_follow_label }}
+        <span data-editable data-field="contact_cta_follow_label" data-type="text">{{ site_settings.contact_cta_follow_label }}</span>
       </a>
       {% endif %}
     </div>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, abort
+from flask import Flask, render_template, redirect, url_for, flash, request, abort, jsonify
 import os
 import uuid
 from datetime import datetime
@@ -44,6 +44,54 @@ def save_uploaded_image(file_storage, prefix):
     filename = secure_filename(f"{prefix}-{uuid.uuid4().hex[:8]}.{ext}")
     file_storage.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
     return f"uploads/{filename}"
+
+
+# Whitelist of SiteSettings text columns that can be edited inline, on the page
+# itself, in "Edit Mode" -> max length allowed for each (matches the model).
+INLINE_TEXT_FIELDS = {
+    "nav_label_mission": 50, "nav_label_services": 50, "nav_label_gallery": 50,
+    "nav_label_stay_plugged": 50, "nav_label_our_story": 50, "nav_label_contact": 50,
+    "nav_cta_label": 50,
+
+    "hero_eyebrow": 200, "hero_headline": 100, "hero_subhead": 300,
+    "hero_cta_primary_label": 50, "hero_cta_secondary_label": 50,
+
+    "mission_eyebrow": 100, "mission_statement": 2000,
+
+    "services_eyebrow": 100, "services_heading": 200,
+    "service1_title": 200, "service1_body": 1000,
+    "service2_title": 200, "service2_body": 1000,
+    "service3_title": 200, "service3_body": 1000,
+    "service4_title": 200, "service4_body": 1000,
+
+    "gallery_eyebrow": 100, "gallery_heading": 200, "gallery_note": 300,
+
+    "stay_plugged_eyebrow": 100, "stay_plugged_heading": 200,
+    "stay_plugged_lede": 300, "stay_plugged_footer_text": 200,
+    "coming_soon_title": 200, "coming_soon_body": 1000,
+
+    # NOTE: what_is_body is intentionally excluded - it renders as multiple
+    # separate <p> tags (split on blank lines), which doesn't map to a single
+    # inline-editable element. Still editable from Admin > Settings.
+    "our_story_eyebrow": 100, "what_is_title": 200,
+    "stat1_value": 50, "stat1_label": 50,
+    "stat2_value": 50, "stat2_label": 50,
+    "stat3_value": 50, "stat3_label": 50,
+    "founder1_name": 200, "founder2_name": 200,
+
+    "contact_eyebrow": 100, "contact_heading_line1": 100, "contact_heading_line2": 100,
+    "contact_lede": 400, "contact_cta_email_label": 50, "contact_cta_follow_label": 50,
+
+    "footer_text": 200,
+}
+
+# Whitelist of SiteSettings image columns editable inline -> filename prefix to use.
+INLINE_IMAGE_FIELDS = {
+    "logo_image": "logo",
+    "services_image": "services",
+    "founder1_image": "founder1",
+    "founder2_image": "founder2",
+}
 
 class SiteSettings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -335,6 +383,8 @@ def home():
             "detail": settings.coming_soon_body or "",
             "date": "",
             "status": "Follow for Updates",
+            "title_field": "coming_soon_title",
+            "detail_field": "coming_soon_body",
         })
 
     return render_template(
@@ -525,6 +575,49 @@ def admin_settings():
         return redirect(url_for("admin_settings"))
 
     return render_template("admin/settings.html", form=form, settings=settings)
+
+@app.route("/admin/inline-edit", methods=["POST"])
+@admin_required
+def admin_inline_edit():
+    """Save a single SiteSettings text field, edited in place on the live page."""
+    data = request.get_json(silent=True) or {}
+    field = data.get("field")
+    value = data.get("value")
+
+    if field not in INLINE_TEXT_FIELDS:
+        return jsonify({"ok": False, "error": "Unknown field."}), 400
+    if not isinstance(value, str):
+        return jsonify({"ok": False, "error": "Invalid value."}), 400
+
+    value = value.strip()
+    max_len = INLINE_TEXT_FIELDS[field]
+    if len(value) > max_len:
+        return jsonify({"ok": False, "error": f"Too long (max {max_len} characters)."}), 400
+
+    settings = get_settings()
+    setattr(settings, field, value)
+    db.session.commit()
+
+    return jsonify({"ok": True, "value": value})
+
+@app.route("/admin/inline-edit-image", methods=["POST"])
+@admin_required
+def admin_inline_edit_image():
+    """Save a single SiteSettings image field, edited in place on the live page."""
+    field = request.form.get("field")
+    if field not in INLINE_IMAGE_FIELDS:
+        return jsonify({"ok": False, "error": "Unknown field."}), 400
+
+    file_storage = request.files.get("file")
+    path = save_uploaded_image(file_storage, INLINE_IMAGE_FIELDS[field])
+    if not path:
+        return jsonify({"ok": False, "error": "Please choose an image file (png, jpg, gif, or webp)."}), 400
+
+    settings = get_settings()
+    setattr(settings, field, path)
+    db.session.commit()
+
+    return jsonify({"ok": True, "url": site_image(path)})
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

@@ -1004,6 +1004,14 @@ body > footer{
   border-left: 1px solid var(--gp-border-warm);
 }
 
+.gp-nav-item-button{
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 .gp-nav-cta{
   display: inline-flex;
   align-items: center;
@@ -1364,13 +1372,15 @@ body > footer{
   font-size: 0.65rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  overflow: hidden;
 }
 
 .gp-services-image i{ font-size: 1.5rem; }
 
-.gp-services-image-real{
+.gp-services-image img{
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: none;
 }
 
 @media (min-width: 768px){
@@ -1893,3 +1903,69 @@ body > footer{
 }
 
 .gp-footer-links a:hover{ color: var(--gp-green); }
+
+/* ==========================================================================
+   INLINE EDIT MODE (admin only)
+   ========================================================================== */
+
+.gp-edit-mode [data-editable]{
+  border-radius: 2px;
+  transition: outline-color 0.15s ease, background-color 0.15s ease;
+  outline: 2px dashed transparent;
+  outline-offset: 3px;
+}
+
+.gp-edit-mode [data-editable]:hover{
+  outline-color: var(--gp-green);
+  background: rgba(64,182,72,0.08);
+  cursor: text;
+}
+
+.gp-edit-mode [data-editable].gp-editing{
+  outline: 2px solid var(--gp-green);
+  outline-offset: 3px;
+  background: #fff;
+  cursor: text;
+}
+
+.gp-edit-mode [data-editable-image]{
+  outline: 2px dashed transparent;
+  outline-offset: 3px;
+  transition: outline-color 0.15s ease;
+}
+
+.gp-edit-mode [data-editable-image]:hover{
+  outline-color: var(--gp-green);
+  cursor: pointer;
+}
+
+.gp-edit-saving{
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+#gp-edit-toast{
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--gp-charcoal);
+  color: var(--gp-cream);
+  padding: 0.65rem 1.25rem;
+  border-radius: 4px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#gp-edit-toast.show{
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+#gp-edit-toast.gp-edit-toast-error{
+  background: #b3261e;
+}

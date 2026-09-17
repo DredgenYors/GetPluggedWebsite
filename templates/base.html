@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,700;1,900&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    {% if current_user.is_authenticated and current_user.is_admin() %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {% endif %}
 </head>
 <body>
     <div class="gp-bg-top" aria-hidden="true"></div>
@@ -22,6 +25,7 @@
                 <img id="gp-nav-logo"
                      class="gp-nav-logo {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
                      src="{{ site_image(site_settings.logo_image, 'gplogotext.png') }}"
+                     data-editable-image data-field="logo_image"
                      alt="Get Plugged NJ">
             </a>
 
@@ -33,26 +37,32 @@
                 <ul class="gp-nav-links">
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           data-editable data-field="nav_label_mission" data-type="text"
                            href="{{ url_for('home') }}#mission">{{ site_settings.nav_label_mission }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           data-editable data-field="nav_label_services" data-type="text"
                            href="{{ url_for('home') }}#services">{{ site_settings.nav_label_services }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %} {% if request.endpoint == 'previous' %}active{% endif %}"
+                           data-editable data-field="nav_label_gallery" data-type="text"
                            href="{{ url_for('previous') }}">{{ site_settings.nav_label_gallery }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           data-editable data-field="nav_label_stay_plugged" data-type="text"
                            href="{{ url_for('home') }}#stay-plugged-in">{{ site_settings.nav_label_stay_plugged }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           data-editable data-field="nav_label_our_story" data-type="text"
                            href="{{ url_for('home') }}#our-story">{{ site_settings.nav_label_our_story }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                           data-editable data-field="nav_label_contact" data-type="text"
                            href="{{ url_for('home') }}#contact">{{ site_settings.nav_label_contact }}</a>
                     </li>
 
@@ -68,6 +78,12 @@
                         <a class="gp-nav-item gp-nav-item-utility {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
                            href="{{ url_for('admin_home') }}">Admin</a>
                     </li>
+                    {% if current_user.is_admin() %}
+                    <li>
+                        <button type="button" id="gp-edit-toggle"
+                           class="gp-nav-item gp-nav-item-utility gp-nav-item-button {% if request.endpoint == 'home' %}gp-anim-init{% endif %}">Edit Page</button>
+                    </li>
+                    {% endif %}
                     <li>
                         <a class="gp-nav-item gp-nav-item-utility {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
                            href="{{ url_for('logout') }}">Log Out</a>
@@ -76,7 +92,7 @@
                 </ul>
 
                 <a class="gp-nav-cta {% if request.endpoint == 'home' %}gp-anim-init{% endif %}" href="{{ url_for('home') }}#contact">
-                    {{ site_settings.nav_cta_label }} <span class="gp-arrow">&#8599;</span>
+                    <span data-editable data-field="nav_cta_label" data-type="text">{{ site_settings.nav_cta_label }}</span> <span class="gp-arrow">&#8599;</span>
                 </a>
             </div>
         </div>
@@ -92,7 +108,7 @@
         <div class="gp-footer-inner">
             <div class="gp-footer-brand">
                 <img src="{{ site_image(site_settings.logo_image, 'gplogotext.png') }}" alt="Get Plugged NJ" class="gp-footer-logo">
-                <span class="gp-footer-copy">&copy; {{ current_year }} {{ site_settings.footer_text }}</span>
+                <span class="gp-footer-copy">&copy; {{ current_year }} <span data-editable data-field="footer_text" data-type="text">{{ site_settings.footer_text }}</span></span>
             </div>
             <div class="gp-footer-links">
                 {% if site_settings.instagram_url %}
@@ -147,6 +163,10 @@
     }
     });
     </script>
+
+    {% if current_user.is_authenticated and current_user.is_admin() %}
+    <script src="{{ url_for('static', filename='js/inline-edit.js') }}"></script>
+    {% endif %}
 
 {% block scripts %}{% endblock %}
 </body>
