@@ -9,12 +9,12 @@
     {{ form.hidden_tag() }}
 
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
-      <h2 class="mb-0">Settings</h2>
+      <h2 class="mb-0">Settings <small class="text-muted fs-6">&mdash; No Code Required</small></h2>
       {{ form.submit(class="btn btn-success align-self-start align-self-sm-auto") }}
     </div>
 
     <p class="text-muted small mb-4">
-      Everything below controls the live text, images, and links on the public home page &mdash; no code required.
+      Everything below controls the live text, images, and links on the public home page.
       Changes take effect as soon as you save.
     </p>
 
@@ -51,7 +51,7 @@
     <!-- Hero -->
     <div class="card mb-4 shadow-sm">
       <div class="card-body">
-        <h5 class="mb-1">Hero</h5>
+        <h5 class="mb-1">Banner</h5>
         <p class="text-muted small mb-3">The large banner at the very top of the home page.</p>
 
         <div class="row g-3">
@@ -90,8 +90,7 @@
     <!-- Mission -->
     <div class="card mb-4 shadow-sm">
       <div class="card-body">
-        <h5 class="mb-1">Mission</h5>
-        <p class="text-muted small mb-3">A short, bold statement of what Get Plugged is for.</p>
+        <h5 class="mb-3">Mission</h5>
 
         <div class="row g-3">
           <div class="col-12">{{ form.mission_eyebrow.label(class="form-label") }}{{ form.mission_eyebrow(class="form-control") }}</div>
@@ -103,8 +102,7 @@
     <!-- Services -->
     <div class="card mb-4 shadow-sm">
       <div class="card-body">
-        <h5 class="mb-1">Services &amp; Experiences</h5>
-        <p class="text-muted small mb-3">The 4-item "what we do" grid.</p>
+        <h5 class="mb-3">Services &amp; Experiences</h5>
 
         <div class="row g-3 mb-3">
           <div class="col-md-6">{{ form.services_eyebrow.label(class="form-label") }}{{ form.services_eyebrow(class="form-control") }}</div>
@@ -207,17 +205,17 @@
 
         <div class="row g-3 mb-4">
           <div class="col-md-4">
-            <div class="fw-bold small text-muted mb-2">Stat 1</div>
+            <div class="fw-bold small text-muted mb-2">WIP 1</div>
             {{ form.stat1_value.label(class="form-label") }}{{ form.stat1_value(class="form-control mb-2") }}
             {{ form.stat1_label.label(class="form-label") }}{{ form.stat1_label(class="form-control") }}
           </div>
           <div class="col-md-4">
-            <div class="fw-bold small text-muted mb-2">Stat 2</div>
+            <div class="fw-bold small text-muted mb-2">WIP 2</div>
             {{ form.stat2_value.label(class="form-label") }}{{ form.stat2_value(class="form-control mb-2") }}
             {{ form.stat2_label.label(class="form-label") }}{{ form.stat2_label(class="form-control") }}
           </div>
           <div class="col-md-4">
-            <div class="fw-bold small text-muted mb-2">Stat 3</div>
+            <div class="fw-bold small text-muted mb-2">WIP 3</div>
             {{ form.stat3_value.label(class="form-label") }}{{ form.stat3_value(class="form-control mb-2") }}
             {{ form.stat3_label.label(class="form-label") }}{{ form.stat3_label(class="form-control") }}
           </div>
@@ -272,8 +270,7 @@
     <!-- Contact -->
     <div class="card mb-4 shadow-sm">
       <div class="card-body">
-        <h5 class="mb-1">Connect</h5>
-        <p class="text-muted small mb-3">The closing call-to-action section.</p>
+        <h5 class="mb-3">Connect</h5>
 
         <div class="row g-3 mb-4">
           <div class="col-md-4">{{ form.contact_eyebrow.label(class="form-label") }}{{ form.contact_eyebrow(class="form-control") }}</div>
