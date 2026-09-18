@@ -2017,7 +2017,11 @@ body > footer{
   z-index: 1100;
   background: var(--gp-green);
   color: #fff;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
   padding: 0.5rem 1rem;
   font-family: 'Space Mono', monospace;
   font-size: 0.72rem;
@@ -2029,6 +2033,37 @@ body > footer{
 
 #gp-edit-banner.show{
   transform: translateY(0);
+}
+
+.gp-edit-banner-action{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #fff;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 3px;
+  padding: 0.2rem 0.6rem;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.gp-edit-banner-action:hover{
+  background: rgba(255,255,255,0.32);
+  color: #fff;
+}
+
+.gp-edit-banner-action-danger{
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.15);
+}
+
+.gp-edit-banner-action-danger:hover{
+  background: #7a1d16;
 }
 
 body.gp-edit-mode .gp-nav{

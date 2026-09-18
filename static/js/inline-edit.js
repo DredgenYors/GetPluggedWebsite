@@ -271,6 +271,28 @@
     button.classList.remove("gp-edit-saving");
   }
 
+  async function deleteEvent(button) {
+    if (!window.confirm("Delete this event? This can't be undone.")) return;
+
+    button.classList.add("gp-edit-saving");
+    try {
+      const res = await fetch("/admin/inline-delete-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+        body: JSON.stringify({ event_id: button.dataset.eventId }),
+      });
+      const result = await res.json();
+      if (result.ok && result.redirect) {
+        window.location.href = result.redirect;
+        return;
+      }
+      showToast(result.error || "Couldn't delete event", true);
+    } catch (err) {
+      showToast("Network error", true);
+    }
+    button.classList.remove("gp-edit-saving");
+  }
+
   function setEditMode(on) {
     sessionStorage.setItem(EDIT_KEY, on ? "1" : "0");
     document.body.classList.toggle("gp-edit-mode", on);
@@ -296,6 +318,14 @@
       addEventBtn.addEventListener("click", (e) => {
         e.preventDefault();
         addEvent(addEventBtn);
+      });
+    }
+
+    const deleteEventBtn = document.getElementById("gp-delete-event");
+    if (deleteEventBtn) {
+      deleteEventBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        deleteEvent(deleteEventBtn);
       });
     }
 

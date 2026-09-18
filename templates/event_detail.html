@@ -2,6 +2,11 @@
 
 {% block title %}{{ event.title }} - Get Plugged NJ{% endblock %}
 
+{% block edit_banner_actions %}
+<a class="gp-edit-banner-action" href="{{ url_for('home') }}#gallery-preview">Save &amp; Return to Gallery</a>
+<button type="button" class="gp-edit-banner-action gp-edit-banner-action-danger" id="gp-delete-event" data-event-id="{{ event.id }}">Delete Event</button>
+{% endblock %}
+
 {% block content %}
 {% set can_edit = current_user.is_authenticated and current_user.is_admin() %}
 

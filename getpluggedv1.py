@@ -469,6 +469,19 @@ def admin_inline_add_event():
     db.session.commit()
     return jsonify({"ok": True, "redirect": url_for("event_detail", event_id=event.id)})
 
+@app.route("/admin/inline-delete-event", methods=["POST"])
+@admin_required
+def admin_inline_delete_event():
+    """Remove an event from the Gallery (e.g. added by mistake, or it's passed)."""
+    data = request.get_json(silent=True) or {}
+    event = Event.query.get(data.get("event_id"))
+    if not event:
+        return jsonify({"ok": False, "error": "Event not found."}), 404
+
+    db.session.delete(event)
+    db.session.commit()
+    return jsonify({"ok": True, "redirect": url_for("home") + "#gallery-preview"})
+
 # Event fields editable in place on /gallery/<id>: max length (strings) or "date".
 EVENT_INLINE_FIELDS = {"title": 200, "location": 200, "date": "date"}
 

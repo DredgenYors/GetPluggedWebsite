@@ -20,7 +20,8 @@
 
     {% if current_user.is_authenticated and current_user.is_admin() %}
     <div id="gp-edit-banner">
-        Edit Mode &mdash; hover any highlighted text or image, click to edit. Click "Exit Edit Mode" when you're done.
+        <span>Edit Mode &mdash; hover any highlighted text or image, click to edit.</span>
+        {% block edit_banner_actions %}{% endblock %}
     </div>
     {% endif %}
 
