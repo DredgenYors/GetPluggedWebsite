@@ -18,6 +18,12 @@
     <div class="gp-bg-noise" aria-hidden="true"></div>
     {% block intro_overlay %}{% endblock %}
 
+    {% if current_user.is_authenticated and current_user.is_admin() %}
+    <div id="gp-edit-banner">
+        Edit Mode &mdash; hover any highlighted text or image, click to edit. Click "Exit Edit Mode" when you're done.
+    </div>
+    {% endif %}
+
     <!-- Navigation Bar -->
     <nav class="gp-nav" id="gp-nav">
         <div class="gp-nav-inner">

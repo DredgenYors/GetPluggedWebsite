@@ -481,93 +481,10 @@ def admin_settings():
         settings.twitter_url = (form.twitter_url.data or "").strip()
         settings.tiktok_url = (form.tiktok_url.data or "").strip()
 
-        # ---- Navigation ----
-        settings.nav_label_mission = (form.nav_label_mission.data or "").strip()
-        settings.nav_label_services = (form.nav_label_services.data or "").strip()
-        settings.nav_label_gallery = (form.nav_label_gallery.data or "").strip()
-        settings.nav_label_stay_plugged = (form.nav_label_stay_plugged.data or "").strip()
-        settings.nav_label_our_story = (form.nav_label_our_story.data or "").strip()
-        settings.nav_label_contact = (form.nav_label_contact.data or "").strip()
-        settings.nav_cta_label = (form.nav_cta_label.data or "").strip()
-
-        logo_path = save_uploaded_image(form.logo_image.data, "logo")
-        if logo_path:
-            settings.logo_image = logo_path
-
-        # ---- Hero ----
-        settings.hero_eyebrow = (form.hero_eyebrow.data or "").strip()
-        settings.hero_headline = (form.hero_headline.data or "").strip()
-        settings.hero_subhead = (form.hero_subhead.data or "").strip()
-        settings.hero_cta_primary_label = (form.hero_cta_primary_label.data or "").strip()
-        settings.hero_cta_secondary_label = (form.hero_cta_secondary_label.data or "").strip()
-
-        # ---- Mission ----
-        settings.mission_eyebrow = (form.mission_eyebrow.data or "").strip()
-        settings.mission_statement = (form.mission_statement.data or "").strip()
-
-        # ---- Services ----
-        settings.services_eyebrow = (form.services_eyebrow.data or "").strip()
-        settings.services_heading = (form.services_heading.data or "").strip()
-
-        services_image_path = save_uploaded_image(form.services_image.data, "services")
-        if services_image_path:
-            settings.services_image = services_image_path
-
-        settings.service1_title = (form.service1_title.data or "").strip()
-        settings.service1_body = (form.service1_body.data or "").strip()
-        settings.service2_title = (form.service2_title.data or "").strip()
-        settings.service2_body = (form.service2_body.data or "").strip()
-        settings.service3_title = (form.service3_title.data or "").strip()
-        settings.service3_body = (form.service3_body.data or "").strip()
-        settings.service4_title = (form.service4_title.data or "").strip()
-        settings.service4_body = (form.service4_body.data or "").strip()
-
-        # ---- Gallery preview ----
-        settings.gallery_eyebrow = (form.gallery_eyebrow.data or "").strip()
-        settings.gallery_heading = (form.gallery_heading.data or "").strip()
-        settings.gallery_note = (form.gallery_note.data or "").strip()
-
-        # ---- Stay Plugged In ----
-        settings.stay_plugged_eyebrow = (form.stay_plugged_eyebrow.data or "").strip()
-        settings.stay_plugged_heading = (form.stay_plugged_heading.data or "").strip()
-        settings.stay_plugged_lede = (form.stay_plugged_lede.data or "").strip()
-        settings.stay_plugged_footer_text = (form.stay_plugged_footer_text.data or "").strip()
-
         settings.coming_soon_title = (form.coming_soon_title.data or "").strip()
         settings.coming_soon_body = (form.coming_soon_body.data or "").strip()
 
-        # ---- Our Story ----
-        settings.our_story_eyebrow = (form.our_story_eyebrow.data or "").strip()
-        settings.what_is_title = (form.what_is_title.data or "").strip()
         settings.what_is_body = (form.what_is_body.data or "").strip()
-
-        settings.stat1_value = (form.stat1_value.data or "").strip()
-        settings.stat1_label = (form.stat1_label.data or "").strip()
-        settings.stat2_value = (form.stat2_value.data or "").strip()
-        settings.stat2_label = (form.stat2_label.data or "").strip()
-        settings.stat3_value = (form.stat3_value.data or "").strip()
-        settings.stat3_label = (form.stat3_label.data or "").strip()
-
-        settings.founder1_name = (form.founder1_name.data or "").strip()
-        founder1_path = save_uploaded_image(form.founder1_image.data, "founder1")
-        if founder1_path:
-            settings.founder1_image = founder1_path
-
-        settings.founder2_name = (form.founder2_name.data or "").strip()
-        founder2_path = save_uploaded_image(form.founder2_image.data, "founder2")
-        if founder2_path:
-            settings.founder2_image = founder2_path
-
-        # ---- Contact ----
-        settings.contact_eyebrow = (form.contact_eyebrow.data or "").strip()
-        settings.contact_heading_line1 = (form.contact_heading_line1.data or "").strip()
-        settings.contact_heading_line2 = (form.contact_heading_line2.data or "").strip()
-        settings.contact_lede = (form.contact_lede.data or "").strip()
-        settings.contact_cta_email_label = (form.contact_cta_email_label.data or "").strip()
-        settings.contact_cta_follow_label = (form.contact_cta_follow_label.data or "").strip()
-
-        # ---- Footer ----
-        settings.footer_text = (form.footer_text.data or "").strip()
 
         db.session.commit()
 

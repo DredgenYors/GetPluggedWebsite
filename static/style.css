@@ -765,23 +765,6 @@ h1, h2, h3, h4, h5, h6,
   max-width: 900px;
 }
 
-.gp-admin-image-field{
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.gp-admin-image-preview{
-  width: 96px;
-  height: 96px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #404040;
-  flex-shrink: 0;
-}
-
-.gp-admin-image-preview-round{ border-radius: 50%; }
-
 .gp-admin-list-item {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -1978,4 +1961,30 @@ body > footer{
 
 #gp-edit-toast.gp-edit-toast-error{
   background: #b3261e;
+}
+
+#gp-edit-banner{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  background: var(--gp-green);
+  color: #fff;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transform: translateY(-100%);
+  transition: transform 0.2s ease;
+}
+
+#gp-edit-banner.show{
+  transform: translateY(0);
+}
+
+body.gp-edit-mode .gp-nav{
+  top: 34px;
 }

@@ -165,6 +165,8 @@
     document.body.classList.toggle("gp-edit-mode", on);
     const btn = document.getElementById("gp-edit-toggle");
     if (btn) btn.textContent = on ? "Exit Edit Mode" : "Edit Page";
+    const banner = document.getElementById("gp-edit-banner");
+    if (banner) banner.classList.toggle("show", on);
   }
 
   document.addEventListener("DOMContentLoaded", () => {

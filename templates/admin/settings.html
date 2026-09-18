@@ -14,55 +14,10 @@
     </div>
 
     <p class="text-muted small mb-4">
-      Everything below controls the live text, images, and links on the public home page.
-      Changes take effect as soon as you save.
+      Headings, copy, and images on the home page are now edited in place &mdash; open the
+      site, log in, and click <strong>Edit Page</strong> in the nav. This page covers the rest:
+      toggles, link targets, and the one thing that can't be edited on the page itself.
     </p>
-
-    <!-- Navigation -->
-    <div class="card mb-4 shadow-sm">
-      <div class="card-body">
-        <h5 class="mb-1">Navigation</h5>
-        <p class="text-muted small mb-3">The menu bar shown at the top of every page.</p>
-
-        <div class="row g-3 mb-3">
-          <div class="col-md-4">{{ form.nav_label_mission.label(class="form-label") }}{{ form.nav_label_mission(class="form-control") }}</div>
-          <div class="col-md-4">{{ form.nav_label_services.label(class="form-label") }}{{ form.nav_label_services(class="form-control") }}</div>
-          <div class="col-md-4">{{ form.nav_label_gallery.label(class="form-label") }}{{ form.nav_label_gallery(class="form-control") }}</div>
-          <div class="col-md-4">{{ form.nav_label_stay_plugged.label(class="form-label") }}{{ form.nav_label_stay_plugged(class="form-control") }}</div>
-          <div class="col-md-4">{{ form.nav_label_our_story.label(class="form-label") }}{{ form.nav_label_our_story(class="form-control") }}</div>
-          <div class="col-md-4">{{ form.nav_label_contact.label(class="form-label") }}{{ form.nav_label_contact(class="form-control") }}</div>
-          <div class="col-md-6">{{ form.nav_cta_label.label(class="form-label") }}{{ form.nav_cta_label(class="form-control") }}</div>
-        </div>
-
-        <div class="gp-admin-image-field">
-          {% if settings.logo_image %}
-            <img src="{{ site_image(settings.logo_image) }}" alt="Current logo" class="gp-admin-image-preview">
-          {% endif %}
-          <div class="flex-grow-1">
-            {{ form.logo_image.label(class="form-label") }}
-            {{ form.logo_image(class="form-control") }}
-            <div class="form-text">Leave blank to keep the current logo.</div>
-            {% for err in form.logo_image.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Hero -->
-    <div class="card mb-4 shadow-sm">
-      <div class="card-body">
-        <h5 class="mb-1">Banner</h5>
-        <p class="text-muted small mb-3">The large banner at the very top of the home page.</p>
-
-        <div class="row g-3">
-          <div class="col-12">{{ form.hero_eyebrow.label(class="form-label") }}{{ form.hero_eyebrow(class="form-control") }}</div>
-          <div class="col-12">{{ form.hero_headline.label(class="form-label") }}{{ form.hero_headline(class="form-control") }}</div>
-          <div class="col-12">{{ form.hero_subhead.label(class="form-label") }}{{ form.hero_subhead(class="form-control") }}</div>
-          <div class="col-md-6">{{ form.hero_cta_primary_label.label(class="form-label") }}{{ form.hero_cta_primary_label(class="form-control") }}</div>
-          <div class="col-md-6">{{ form.hero_cta_secondary_label.label(class="form-label") }}{{ form.hero_cta_secondary_label(class="form-control") }}</div>
-        </div>
-      </div>
-    </div>
 
     <!-- Tickets -->
     <div class="card mb-4 shadow-sm">
@@ -87,94 +42,14 @@
       </div>
     </div>
 
-    <!-- Mission -->
-    <div class="card mb-4 shadow-sm">
-      <div class="card-body">
-        <h5 class="mb-3">Mission</h5>
-
-        <div class="row g-3">
-          <div class="col-12">{{ form.mission_eyebrow.label(class="form-label") }}{{ form.mission_eyebrow(class="form-control") }}</div>
-          <div class="col-12">{{ form.mission_statement.label(class="form-label") }}{{ form.mission_statement(class="form-control", rows="3") }}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Services -->
-    <div class="card mb-4 shadow-sm">
-      <div class="card-body">
-        <h5 class="mb-3">Services &amp; Experiences</h5>
-
-        <div class="row g-3 mb-3">
-          <div class="col-md-6">{{ form.services_eyebrow.label(class="form-label") }}{{ form.services_eyebrow(class="form-control") }}</div>
-          <div class="col-md-6">{{ form.services_heading.label(class="form-label") }}{{ form.services_heading(class="form-control") }}</div>
-        </div>
-
-        <div class="gp-admin-image-field mb-4">
-          {% if settings.services_image %}
-            <img src="{{ site_image(settings.services_image) }}" alt="Current services image" class="gp-admin-image-preview">
-          {% endif %}
-          <div class="flex-grow-1">
-            {{ form.services_image.label(class="form-label") }}
-            {{ form.services_image(class="form-control") }}
-            <div class="form-text">Shown next to the heading. Leave blank to keep showing the placeholder.</div>
-            {% for err in form.services_image.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-          </div>
-        </div>
-
-        <div class="row g-3">
-          <div class="col-md-6 border rounded p-3">
-            <div class="fw-bold small text-muted mb-2">Service 1</div>
-            {{ form.service1_title.label(class="form-label") }}{{ form.service1_title(class="form-control mb-2") }}
-            {{ form.service1_body.label(class="form-label") }}{{ form.service1_body(class="form-control", rows="2") }}
-          </div>
-          <div class="col-md-6 border rounded p-3">
-            <div class="fw-bold small text-muted mb-2">Service 2</div>
-            {{ form.service2_title.label(class="form-label") }}{{ form.service2_title(class="form-control mb-2") }}
-            {{ form.service2_body.label(class="form-label") }}{{ form.service2_body(class="form-control", rows="2") }}
-          </div>
-          <div class="col-md-6 border rounded p-3">
-            <div class="fw-bold small text-muted mb-2">Service 3</div>
-            {{ form.service3_title.label(class="form-label") }}{{ form.service3_title(class="form-control mb-2") }}
-            {{ form.service3_body.label(class="form-label") }}{{ form.service3_body(class="form-control", rows="2") }}
-          </div>
-          <div class="col-md-6 border rounded p-3">
-            <div class="fw-bold small text-muted mb-2">Service 4</div>
-            {{ form.service4_title.label(class="form-label") }}{{ form.service4_title(class="form-control mb-2") }}
-            {{ form.service4_body.label(class="form-label") }}{{ form.service4_body(class="form-control", rows="2") }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gallery -->
-    <div class="card mb-4 shadow-sm">
-      <div class="card-body">
-        <h5 class="mb-1">Gallery</h5>
-        <p class="text-muted small mb-3">The preview grid of recent events. Events themselves are managed from the Events page.</p>
-
-        <div class="row g-3">
-          <div class="col-md-6">{{ form.gallery_eyebrow.label(class="form-label") }}{{ form.gallery_eyebrow(class="form-control") }}</div>
-          <div class="col-md-6">{{ form.gallery_heading.label(class="form-label") }}{{ form.gallery_heading(class="form-control") }}</div>
-          <div class="col-12">{{ form.gallery_note.label(class="form-label") }}{{ form.gallery_note(class="form-control") }}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Stay Plugged In -->
+    <!-- Stay Plugged In fallback -->
     <div class="card mb-4 shadow-sm">
       <div class="card-body">
         <h5 class="mb-1">Stay Plugged In</h5>
         <p class="text-muted small mb-3">
-          Shows your confirmed event (from the Tickets section above) when one is set, or the
-          "no event yet" message below otherwise.
+          Shown in place of a confirmed event when the Tickets toggle above is off. Since that
+          state isn't always on screen, it's set here rather than inline.
         </p>
-
-        <div class="row g-3 mb-3">
-          <div class="col-md-6">{{ form.stay_plugged_eyebrow.label(class="form-label") }}{{ form.stay_plugged_eyebrow(class="form-control") }}</div>
-          <div class="col-md-6">{{ form.stay_plugged_heading.label(class="form-label") }}{{ form.stay_plugged_heading(class="form-control") }}</div>
-          <div class="col-12">{{ form.stay_plugged_lede.label(class="form-label") }}{{ form.stay_plugged_lede(class="form-control") }}</div>
-          <div class="col-12">{{ form.stay_plugged_footer_text.label(class="form-label") }}{{ form.stay_plugged_footer_text(class="form-control") }}</div>
-        </div>
 
         <div class="row g-3">
           <div class="col-md-6">
@@ -189,97 +64,23 @@
       </div>
     </div>
 
-    <!-- Our Story -->
+    <!-- Our Story blurb -->
     <div class="card mb-4 shadow-sm">
       <div class="card-body">
         <h5 class="mb-1">Our Story</h5>
         <p class="text-muted small mb-3">
-          Paragraphs are separated by a blank line between them.
+          The heading and founder info are editable on the page; this paragraph text isn't
+          (it renders as several separate paragraphs, split on blank lines).
         </p>
-
-        <div class="row g-3 mb-3">
-          <div class="col-md-6">{{ form.our_story_eyebrow.label(class="form-label") }}{{ form.our_story_eyebrow(class="form-control") }}</div>
-          <div class="col-md-6">{{ form.what_is_title.label(class="form-label") }}{{ form.what_is_title(class="form-control") }}</div>
-          <div class="col-12">{{ form.what_is_body.label(class="form-label") }}{{ form.what_is_body(class="form-control", rows="6") }}</div>
-        </div>
-
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">
-            <div class="fw-bold small text-muted mb-2">WIP 1</div>
-            {{ form.stat1_value.label(class="form-label") }}{{ form.stat1_value(class="form-control mb-2") }}
-            {{ form.stat1_label.label(class="form-label") }}{{ form.stat1_label(class="form-control") }}
-          </div>
-          <div class="col-md-4">
-            <div class="fw-bold small text-muted mb-2">WIP 2</div>
-            {{ form.stat2_value.label(class="form-label") }}{{ form.stat2_value(class="form-control mb-2") }}
-            {{ form.stat2_label.label(class="form-label") }}{{ form.stat2_label(class="form-control") }}
-          </div>
-          <div class="col-md-4">
-            <div class="fw-bold small text-muted mb-2">WIP 3</div>
-            {{ form.stat3_value.label(class="form-label") }}{{ form.stat3_value(class="form-control mb-2") }}
-            {{ form.stat3_label.label(class="form-label") }}{{ form.stat3_label(class="form-control") }}
-          </div>
-        </div>
-
-        <p class="text-muted small mb-3">Paste a full image URL or upload a photo.</p>
-
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="border rounded p-3 h-100">
-              <h6 class="mb-3">Founder 1</h6>
-              <div class="mb-3">
-                {{ form.founder1_name.label(class="form-label") }}
-                {{ form.founder1_name(class="form-control") }}
-              </div>
-              <div class="gp-admin-image-field">
-                {% if settings.founder1_image %}
-                  <img src="{{ site_image(settings.founder1_image) }}" alt="Founder 1" class="gp-admin-image-preview gp-admin-image-preview-round">
-                {% endif %}
-                <div class="flex-grow-1">
-                  {{ form.founder1_image.label(class="form-label") }}
-                  {{ form.founder1_image(class="form-control") }}
-                  {% for err in form.founder1_image.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6">
-            <div class="border rounded p-3 h-100">
-              <h6 class="mb-3">Founder 2</h6>
-              <div class="mb-3">
-                {{ form.founder2_name.label(class="form-label") }}
-                {{ form.founder2_name(class="form-control") }}
-              </div>
-              <div class="gp-admin-image-field">
-                {% if settings.founder2_image %}
-                  <img src="{{ site_image(settings.founder2_image) }}" alt="Founder 2" class="gp-admin-image-preview gp-admin-image-preview-round">
-                {% endif %}
-                <div class="flex-grow-1">
-                  {{ form.founder2_image.label(class="form-label") }}
-                  {{ form.founder2_image(class="form-control") }}
-                  {% for err in form.founder2_image.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {{ form.what_is_body.label(class="form-label") }}
+        {{ form.what_is_body(class="form-control", rows="6") }}
       </div>
     </div>
 
     <!-- Contact -->
     <div class="card mb-4 shadow-sm">
       <div class="card-body">
-        <h5 class="mb-3">Connect</h5>
-
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">{{ form.contact_eyebrow.label(class="form-label") }}{{ form.contact_eyebrow(class="form-control") }}</div>
-          <div class="col-md-4">{{ form.contact_heading_line1.label(class="form-label") }}{{ form.contact_heading_line1(class="form-control") }}</div>
-          <div class="col-md-4">{{ form.contact_heading_line2.label(class="form-label") }}{{ form.contact_heading_line2(class="form-control") }}</div>
-          <div class="col-12">{{ form.contact_lede.label(class="form-label") }}{{ form.contact_lede(class="form-control") }}</div>
-          <div class="col-md-6">{{ form.contact_cta_email_label.label(class="form-label") }}{{ form.contact_cta_email_label(class="form-control") }}</div>
-          <div class="col-md-6">{{ form.contact_cta_follow_label.label(class="form-label") }}{{ form.contact_cta_follow_label(class="form-control") }}</div>
-        </div>
+        <h5 class="mb-3">Contact Info</h5>
 
         <div class="mb-3">
           {{ form.email.label(class="form-label") }}
@@ -314,16 +115,6 @@
             <div class="text-danger small">{{ err }}</div>
           {% endfor %}
         </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="card mb-4 shadow-sm">
-      <div class="card-body">
-        <h5 class="mb-1">Footer</h5>
-        <p class="text-muted small mb-3">Shown at the bottom of every page, alongside the social links above.</p>
-        {{ form.footer_text.label(class="form-label") }}
-        {{ form.footer_text(class="form-control") }}
       </div>
     </div>
 
