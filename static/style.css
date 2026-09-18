@@ -1580,6 +1580,16 @@ body > footer{
   padding: 0.5rem 1rem;
 }
 
+.gp-next-row-badge-link{
+  text-decoration: none;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.gp-next-row-badge-link:hover{
+  border-color: var(--gp-green);
+  color: var(--gp-green);
+}
+
 @media (min-width: 768px){
   .gp-next-row{ flex-direction: row; align-items: center; gap: 3rem; }
   .gp-next-row-meta{ flex-direction: column; align-items: flex-end; text-align: right; flex-shrink: 0; }

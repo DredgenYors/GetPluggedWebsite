@@ -76,7 +76,7 @@
                     {% if site_settings.events_confirmed %}
                     <li>
                         <a class="gp-nav-item gp-nav-item-utility {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
-                           href="{{ site_settings.ticket_url }}" target="_blank" rel="noopener noreferrer">Tickets</a>
+                           href="{{ url_for('tickets') }}">Tickets</a>
                     </li>
                     {% endif %}
 

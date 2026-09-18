@@ -83,6 +83,10 @@ INLINE_TEXT_FIELDS = {
     "contact_lede": 400, "contact_cta_email_label": 50, "contact_cta_follow_label": 50,
 
     "footer_text": 200,
+
+    "tickets_eyebrow": 100, "tickets_heading": 200, "tickets_subheading": 400,
+    "tickets_event_title": 200, "tickets_event_date": 100, "tickets_event_location": 200,
+    "tickets_cta_label": 50,
 }
 
 # Whitelist of SiteSettings image columns editable inline -> filename prefix to use.
@@ -91,6 +95,7 @@ INLINE_IMAGE_FIELDS = {
     "services_image": "services",
     "founder1_image": "founder1",
     "founder2_image": "founder2",
+    "tickets_image": "tickets",
 }
 
 class SiteSettings(db.Model):
@@ -190,6 +195,16 @@ class SiteSettings(db.Model):
 
     # ---- Footer ----
     footer_text = db.Column(db.String(200), default="Get Plugged NJ. All rights reserved.", nullable=False)
+
+    # ---- Tickets page ----
+    tickets_image = db.Column(db.String(500), default="", nullable=False)
+    tickets_eyebrow = db.Column(db.String(100), default="Tickets", nullable=False)
+    tickets_heading = db.Column(db.String(200), default="Get Your Tickets", nullable=False)
+    tickets_subheading = db.Column(db.String(400), default="Secure your spot at our next event. Tickets are available now.", nullable=False)
+    tickets_event_title = db.Column(db.String(200), default="Our Next Event", nullable=False)
+    tickets_event_date = db.Column(db.String(100), default="Date TBD", nullable=False)
+    tickets_event_location = db.Column(db.String(200), default="", nullable=False)
+    tickets_cta_label = db.Column(db.String(50), default="Buy Tickets", nullable=False)
 
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -390,6 +405,7 @@ def home():
             "detail": next_event["location"],
             "date_text": next_event["date"],
             "status": "Get Tickets" if settings.ticket_url else "More Info Soon",
+            "status_href": url_for("tickets") if settings.ticket_url else None,
         })
 
     for row in StayPluggedRow.query.order_by(StayPluggedRow.id.asc()).all():
@@ -474,6 +490,10 @@ def event_detail(event_id):
         videos=videos,
         cover=cover,
     )
+
+@app.route("/tickets")
+def tickets():
+    return render_template("tickets.html")
 
 @app.route("/admin/inline-add-event", methods=["POST"])
 @admin_required

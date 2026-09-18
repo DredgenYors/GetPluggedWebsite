@@ -184,7 +184,11 @@
             {% endif %}
             {% else %}
             {% if row.date_text %}<div class="gp-next-row-date">{{ row.date_text }}</div>{% endif %}
+            {% if row.status_href %}
+            <a class="gp-next-row-badge gp-next-row-badge-link" href="{{ row.status_href }}">{{ row.status }}</a>
+            {% else %}
             <span class="gp-next-row-badge">{{ row.status }}</span>
+            {% endif %}
             {% endif %}
           </div>
         </div>
