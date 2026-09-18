@@ -1335,6 +1335,11 @@ body > footer{
   text-transform: uppercase;
   margin: 0 0 0.5rem;
   color: var(--gp-charcoal);
+  transition: color 0.2s ease;
+}
+
+.gp-service:hover h3{
+  color: var(--gp-green);
 }
 
 .gp-service p{
