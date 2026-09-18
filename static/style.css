@@ -1585,6 +1585,58 @@ body > footer{
   .gp-next-row-meta{ flex-direction: column; align-items: flex-end; text-align: right; flex-shrink: 0; }
 }
 
+.gp-next-row-remove{
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--gp-border-warm);
+  background: none;
+  color: var(--gp-muted-text);
+  font-size: 1.1rem;
+  line-height: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.gp-edit-mode .gp-next-row-remove{
+  display: inline-flex;
+}
+
+.gp-next-row-remove:hover{
+  border-color: #b3261e;
+  color: #b3261e;
+}
+
+.gp-next-row-add{
+  display: none;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 0;
+  background: none;
+  border: none;
+  border-top: 1px dashed var(--gp-border-warm);
+  color: var(--gp-muted-text);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.gp-edit-mode .gp-next-row-add{
+  display: flex;
+}
+
+.gp-next-row-add:hover{
+  color: var(--gp-green);
+  border-color: var(--gp-green);
+}
+
 /* ---- Our Story ---- */
 .gp-story-inner{ max-width: 780px; }
 

@@ -39,6 +39,14 @@
         });
         return await res.json();
       }
+      if (entity === "stay_plugged_row") {
+        const res = await fetch("/admin/inline-edit-stay-plugged-row", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+          body: JSON.stringify({ row_id: entityId, field, value }),
+        });
+        return await res.json();
+      }
       const res = await fetch("/admin/inline-edit", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
@@ -252,10 +260,10 @@
     fileInput.click();
   }
 
-  async function addEvent(button) {
+  async function createRecord(url, button, errorLabel) {
     button.classList.add("gp-edit-saving");
     try {
-      const res = await fetch("/admin/inline-add-event", {
+      const res = await fetch(url, {
         method: "POST",
         headers: { "X-CSRFToken": csrfToken },
       });
@@ -264,29 +272,29 @@
         window.location.href = result.redirect;
         return;
       }
-      showToast(result.error || "Couldn't add event", true);
+      showToast(result.error || `Couldn't add ${errorLabel}`, true);
     } catch (err) {
       showToast("Network error", true);
     }
     button.classList.remove("gp-edit-saving");
   }
 
-  async function deleteEvent(button) {
-    if (!window.confirm("Delete this event? This can't be undone.")) return;
+  async function deleteRecord(url, body, button, confirmMsg, errorLabel) {
+    if (!window.confirm(confirmMsg)) return;
 
     button.classList.add("gp-edit-saving");
     try {
-      const res = await fetch("/admin/inline-delete-event", {
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
-        body: JSON.stringify({ event_id: button.dataset.eventId }),
+        body: JSON.stringify(body),
       });
       const result = await res.json();
       if (result.ok && result.redirect) {
         window.location.href = result.redirect;
         return;
       }
-      showToast(result.error || "Couldn't delete event", true);
+      showToast(result.error || `Couldn't remove ${errorLabel}`, true);
     } catch (err) {
       showToast("Network error", true);
     }
@@ -317,7 +325,7 @@
     if (addEventBtn) {
       addEventBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        addEvent(addEventBtn);
+        createRecord("/admin/inline-add-event", addEventBtn, "event");
       });
     }
 
@@ -325,12 +333,39 @@
     if (deleteEventBtn) {
       deleteEventBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        deleteEvent(deleteEventBtn);
+        deleteRecord(
+          "/admin/inline-delete-event",
+          { event_id: deleteEventBtn.dataset.eventId },
+          deleteEventBtn,
+          "Delete this event? This can't be undone.",
+          "event"
+        );
+      });
+    }
+
+    const addRowBtn = document.getElementById("gp-add-stay-plugged-row");
+    if (addRowBtn) {
+      addRowBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        createRecord("/admin/inline-add-stay-plugged-row", addRowBtn, "row");
       });
     }
 
     document.body.addEventListener("click", (e) => {
       if (!isEditMode()) return;
+
+      const removeRowBtn = e.target.closest(".gp-next-row-remove");
+      if (removeRowBtn) {
+        e.preventDefault();
+        deleteRecord(
+          "/admin/inline-delete-stay-plugged-row",
+          { row_id: removeRowBtn.dataset.rowId },
+          removeRowBtn,
+          "Remove this row?",
+          "row"
+        );
+        return;
+      }
 
       const imgWrap = e.target.closest("[data-editable-image]");
       if (imgWrap) {

@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block content %}
+{% set can_edit = current_user.is_authenticated and current_user.is_admin() %}
 
 <!-- ===== HERO ===== -->
 <section id="gp-hero-card" class="gp-hero gp-anim-init">
@@ -162,16 +163,35 @@
         <div class="gp-next-row">
           <span class="gp-next-row-num">{{ "%02d"|format(loop.index) }}</span>
           <div class="gp-next-row-body">
-            <span class="gp-label-accent">{{ row.label }}</span>
-            <h3 class="gp-next-row-title"{% if row.title_field %} data-editable data-field="{{ row.title_field }}" data-type="text"{% endif %}>{{ row.title }}</h3>
-            {% if row.detail %}<p class="gp-next-row-detail"{% if row.detail_field %} data-editable data-field="{{ row.detail_field }}" data-type="textarea"{% endif %}>{{ row.detail }}</p>{% endif %}
+            <span class="gp-label-accent" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="label">{{ row.label }}</span>
+            <h3 class="gp-next-row-title" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="title">{{ row.title }}</h3>
+            {% if row.detail or can_edit %}
+            <p class="gp-next-row-detail" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="detail" data-allow-empty="true" data-empty-placeholder="Add detail">{{ row.detail or "Add detail" }}</p>
+            {% endif %}
           </div>
           <div class="gp-next-row-meta">
-            {% if row.date %}<div class="gp-next-row-date">{{ row.date }}</div>{% endif %}
-            <span class="gp-next-row-badge">{{ row.status }}</span>
+            <div class="gp-next-row-date" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="date_text" data-allow-empty="true" data-empty-placeholder="Add date">{{ row.date_text or "Add date" }}</div>
+            <span class="gp-next-row-badge" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="status">{{ row.status }}</span>
+            {% if can_edit %}
+            <button type="button" class="gp-next-row-remove" data-row-id="{{ row.id }}" title="Remove row">&times;</button>
+            {% endif %}
           </div>
         </div>
       {% endfor %}
+
+      {% if not stay_plugged_rows %}
+        <div class="gp-next-row">
+          <div class="gp-next-row-body">
+            <span class="gp-label-accent">Announcement</span>
+            <h3 class="gp-next-row-title">{{ site_settings.coming_soon_title or "More on the way" }}</h3>
+            <p class="gp-next-row-detail">{{ site_settings.coming_soon_body }}</p>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if can_edit %}
+      <button type="button" class="gp-next-row gp-next-row-add" id="gp-add-stay-plugged-row">+ Add Row</button>
+      {% endif %}
     </div>
 
     <div class="gp-section-foot">

@@ -254,6 +254,18 @@ class Media(db.Model):
     # optional caption
     caption = db.Column(db.String(200), default="", nullable=False)
 
+class StayPluggedRow(db.Model):
+    """A row in the home page's "Stay Plugged In" list - admin-managed,
+    independent of the Gallery's Event model since these are forward-looking
+    promotional entries (events, collabs, announcements) and their date is
+    often not a real calendar date yet (e.g. "Coming Soon")."""
+    id = db.Column(db.Integer, primary_key=True)
+    label = db.Column(db.String(100), default="Announcement", nullable=False)
+    title = db.Column(db.String(200), default="New Update", nullable=False)
+    detail = db.Column(db.String(300), default="", nullable=False)
+    date_text = db.Column(db.String(100), default="", nullable=False)
+    status = db.Column(db.String(100), default="Coming Soon", nullable=False)
+
 def get_settings() -> SiteSettings:
     settings = SiteSettings.query.first()
     if not settings:
@@ -299,14 +311,6 @@ def super_admin_required(f):
             return redirect(url_for("admin_home"))
         return f(*args, **kwargs)
     return wrapper
-
-upcoming_events = [
-    {
-        'title': 'Upcoming Confirmed Sample Event 1',
-        'date': 'Date: xxxx - xx - xx',
-        'location': 'Sample Location 1',
-    },
-]
 
 artists = [
             {'name': 'Barti', 'social_media': {'instagram': '@chaevscarti'}},
@@ -356,7 +360,6 @@ def site_image(value, fallback=None):
 @app.route('/')
 def home():
     """Home page route"""
-    next_event = upcoming_events[0] if upcoming_events else None
     settings = get_settings()
 
     # Small "Gallery" preview: most recent events, each with one cover photo if available
@@ -365,31 +368,12 @@ def home():
         cover = Media.query.filter_by(event_id=ev.id, media_type="photo").order_by(Media.id.desc()).first()
         gallery_preview.append({"event": ev, "cover": cover})
 
-    # "Stay Plugged In" rows. Ticket status is shown as a visual badge only (not a
-    # link) for now, per current design direction.
-    stay_plugged_rows = []
-    if settings.events_confirmed and next_event:
-        stay_plugged_rows.append({
-            "label": "Upcoming Event",
-            "title": next_event["title"],
-            "detail": next_event["location"],
-            "date": next_event["date"],
-            "status": "Get Tickets" if settings.ticket_url else "More Info Soon",
-        })
-    else:
-        stay_plugged_rows.append({
-            "label": "Announcement",
-            "title": settings.coming_soon_title or "More on the way",
-            "detail": settings.coming_soon_body or "",
-            "date": "",
-            "status": "Follow for Updates",
-            "title_field": "coming_soon_title",
-            "detail_field": "coming_soon_body",
-        })
+    # "Stay Plugged In" rows: admin-managed via Edit Mode (add/edit/remove).
+    # When there are none yet, fall back to the Settings-configured message.
+    stay_plugged_rows = StayPluggedRow.query.order_by(StayPluggedRow.id.asc()).all()
 
     return render_template(
         'home.html',
-        next_event=next_event,
         gallery_preview=gallery_preview,
         stay_plugged_rows=stay_plugged_rows,
     )
@@ -523,6 +507,63 @@ def admin_inline_edit_event():
 
     db.session.commit()
     return jsonify({"ok": True, "value": display_value, "raw_value": value})
+
+@app.route("/admin/inline-add-stay-plugged-row", methods=["POST"])
+@admin_required
+def admin_inline_add_stay_plugged_row():
+    """Add a blank template row to the "Stay Plugged In" list."""
+    row = StayPluggedRow()
+    db.session.add(row)
+    db.session.commit()
+    return jsonify({"ok": True, "redirect": url_for("home") + "#stay-plugged-in"})
+
+@app.route("/admin/inline-delete-stay-plugged-row", methods=["POST"])
+@admin_required
+def admin_inline_delete_stay_plugged_row():
+    """Remove a row from the "Stay Plugged In" list."""
+    data = request.get_json(silent=True) or {}
+    row = StayPluggedRow.query.get(data.get("row_id"))
+    if not row:
+        return jsonify({"ok": False, "error": "Row not found."}), 404
+
+    db.session.delete(row)
+    db.session.commit()
+    return jsonify({"ok": True, "redirect": url_for("home") + "#stay-plugged-in"})
+
+# StayPluggedRow fields editable in place: max length for each.
+STAY_PLUGGED_ROW_FIELDS = {"label": 100, "title": 200, "detail": 300, "date_text": 100, "status": 100}
+
+@app.route("/admin/inline-edit-stay-plugged-row", methods=["POST"])
+@admin_required
+def admin_inline_edit_stay_plugged_row():
+    """Save a single "Stay Plugged In" row field, edited in place on the home page."""
+    data = request.get_json(silent=True) or {}
+    field = data.get("field")
+    value = data.get("value")
+
+    if field not in STAY_PLUGGED_ROW_FIELDS:
+        return jsonify({"ok": False, "error": "Unknown field."}), 400
+    if not isinstance(value, str):
+        return jsonify({"ok": False, "error": "Invalid value."}), 400
+
+    row = StayPluggedRow.query.get(data.get("row_id"))
+    if not row:
+        return jsonify({"ok": False, "error": "Row not found."}), 404
+
+    value = value.strip()
+    if field == "title" and not value:
+        return jsonify({"ok": False, "error": "Title can't be empty."}), 400
+
+    max_len = STAY_PLUGGED_ROW_FIELDS[field]
+    if len(value) > max_len:
+        return jsonify({"ok": False, "error": f"Too long (max {max_len} characters)."}), 400
+
+    setattr(row, field, value)
+    db.session.commit()
+
+    placeholders = {"detail": "Add detail", "date_text": "Add date"}
+    display_value = value or placeholders.get(field, value)
+    return jsonify({"ok": True, "value": display_value})
 
 @app.route("/admin/settings", methods=["GET", "POST"])
 @admin_required
