@@ -3,6 +3,7 @@
 {% block title %}{{ event.title }} - Get Plugged NJ{% endblock %}
 
 {% block content %}
+{% set can_edit = current_user.is_authenticated and current_user.is_admin() %}
 
 <!-- ===== EVENT HERO ===== -->
 <section class="gp-event-hero">
@@ -14,9 +15,11 @@
   <div class="gp-event-hero-gradient"></div>
 
   <div class="gp-event-hero-content">
-    <span class="gp-event-hero-date">{{ event.date.strftime('%b %d, %Y') }}</span>
-    <h1 class="gp-event-hero-title">{{ event.title }}</h1>
-    {% if event.location %}<p class="gp-event-hero-venue">{{ event.location }}</p>{% endif %}
+    <span class="gp-event-hero-date" data-editable data-type="date" data-entity="event" data-entity-id="{{ event.id }}" data-field="date" data-value="{{ event.date.isoformat() }}">{{ event.date.strftime('%b %d, %Y') }}</span>
+    <h1 class="gp-event-hero-title" data-editable data-type="text" data-entity="event" data-entity-id="{{ event.id }}" data-field="title">{{ event.title }}</h1>
+    {% if event.location or can_edit %}
+    <p class="gp-event-hero-venue" data-editable data-type="text" data-entity="event" data-entity-id="{{ event.id }}" data-field="location" data-allow-empty="true" data-empty-placeholder="Add location">{{ event.location or "Add location" }}</p>
+    {% endif %}
   </div>
 </section>
 
@@ -39,12 +42,12 @@
       <div class="gp-event-meta">
         <div>
           <div class="gp-event-meta-label">Date</div>
-          <div class="gp-event-meta-value">{{ event.date.strftime('%b %d, %Y') }}</div>
+          <div class="gp-event-meta-value" data-editable data-type="date" data-entity="event" data-entity-id="{{ event.id }}" data-field="date" data-value="{{ event.date.isoformat() }}">{{ event.date.strftime('%b %d, %Y') }}</div>
         </div>
-        {% if event.location %}
+        {% if event.location or can_edit %}
         <div>
           <div class="gp-event-meta-label">Venue</div>
-          <div class="gp-event-meta-value">{{ event.location }}</div>
+          <div class="gp-event-meta-value" data-editable data-type="text" data-entity="event" data-entity-id="{{ event.id }}" data-field="location" data-allow-empty="true" data-empty-placeholder="Add location">{{ event.location or "Add location" }}</div>
         </div>
         {% endif %}
         <div>

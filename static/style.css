@@ -1485,6 +1485,38 @@ body > footer{
   color: var(--gp-green);
 }
 
+.gp-gallery-add{
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--gp-muted-bg);
+  border: 1px dashed var(--gp-border-warm);
+  color: var(--gp-muted-text);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.gp-gallery-add:hover{
+  border-color: var(--gp-green);
+  color: var(--gp-green);
+}
+
+.gp-gallery-add-icon{
+  font-size: 1.75rem;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.gp-edit-mode .gp-gallery-add{
+  display: flex;
+}
+
 /* ---- Stay Plugged In ---- */
 .gp-next-rows{
   display: flex;
@@ -1940,6 +1972,15 @@ body > footer{
 .gp-edit-saving{
   opacity: 0.5;
   pointer-events: none;
+}
+
+.gp-edit-date-input{
+  font: inherit;
+  color: var(--gp-charcoal);
+  background: #fff;
+  border: 2px solid var(--gp-green);
+  border-radius: 2px;
+  padding: 0.15em 0.4em;
 }
 
 #gp-edit-toast{

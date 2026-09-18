@@ -113,7 +113,7 @@
       <p class="gp-section-lede" data-editable data-field="gallery_note" data-type="text">{{ site_settings.gallery_note }}</p>
     </div>
 
-    {% if gallery_preview %}
+    {% if gallery_preview or (current_user.is_authenticated and current_user.is_admin()) %}
     <div class="gp-gallery-grid">
       {% for item in gallery_preview %}
         <a class="gp-gallery-card" href="{{ url_for('event_detail', event_id=item.event.id) }}">
@@ -133,6 +133,12 @@
           </div>
         </a>
       {% endfor %}
+      {% if current_user.is_authenticated and current_user.is_admin() %}
+      <button type="button" class="gp-gallery-card gp-gallery-add" id="gp-add-event">
+        <span class="gp-gallery-add-icon">+</span>
+        <span>Add Event</span>
+      </button>
+      {% endif %}
     </div>
     {% else %}
       <p class="gp-empty-note">No events yet &mdash; check back soon.</p>

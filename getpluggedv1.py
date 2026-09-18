@@ -460,6 +460,57 @@ def event_detail(event_id):
         cover=cover,
     )
 
+@app.route("/admin/inline-add-event", methods=["POST"])
+@admin_required
+def admin_inline_add_event():
+    """Create a blank template event and send the admin straight to its page to fill in."""
+    event = Event(title="New Event", date=datetime.now().date(), location="")
+    db.session.add(event)
+    db.session.commit()
+    return jsonify({"ok": True, "redirect": url_for("event_detail", event_id=event.id)})
+
+# Event fields editable in place on /gallery/<id>: max length (strings) or "date".
+EVENT_INLINE_FIELDS = {"title": 200, "location": 200, "date": "date"}
+
+@app.route("/admin/inline-edit-event", methods=["POST"])
+@admin_required
+def admin_inline_edit_event():
+    """Save a single Event field, edited in place on its own page."""
+    data = request.get_json(silent=True) or {}
+    event_id = data.get("event_id")
+    field = data.get("field")
+    value = data.get("value")
+
+    if field not in EVENT_INLINE_FIELDS:
+        return jsonify({"ok": False, "error": "Unknown field."}), 400
+    if not isinstance(value, str):
+        return jsonify({"ok": False, "error": "Invalid value."}), 400
+
+    event = Event.query.get(event_id)
+    if not event:
+        return jsonify({"ok": False, "error": "Event not found."}), 404
+
+    value = value.strip()
+
+    if field == "date":
+        try:
+            parsed = datetime.strptime(value, "%Y-%m-%d").date()
+        except ValueError:
+            return jsonify({"ok": False, "error": "Please pick a valid date."}), 400
+        event.date = parsed
+        display_value = parsed.strftime("%b %d, %Y")
+    else:
+        if field == "title" and not value:
+            return jsonify({"ok": False, "error": "Title can't be empty."}), 400
+        max_len = EVENT_INLINE_FIELDS[field]
+        if len(value) > max_len:
+            return jsonify({"ok": False, "error": f"Too long (max {max_len} characters)."}), 400
+        setattr(event, field, value)
+        display_value = value or "Add location"
+
+    db.session.commit()
+    return jsonify({"ok": True, "value": display_value, "raw_value": value})
+
 @app.route("/admin/settings", methods=["GET", "POST"])
 @admin_required
 def admin_settings():

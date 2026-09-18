@@ -20,8 +20,25 @@
     toast._hideTimer = setTimeout(() => toast.classList.remove("show"), 2200);
   }
 
-  async function saveField(field, value) {
+  function entityOf(el) {
+    return {
+      entity: el.dataset.entity || "settings",
+      entityId: el.dataset.entityId || "",
+    };
+  }
+
+  async function saveField(el, value) {
+    const { entity, entityId } = entityOf(el);
+    const field = el.dataset.field;
     try {
+      if (entity === "event") {
+        const res = await fetch("/admin/inline-edit-event", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+          body: JSON.stringify({ event_id: entityId, field, value }),
+        });
+        return await res.json();
+      }
       const res = await fetch("/admin/inline-edit", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
@@ -49,11 +66,25 @@
     }
   }
 
+  // Find every other element on the page bound to the same entity+field, so
+  // a value shown in more than one place (e.g. an event's date in the hero
+  // and in the meta list) stays in sync without a page reload.
+  function findSiblings(el) {
+    const field = el.dataset.field;
+    const { entity, entityId } = entityOf(el);
+    return Array.from(document.querySelectorAll(`[data-field="${field}"]`)).filter((node) => {
+      if (node === el) return false;
+      const n = entityOf(node);
+      return n.entity === entity && n.entityId === entityId;
+    });
+  }
+
   function startEditingText(el) {
     if (el.classList.contains("gp-editing")) return;
 
-    const field = el.dataset.field;
     const isMultiline = el.dataset.type === "textarea";
+    const allowEmpty = el.dataset.allowEmpty === "true";
+    const emptyPlaceholder = el.dataset.emptyPlaceholder || "";
     const original = el.textContent.trim();
 
     el.classList.add("gp-editing");
@@ -92,21 +123,23 @@
       el.contentEditable = "false";
       el.classList.remove("gp-editing");
 
-      const newValue = el.textContent.trim();
+      let newValue = el.textContent.trim();
       if (newValue === original) return;
 
-      if (!newValue) {
+      if (!newValue && !allowEmpty) {
         el.textContent = original;
         showToast("Can't be empty", true);
         return;
       }
 
       el.classList.add("gp-edit-saving");
-      const result = await saveField(field, newValue);
+      const result = await saveField(el, newValue);
       el.classList.remove("gp-edit-saving");
 
       if (result.ok) {
-        el.textContent = result.value;
+        const shown = result.value || emptyPlaceholder || result.value;
+        el.textContent = shown;
+        findSiblings(el).forEach((node) => { node.textContent = shown; });
         showToast("Saved");
       } else {
         el.textContent = original;
@@ -117,6 +150,65 @@
     el.addEventListener("paste", onPaste);
     el.addEventListener("keydown", onKeydown);
     el.addEventListener("blur", onBlur);
+  }
+
+  function startEditingDate(el) {
+    if (el.classList.contains("gp-editing")) return;
+    el.classList.add("gp-editing");
+
+    const originalText = el.textContent.trim();
+    const originalIso = el.dataset.value || "";
+
+    const input = document.createElement("input");
+    input.type = "date";
+    input.className = "gp-edit-date-input";
+    input.value = originalIso;
+
+    el.insertAdjacentElement("afterend", input);
+    el.style.display = "none";
+    input.focus();
+    if (input.showPicker) {
+      try { input.showPicker(); } catch (err) { /* not supported everywhere */ }
+    }
+
+    let finished = false;
+    async function finish(save) {
+      if (finished) return;
+      finished = true;
+      input.removeEventListener("change", onChange);
+      input.removeEventListener("blur", onBlur);
+      input.removeEventListener("keydown", onKeydown);
+      input.remove();
+      el.style.display = "";
+      el.classList.remove("gp-editing");
+
+      if (!save || !input.value || input.value === originalIso) return;
+
+      el.classList.add("gp-edit-saving");
+      const result = await saveField(el, input.value);
+      el.classList.remove("gp-edit-saving");
+
+      if (result.ok) {
+        el.textContent = result.value;
+        el.dataset.value = input.value;
+        findSiblings(el).forEach((node) => {
+          node.textContent = result.value;
+          node.dataset.value = input.value;
+        });
+        showToast("Saved");
+      } else {
+        el.textContent = originalText;
+        showToast(result.error || "Couldn't save", true);
+      }
+    }
+
+    const onChange = () => finish(true);
+    const onBlur = () => finish(true);
+    const onKeydown = (e) => { if (e.key === "Escape") finish(false); };
+
+    input.addEventListener("change", onChange);
+    input.addEventListener("blur", onBlur);
+    input.addEventListener("keydown", onKeydown);
   }
 
   function startEditingImage(wrapper) {
@@ -160,6 +252,25 @@
     fileInput.click();
   }
 
+  async function addEvent(button) {
+    button.classList.add("gp-edit-saving");
+    try {
+      const res = await fetch("/admin/inline-add-event", {
+        method: "POST",
+        headers: { "X-CSRFToken": csrfToken },
+      });
+      const result = await res.json();
+      if (result.ok && result.redirect) {
+        window.location.href = result.redirect;
+        return;
+      }
+      showToast(result.error || "Couldn't add event", true);
+    } catch (err) {
+      showToast("Network error", true);
+    }
+    button.classList.remove("gp-edit-saving");
+  }
+
   function setEditMode(on) {
     sessionStorage.setItem(EDIT_KEY, on ? "1" : "0");
     document.body.classList.toggle("gp-edit-mode", on);
@@ -180,6 +291,14 @@
       });
     }
 
+    const addEventBtn = document.getElementById("gp-add-event");
+    if (addEventBtn) {
+      addEventBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        addEvent(addEventBtn);
+      });
+    }
+
     document.body.addEventListener("click", (e) => {
       if (!isEditMode()) return;
 
@@ -193,7 +312,11 @@
       const textEl = e.target.closest("[data-editable]");
       if (textEl && !textEl.classList.contains("gp-editing")) {
         e.preventDefault();
-        startEditingText(textEl);
+        if (textEl.dataset.type === "date") {
+          startEditingDate(textEl);
+        } else {
+          startEditingText(textEl);
+        }
       }
     });
   });
