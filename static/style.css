@@ -972,6 +972,16 @@ body > footer{
   margin-left: auto;
 }
 
+/* Bootstrap's .collapse:not(.show){display:none} outranks the rule above by
+   specificity, hiding the nav on desktop until the hamburger's JS adds
+   .show. Force it visible at desktop widths; mobile keeps Bootstrap's
+   collapse/show toggle behavior untouched below. */
+@media (min-width: 992px){
+  .gp-nav-collapse.collapse:not(.show){
+    display: flex !important;
+  }
+}
+
 .gp-nav-links{
   list-style: none;
   display: flex;
