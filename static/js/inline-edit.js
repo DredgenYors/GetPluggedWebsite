@@ -27,6 +27,21 @@
     };
   }
 
+  // Navigate to a server-provided redirect. When it's the same page (just a
+  // different #hash, e.g. adding/removing a Stay Plugged In row from the
+  // home page), setting location.href alone only scrolls - it doesn't
+  // reload, so the new server-rendered HTML never arrives. Force a real
+  // reload in that case; otherwise a normal cross-page navigation is fine.
+  function goTo(redirect) {
+    const url = new URL(redirect, window.location.origin);
+    if (url.pathname === window.location.pathname) {
+      window.location.hash = url.hash;
+      window.location.reload();
+    } else {
+      window.location.href = redirect;
+    }
+  }
+
   async function saveField(el, value) {
     const { entity, entityId } = entityOf(el);
     const field = el.dataset.field;
@@ -269,7 +284,7 @@
       });
       const result = await res.json();
       if (result.ok && result.redirect) {
-        window.location.href = result.redirect;
+        goTo(result.redirect);
         return;
       }
       showToast(result.error || `Couldn't add ${errorLabel}`, true);
@@ -291,7 +306,7 @@
       });
       const result = await res.json();
       if (result.ok && result.redirect) {
-        window.location.href = result.redirect;
+        goTo(result.redirect);
         return;
       }
       showToast(result.error || `Couldn't remove ${errorLabel}`, true);

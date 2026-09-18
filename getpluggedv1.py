@@ -312,6 +312,14 @@ def super_admin_required(f):
         return f(*args, **kwargs)
     return wrapper
 
+upcoming_events = [
+    {
+        'title': 'Upcoming Confirmed Sample Event 1',
+        'date': 'Date: xxxx - xx - xx',
+        'location': 'Sample Location 1',
+    },
+]
+
 artists = [
             {'name': 'Barti', 'social_media': {'instagram': '@chaevscarti'}},
             {'name': 'Brandin Tyrik', 'social_media': {'instagram': '@brandintyrik'}},
@@ -361,6 +369,7 @@ def site_image(value, fallback=None):
 def home():
     """Home page route"""
     settings = get_settings()
+    next_event = upcoming_events[0] if upcoming_events else None
 
     # Small "Gallery" preview: most recent events, each with one cover photo if available
     gallery_preview = []
@@ -368,9 +377,31 @@ def home():
         cover = Media.query.filter_by(event_id=ev.id, media_type="photo").order_by(Media.id.desc()).first()
         gallery_preview.append({"event": ev, "cover": cover})
 
-    # "Stay Plugged In" rows: admin-managed via Edit Mode (add/edit/remove).
-    # When there are none yet, fall back to the Settings-configured message.
-    stay_plugged_rows = StayPluggedRow.query.order_by(StayPluggedRow.id.asc()).all()
+    # "Stay Plugged In" rows. The original Tickets-toggle-driven row (fixed,
+    # not admin-removable for now) comes first when confirmed, followed by
+    # any rows added via Edit Mode (removable). When there's neither, the
+    # section falls back to the Settings-configured coming-soon message.
+    stay_plugged_rows = []
+    if settings.events_confirmed and next_event:
+        stay_plugged_rows.append({
+            "removable": False,
+            "label": "Upcoming Event",
+            "title": next_event["title"],
+            "detail": next_event["location"],
+            "date_text": next_event["date"],
+            "status": "Get Tickets" if settings.ticket_url else "More Info Soon",
+        })
+
+    for row in StayPluggedRow.query.order_by(StayPluggedRow.id.asc()).all():
+        stay_plugged_rows.append({
+            "removable": True,
+            "id": row.id,
+            "label": row.label,
+            "title": row.title,
+            "detail": row.detail,
+            "date_text": row.date_text,
+            "status": row.status,
+        })
 
     return render_template(
         'home.html',
