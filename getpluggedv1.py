@@ -280,6 +280,7 @@ class StayPluggedRow(db.Model):
     detail = db.Column(db.String(300), default="", nullable=False)
     date_text = db.Column(db.String(100), default="", nullable=False)
     status = db.Column(db.String(100), default="Coming Soon", nullable=False)
+    links_to_tickets = db.Column(db.Boolean, default=False, nullable=False)
 
 def get_settings() -> SiteSettings:
     settings = SiteSettings.query.first()
@@ -417,6 +418,7 @@ def home():
             "detail": row.detail,
             "date_text": row.date_text,
             "status": row.status,
+            "links_to_tickets": row.links_to_tickets,
         })
 
     return render_template(
@@ -578,6 +580,19 @@ def admin_inline_delete_stay_plugged_row():
         return jsonify({"ok": False, "error": "Row not found."}), 404
 
     db.session.delete(row)
+    db.session.commit()
+    return jsonify({"ok": True, "redirect": url_for("home") + "#stay-plugged-in"})
+
+@app.route("/admin/inline-toggle-stay-plugged-row-link", methods=["POST"])
+@admin_required
+def admin_inline_toggle_stay_plugged_row_link():
+    """Turn a row's status badge into a real link to the Tickets page, or back into plain text."""
+    data = request.get_json(silent=True) or {}
+    row = StayPluggedRow.query.get(data.get("row_id"))
+    if not row:
+        return jsonify({"ok": False, "error": "Row not found."}), 404
+
+    row.links_to_tickets = not row.links_to_tickets
     db.session.commit()
     return jsonify({"ok": True, "redirect": url_for("home") + "#stay-plugged-in"})
 

@@ -178,8 +178,16 @@
           <div class="gp-next-row-meta">
             {% if row.removable %}
             <div class="gp-next-row-date" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="date_text" data-allow-empty="true" data-empty-placeholder="Add date">{{ row.date_text or "Add date" }}</div>
+            {% if row.links_to_tickets %}
+            <a class="gp-next-row-badge gp-next-row-badge-link" href="{{ url_for('tickets') }}" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="status">{{ row.status }}</a>
+            {% else %}
             <span class="gp-next-row-badge" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="status">{{ row.status }}</span>
+            {% endif %}
             {% if can_edit %}
+            <label class="gp-next-row-link-toggle" title="Link this badge to the Tickets page">
+              <input type="checkbox" class="gp-row-link-toggle" data-row-id="{{ row.id }}" {% if row.links_to_tickets %}checked{% endif %}>
+              Link to Tickets
+            </label>
             <button type="button" class="gp-next-row-remove" data-row-id="{{ row.id }}" title="Remove row">&times;</button>
             {% endif %}
             {% else %}

@@ -366,6 +366,31 @@
       });
     }
 
+    document.body.addEventListener("change", async (e) => {
+      const toggle = e.target.closest(".gp-row-link-toggle");
+      if (!toggle) return;
+
+      toggle.disabled = true;
+      try {
+        const res = await fetch("/admin/inline-toggle-stay-plugged-row-link", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+          body: JSON.stringify({ row_id: toggle.dataset.rowId }),
+        });
+        const result = await res.json();
+        if (result.ok && result.redirect) {
+          goTo(result.redirect);
+          return;
+        }
+        toggle.checked = !toggle.checked;
+        showToast(result.error || "Couldn't update", true);
+      } catch (err) {
+        toggle.checked = !toggle.checked;
+        showToast("Network error", true);
+      }
+      toggle.disabled = false;
+    });
+
     document.body.addEventListener("click", (e) => {
       if (!isEditMode()) return;
 

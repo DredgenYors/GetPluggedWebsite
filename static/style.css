@@ -1620,6 +1620,28 @@ body > footer{
   color: #b3261e;
 }
 
+.gp-next-row-link-toggle{
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gp-muted-text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.gp-edit-mode .gp-next-row-link-toggle{
+  display: inline-flex;
+}
+
+.gp-next-row-link-toggle input{
+  accent-color: var(--gp-green);
+  cursor: pointer;
+}
+
 .gp-next-row-add{
   display: none;
   width: 100%;
