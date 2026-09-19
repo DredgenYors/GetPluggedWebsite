@@ -73,7 +73,8 @@ INLINE_TEXT_FIELDS = {
     # NOTE: what_is_body is intentionally excluded - it renders as multiple
     # separate <p> tags (split on blank lines), which doesn't map to a single
     # inline-editable element. Still editable from Admin > Settings.
-    "our_story_eyebrow": 100, "what_is_title": 200,
+    "our_story_eyebrow": 100,
+    "story_heading_prefix": 100, "story_heading_accent": 100, "story_heading_suffix": 100,
     "stat1_value": 50, "stat1_label": 50,
     "stat2_value": 50, "stat2_label": 50,
     "stat3_value": 50, "stat3_label": 50,
@@ -162,8 +163,12 @@ class SiteSettings(db.Model):
     # ---- Our Story ----
     our_story_eyebrow = db.Column(db.String(100), default="Our Story", nullable=False)
 
-    # Drives the "Our Story" section heading + blurb (paired with founder cards below)
-    what_is_title = db.Column(db.String(200), default="Born In NJ, Made To Connect.", nullable=False)
+    # Drives the "Our Story" section heading (3 parts so the middle word can be
+    # styled as a colored/italic accent, matching the Figma reference) + blurb
+    # (paired with founder cards below)
+    story_heading_prefix = db.Column(db.String(100), default="Born In", nullable=False)
+    story_heading_accent = db.Column(db.String(100), default="NJ,", nullable=False)
+    story_heading_suffix = db.Column(db.String(100), default="Made To Connect.", nullable=False)
     what_is_body = db.Column(db.Text, default=(
         "Get Plugged was founded by Jordan Scott-Young and MCP, two lifelong music lovers whose connection to the industry started before they ever met.\n\n"
         "Jordan and MCP both developed a connection to music from an early age, with Jordan immersed in singing and performance and MCP in production and engineering.\n\n"

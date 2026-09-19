@@ -1685,6 +1685,11 @@ body > footer{
   color: var(--gp-charcoal);
 }
 
+.gp-story-accent{
+  color: var(--gp-green);
+  font-style: italic;
+}
+
 .gp-story-paragraphs{
   display: flex;
   flex-direction: column;

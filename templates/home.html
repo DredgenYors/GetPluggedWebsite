@@ -227,7 +227,11 @@
 <section id="our-story" class="gp-section">
   <div class="gp-section-inner gp-story-inner">
     <span class="gp-eyebrow gp-eyebrow-accent" data-editable data-field="our_story_eyebrow" data-type="text">{{ site_settings.our_story_eyebrow }}</span>
-    <h2 class="gp-story-title" data-editable data-field="what_is_title" data-type="text">{{ site_settings.what_is_title or "Born In NJ, Made To Connect." }}</h2>
+    <h2 class="gp-story-title">
+      <span data-editable data-type="text" data-field="story_heading_prefix">{{ site_settings.story_heading_prefix }}</span><br>
+      <span class="gp-story-accent" data-editable data-type="text" data-field="story_heading_accent">{{ site_settings.story_heading_accent }}</span><br>
+      <span data-editable data-type="text" data-field="story_heading_suffix">{{ site_settings.story_heading_suffix }}</span>
+    </h2>
 
     <div class="gp-story-paragraphs">
       {% for para in (site_settings.what_is_body or "").split('\n\n') %}
