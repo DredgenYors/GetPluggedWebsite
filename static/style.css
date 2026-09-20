@@ -1252,6 +1252,7 @@ body > footer{
   align-items: flex-end;
   padding-bottom: 5rem;
   padding-top: 7rem;
+  border-bottom: 1px solid var(--gp-border-warm);
 }
 
 .gp-hero-inner{ width: 100%; }
