@@ -1335,6 +1335,15 @@ body > footer{
   border-top: 1px solid var(--gp-border-warm);
 }
 
+@media (min-width: 768px){
+  .gp-service{ padding: 2rem 2.5rem; }
+  .gp-service:nth-child(odd){ padding-left: 0; }
+  .gp-service:nth-child(even){
+    padding-right: 0;
+    border-left: 1px solid var(--gp-border-warm);
+  }
+}
+
 .gp-service-num{
   flex-shrink: 0;
   font-family: 'Space Mono', monospace;
