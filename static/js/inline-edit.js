@@ -73,12 +73,19 @@
     }
   }
 
-  async function saveImage(field, file) {
+  async function saveImage(wrapper, file) {
+    const { entity, entityId } = entityOf(wrapper);
     try {
       const fd = new FormData();
-      fd.append("field", field);
       fd.append("file", file);
-      const res = await fetch("/admin/inline-edit-image", {
+      let url;
+      if (entity === "event") {
+        url = `/admin/events/${entityId}/inline-edit-cover`;
+      } else {
+        fd.append("field", wrapper.dataset.field);
+        url = "/admin/inline-edit-image";
+      }
+      const res = await fetch(url, {
         method: "POST",
         headers: { "X-CSRFToken": csrfToken },
         body: fd,
@@ -235,7 +242,6 @@
   }
 
   function startEditingImage(wrapper) {
-    const field = wrapper.dataset.field;
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = "image/png,image/jpeg,image/gif,image/webp";
@@ -248,7 +254,7 @@
       if (!file) return;
 
       wrapper.classList.add("gp-edit-saving");
-      const result = await saveImage(field, file);
+      const result = await saveImage(wrapper, file);
       wrapper.classList.remove("gp-edit-saving");
 
       if (result.ok) {
@@ -344,20 +350,6 @@
       });
     }
 
-    const deleteEventBtn = document.getElementById("gp-delete-event");
-    if (deleteEventBtn) {
-      deleteEventBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        deleteRecord(
-          "/admin/inline-delete-event",
-          { event_id: deleteEventBtn.dataset.eventId },
-          deleteEventBtn,
-          "Delete this event? This can't be undone.",
-          "event"
-        );
-      });
-    }
-
     const addRowBtn = document.getElementById("gp-add-stay-plugged-row");
     if (addRowBtn) {
       addRowBtn.addEventListener("click", (e) => {
@@ -366,63 +358,88 @@
       });
     }
 
-    const addPhotoBtn = document.getElementById("gp-add-photo");
-    if (addPhotoBtn) {
-      addPhotoBtn.addEventListener("click", (e) => {
-        e.preventDefault();
+    // Add Photo, Remove Photo, and Delete Event are wired via the delegated
+    // click handler below (not looked up here) since this event page's
+    // content can also be injected later into the Gallery's popup modal.
+    async function addEventPhoto(button) {
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/png,image/jpeg,image/gif,image/webp";
+      fileInput.style.display = "none";
+      document.body.appendChild(fileInput);
 
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = "image/png,image/jpeg,image/gif,image/webp";
-        fileInput.style.display = "none";
-        document.body.appendChild(fileInput);
+      fileInput.addEventListener("change", async () => {
+        const file = fileInput.files[0];
+        fileInput.remove();
+        if (!file) return;
 
-        fileInput.addEventListener("change", async () => {
-          const file = fileInput.files[0];
-          fileInput.remove();
-          if (!file) return;
+        button.classList.add("gp-edit-saving");
+        const fd = new FormData();
+        fd.append("file", file);
+        let result;
+        try {
+          const res = await fetch(`/admin/events/${button.dataset.eventId}/inline-add-photo`, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken },
+            body: fd,
+          });
+          result = await res.json();
+        } catch (err) {
+          result = { ok: false, error: "Network error." };
+        }
+        button.classList.remove("gp-edit-saving");
 
-          addPhotoBtn.classList.add("gp-edit-saving");
-          const fd = new FormData();
-          fd.append("file", file);
-          let result;
-          try {
-            const res = await fetch(`/admin/events/${addPhotoBtn.dataset.eventId}/inline-add-photo`, {
-              method: "POST",
-              headers: { "X-CSRFToken": csrfToken },
-              body: fd,
-            });
-            result = await res.json();
-          } catch (err) {
-            result = { ok: false, error: "Network error." };
-          }
-          addPhotoBtn.classList.remove("gp-edit-saving");
-
-          if (result.ok) {
-            const grid = document.getElementById("gp-event-recap-grid");
-            const emptyNote = document.getElementById("gp-event-recap-empty");
-            const link = document.createElement("a");
-            link.className = "gp-event-recap-item";
-            link.href = result.url;
-            link.target = "_blank";
-            link.rel = "noopener noreferrer";
-            const img = document.createElement("img");
-            img.src = result.url;
-            img.loading = "lazy";
-            img.alt = "";
-            link.appendChild(img);
-            grid.appendChild(link);
-            grid.hidden = false;
-            if (emptyNote) emptyNote.hidden = true;
-            grid.scrollTo({ left: grid.scrollWidth, behavior: "smooth" });
-            showToast("Photo added");
-          } else {
-            showToast(result.error || "Couldn't upload", true);
-          }
-        });
-
-        fileInput.click();
+        if (result.ok) {
+          const grid = document.getElementById("gp-event-recap-grid");
+          const emptyNote = document.getElementById("gp-event-recap-empty");
+          const item = document.createElement("div");
+          item.className = "gp-event-recap-item";
+          item.innerHTML =
+            `<a href="${result.url}" target="_blank" rel="noopener noreferrer">` +
+            `<img src="${result.url}" alt="" loading="lazy"></a>` +
+            `<button type="button" class="gp-event-recap-remove" data-media-id="${result.media_id}" title="Remove photo">&times;</button>`;
+          grid.appendChild(item);
+          grid.hidden = false;
+          if (emptyNote) emptyNote.hidden = true;
+          grid.scrollTo({ left: grid.scrollWidth, behavior: "smooth" });
+          showToast("Photo added");
+        } else {
+          showToast(result.error || "Couldn't upload", true);
+        }
       });
+
+      fileInput.click();
+    }
+
+    async function removeEventPhoto(button) {
+      if (!window.confirm("Remove this photo?")) return;
+
+      button.classList.add("gp-edit-saving");
+      let result;
+      try {
+        const res = await fetch(`/admin/media/${button.dataset.mediaId}/inline-delete`, {
+          method: "POST",
+          headers: { "X-CSRFToken": csrfToken },
+        });
+        result = await res.json();
+      } catch (err) {
+        result = { ok: false, error: "Network error." };
+      }
+
+      if (result.ok) {
+        const item = button.closest(".gp-event-recap-item");
+        const grid = item ? item.parentElement : null;
+        if (item) item.remove();
+        if (grid && !grid.children.length) {
+          grid.hidden = true;
+          const emptyNote = document.getElementById("gp-event-recap-empty");
+          if (emptyNote) emptyNote.hidden = false;
+        }
+        showToast("Photo removed");
+      } else {
+        button.classList.remove("gp-edit-saving");
+        showToast(result.error || "Couldn't remove photo", true);
+      }
     }
 
     document.body.addEventListener("change", async (e) => {
@@ -462,6 +479,33 @@
           removeRowBtn,
           "Remove this row?",
           "row"
+        );
+        return;
+      }
+
+      const addPhotoBtn = e.target.closest(".gp-event-recap-add");
+      if (addPhotoBtn) {
+        e.preventDefault();
+        addEventPhoto(addPhotoBtn);
+        return;
+      }
+
+      const removePhotoBtn = e.target.closest(".gp-event-recap-remove");
+      if (removePhotoBtn) {
+        e.preventDefault();
+        removeEventPhoto(removePhotoBtn);
+        return;
+      }
+
+      const deleteEventBtn = e.target.closest("#gp-delete-event");
+      if (deleteEventBtn) {
+        e.preventDefault();
+        deleteRecord(
+          "/admin/inline-delete-event",
+          { event_id: deleteEventBtn.dataset.eventId },
+          deleteEventBtn,
+          "Delete this event? This can't be undone.",
+          "event"
         );
         return;
       }

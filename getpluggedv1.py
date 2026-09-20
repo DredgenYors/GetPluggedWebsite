@@ -257,6 +257,7 @@ class Event(db.Model):
     title = db.Column(db.String(200), nullable=False)
     date = db.Column(db.Date, nullable=False)
     location = db.Column(db.String(200), default="", nullable=False)
+    cover_image = db.Column(db.String(300), default="", nullable=False)
 
     artists = db.relationship("Artist", secondary=event_artists, backref="events")
     media_items = db.relationship("Media", backref="event", cascade="all, delete-orphan")
@@ -386,17 +387,25 @@ def site_image(value, fallback=None):
         return value
     return url_for("static", filename=value.removeprefix("/static/").lstrip("/"))
 
+def event_cover_url(event):
+    """An event's cover image: its own explicitly-set cover_image if there is
+    one, else its most recently added Recap photo (so events added before
+    the cover field existed still show something), else None."""
+    if event.cover_image:
+        return site_image(event.cover_image)
+    photo = Media.query.filter_by(event_id=event.id, media_type="photo").order_by(Media.id.desc()).first()
+    return site_image(photo.url) if photo else None
+
 @app.route('/')
 def home():
     """Home page route"""
     settings = get_settings()
     next_event = upcoming_events[0] if upcoming_events else None
 
-    # Small "Gallery" preview: most recent events, each with one cover photo if available
+    # Small "Gallery" preview: most recent events, each with a cover image if available
     gallery_preview = []
     for ev in Event.query.order_by(Event.date.desc()).limit(4).all():
-        cover = Media.query.filter_by(event_id=ev.id, media_type="photo").order_by(Media.id.desc()).first()
-        gallery_preview.append({"event": ev, "cover": cover})
+        gallery_preview.append({"event": ev, "cover_url": event_cover_url(ev)})
 
     # "Stay Plugged In" rows. The original Tickets-toggle-driven row (fixed,
     # not admin-removable for now) comes first when confirmed, followed by
@@ -474,8 +483,8 @@ def previous():
         videos=videos,
     )
 
-@app.route("/gallery/<int:event_id>")
-def event_detail(event_id):
+def load_event_context(event_id):
+    """Query everything an event's page (or its modal) needs to render."""
     event = Event.query.get_or_404(event_id)
 
     artists = (
@@ -487,44 +496,21 @@ def event_detail(event_id):
     )
     photos = Media.query.filter_by(event_id=event.id, media_type="photo").order_by(Media.id.desc()).all()
     videos = Media.query.filter_by(event_id=event.id, media_type="video").order_by(Media.id.desc()).all()
-    cover = photos[0] if photos else None
 
-    return render_template(
-        "event_detail.html",
-        event=event,
-        artists=artists,
-        photos=photos,
-        videos=videos,
-        cover=cover,
-    )
+    return dict(event=event, artists=artists, photos=photos, videos=videos, cover_url=event_cover_url(event))
+
+@app.route("/gallery/<int:event_id>")
+def event_detail(event_id):
+    return render_template("event_detail.html", **load_event_context(event_id))
 
 @app.route("/gallery/<int:event_id>/modal")
 def event_detail_modal(event_id):
     """Same event content as event_detail, rendered as a bare fragment for
     the home page's Gallery preview to fetch into its popup modal (matching
     the original Figma design, where clicking an experience opens a smaller
-    overlay instead of navigating to a full page)."""
-    event = Event.query.get_or_404(event_id)
-
-    artists = (
-        Artist.query
-        .join(event_artists, Artist.id == event_artists.c.artist_id)
-        .filter(event_artists.c.event_id == event.id)
-        .order_by(Artist.display_name.asc())
-        .all()
-    )
-    photos = Media.query.filter_by(event_id=event.id, media_type="photo").order_by(Media.id.desc()).all()
-    videos = Media.query.filter_by(event_id=event.id, media_type="video").order_by(Media.id.desc()).all()
-    cover = photos[0] if photos else None
-
-    return render_template(
-        "_event_modal.html",
-        event=event,
-        artists=artists,
-        photos=photos,
-        videos=videos,
-        cover=cover,
-    )
+    overlay instead of navigating to a full page). Used for editing too, so
+    an admin never leaves the blurred popup to manage an event."""
+    return render_template("_event_modal.html", **load_event_context(event_id))
 
 @app.route("/tickets")
 def tickets():
@@ -565,6 +551,35 @@ def admin_inline_add_event_photo(event_id):
 
     media = Media(event_id=event.id, media_type="photo", url=path, caption="")
     db.session.add(media)
+    db.session.commit()
+
+    return jsonify({"ok": True, "url": site_image(path), "media_id": media.id})
+
+@app.route("/admin/media/<int:media_id>/inline-delete", methods=["POST"])
+@admin_required
+def admin_inline_delete_media(media_id):
+    """Remove a single Recap photo/video from an event's page."""
+    media = Media.query.get(media_id)
+    if not media:
+        return jsonify({"ok": False, "error": "Not found."}), 404
+
+    db.session.delete(media)
+    db.session.commit()
+    return jsonify({"ok": True})
+
+@app.route("/admin/events/<int:event_id>/inline-edit-cover", methods=["POST"])
+@admin_required
+def admin_inline_edit_event_cover(event_id):
+    """Save the event's cover image - shown on its Gallery card and behind
+    its title/date/location, independent of the Recap photos below it."""
+    event = Event.query.get_or_404(event_id)
+
+    file_storage = request.files.get("file")
+    path = save_uploaded_image(file_storage, "event_cover")
+    if not path:
+        return jsonify({"ok": False, "error": "Please choose an image file (png, jpg, gif, or webp)."}), 400
+
+    event.cover_image = path
     db.session.commit()
 
     return jsonify({"ok": True, "url": site_image(path)})

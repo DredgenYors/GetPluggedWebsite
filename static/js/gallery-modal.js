@@ -3,8 +3,6 @@
   const contentRoot = document.getElementById("gp-gallery-modal-content");
   if (!overlay || !contentRoot) return;
 
-  const isEditMode = () => sessionStorage.getItem("gp_edit_mode") === "1";
-
   function closeModal() {
     overlay.hidden = true;
     contentRoot.innerHTML = "";
@@ -30,7 +28,7 @@
 
   document.addEventListener("click", (e) => {
     const card = e.target.closest(".gp-gallery-card");
-    if (card && !card.classList.contains("gp-gallery-add") && !isEditMode()) {
+    if (card && !card.classList.contains("gp-gallery-add")) {
       const href = card.getAttribute("href");
       if (href) {
         e.preventDefault();
@@ -39,14 +37,29 @@
       return;
     }
 
-    if (!overlay.hidden) {
-      if (e.target === overlay || e.target === contentRoot) {
-        closeModal();
-        return;
-      }
-      if (e.target.closest(".gp-modal-close") || e.target.closest(".gp-modal-back")) {
+    if (overlay.hidden) return;
+
+    if (e.target === overlay || e.target === contentRoot) {
+      closeModal();
+      return;
+    }
+
+    if (e.target.closest(".gp-modal-close") || e.target.closest(".gp-modal-back")) {
+      e.preventDefault();
+      closeModal();
+      return;
+    }
+
+    // Any other in-modal link that points back at this same page (e.g.
+    // "Connect with us" -> /#contact) should close the popup first, then
+    // let the hash navigation scroll the real page underneath it.
+    const link = e.target.closest("a");
+    if (link && contentRoot.contains(link)) {
+      const url = new URL(link.href, window.location.origin);
+      if (url.pathname === window.location.pathname && url.hash) {
         e.preventDefault();
         closeModal();
+        window.location.hash = url.hash;
       }
     }
   });

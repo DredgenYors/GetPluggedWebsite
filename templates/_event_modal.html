@@ -1,16 +1,21 @@
+{% set can_edit = current_user.is_authenticated and current_user.is_admin() %}
 <div class="gp-modal-box">
   <div class="gp-modal-hero">
-    {% if cover %}
-      <img src="{{ site_image(cover.url) }}" alt="{{ event.title }}" class="gp-modal-hero-img">
-    {% else %}
-      <div class="gp-modal-hero-placeholder"></div>
-    {% endif %}
+    <div class="gp-event-hero-media" data-editable-image data-entity="event" data-entity-id="{{ event.id }}" data-field="cover_image" role="img" aria-label="Cover image">
+      {% if cover_url %}
+        <img src="{{ cover_url }}" alt="{{ event.title }}" class="gp-modal-hero-img">
+      {% else %}
+        <div class="gp-modal-hero-placeholder"></div>
+      {% endif %}
+    </div>
     <div class="gp-modal-hero-gradient"></div>
 
     <div class="gp-modal-hero-content">
-      <span class="gp-modal-hero-date">{{ event.date.strftime('%b %d, %Y') }}</span>
-      <h2 class="gp-modal-hero-title">{{ event.title }}</h2>
-      {% if event.location %}<p class="gp-modal-hero-venue">{{ event.location }}</p>{% endif %}
+      <span class="gp-modal-hero-date" data-editable data-type="date" data-entity="event" data-entity-id="{{ event.id }}" data-field="date" data-value="{{ event.date.isoformat() }}">{{ event.date.strftime('%b %d, %Y') }}</span>
+      <h2 class="gp-modal-hero-title" data-editable data-type="text" data-entity="event" data-entity-id="{{ event.id }}" data-field="title">{{ event.title }}</h2>
+      {% if event.location or can_edit %}
+      <p class="gp-modal-hero-venue" data-editable data-type="text" data-entity="event" data-entity-id="{{ event.id }}" data-field="location" data-allow-empty="true" data-empty-placeholder="Add location">{{ event.location or "Add location" }}</p>
+      {% endif %}
     </div>
 
     <button type="button" class="gp-modal-close" aria-label="Close">&times;</button>
@@ -33,12 +38,12 @@
       <div class="gp-modal-meta">
         <div>
           <div class="gp-modal-meta-label">Date</div>
-          <div class="gp-modal-meta-value">{{ event.date.strftime('%b %d, %Y') }}</div>
+          <div class="gp-modal-meta-value" data-editable data-type="date" data-entity="event" data-entity-id="{{ event.id }}" data-field="date" data-value="{{ event.date.isoformat() }}">{{ event.date.strftime('%b %d, %Y') }}</div>
         </div>
-        {% if event.location %}
+        {% if event.location or can_edit %}
         <div>
           <div class="gp-modal-meta-label">Venue</div>
-          <div class="gp-modal-meta-value">{{ event.location }}</div>
+          <div class="gp-modal-meta-value" data-editable data-type="text" data-entity="event" data-entity-id="{{ event.id }}" data-field="location" data-allow-empty="true" data-empty-placeholder="Add location">{{ event.location or "Add location" }}</div>
         </div>
         {% endif %}
         <div>
@@ -48,25 +53,34 @@
       </div>
     </div>
 
-    {% if photos %}
-    <div class="gp-modal-recap">
-      <p class="gp-modal-recap-label">Recap &mdash; Photos</p>
-      <div class="gp-modal-recap-grid">
+    <div class="gp-event-recap">
+      <div class="gp-event-recap-head">
+        <p class="gp-event-recap-label">Recap &mdash; Photos</p>
+        {% if can_edit %}
+        <button type="button" class="gp-event-recap-add" id="gp-add-photo" data-event-id="{{ event.id }}">+ Add Photo</button>
+        {% endif %}
+      </div>
+      <div class="gp-event-recap-grid" id="gp-event-recap-grid"{% if not photos %} hidden{% endif %}>
         {% for p in photos %}
-          <a class="gp-modal-recap-item" href="{{ site_image(p.url) }}" target="_blank" rel="noopener noreferrer">
-            <img src="{{ site_image(p.url) }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
-          </a>
+          <div class="gp-event-recap-item">
+            <a href="{{ site_image(p.url) }}" target="_blank" rel="noopener noreferrer">
+              <img src="{{ site_image(p.url) }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
+            </a>
+            {% if can_edit %}
+            <button type="button" class="gp-event-recap-remove" data-media-id="{{ p.id }}" title="Remove photo">&times;</button>
+            {% endif %}
+          </div>
         {% endfor %}
       </div>
+      <p class="gp-empty-note" id="gp-event-recap-empty"{% if photos %} hidden{% endif %}>No photos added yet.</p>
     </div>
-    {% endif %}
 
     {% if videos %}
-    <div class="gp-modal-recap">
-      <p class="gp-modal-recap-label">Recap &mdash; Videos</p>
-      <div class="gp-modal-recap-grid">
+    <div class="gp-event-recap">
+      <p class="gp-event-recap-label">Recap &mdash; Videos</p>
+      <div class="gp-event-recap-grid">
         {% for v in videos %}
-          <a class="gp-modal-recap-item gp-modal-recap-video" href="{{ v.url }}" target="_blank" rel="noopener noreferrer">
+          <a class="gp-event-recap-item gp-event-recap-video" href="{{ v.url }}" target="_blank" rel="noopener noreferrer">
             <i class="fas fa-play"></i>
             <span>{{ v.caption if v.caption else "Video " ~ loop.index }}</span>
           </a>
@@ -79,9 +93,14 @@
       <button type="button" class="gp-textlink gp-modal-back">
         <span class="gp-chevron">&lsaquo;</span> Back to Gallery
       </button>
-      <a class="gp-textlink" href="{{ url_for('home') }}#contact">
-        Connect with us <span class="gp-arrow">&#8599;</span>
-      </a>
+      <div class="gp-event-footer-right">
+        {% if can_edit %}
+        <button type="button" class="gp-textlink gp-textlink-danger" id="gp-delete-event" data-event-id="{{ event.id }}">Delete Event</button>
+        {% endif %}
+        <a class="gp-textlink" href="{{ url_for('home') }}#contact">
+          Connect with us <span class="gp-arrow">&#8599;</span>
+        </a>
+      </div>
     </div>
   </div>
 </div>

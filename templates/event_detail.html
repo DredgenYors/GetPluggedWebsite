@@ -2,21 +2,18 @@
 
 {% block title %}{{ event.title }} - Get Plugged NJ{% endblock %}
 
-{% block edit_banner_actions %}
-<a class="gp-edit-banner-action" href="{{ url_for('home') }}#gallery-preview">Save &amp; Return to Gallery</a>
-<button type="button" class="gp-edit-banner-action gp-edit-banner-action-danger" id="gp-delete-event" data-event-id="{{ event.id }}">Delete Event</button>
-{% endblock %}
-
 {% block content %}
 {% set can_edit = current_user.is_authenticated and current_user.is_admin() %}
 
 <!-- ===== EVENT HERO ===== -->
 <section class="gp-event-hero">
-  {% if cover %}
-    <img src="{{ site_image(cover.url) }}" alt="{{ event.title }}" class="gp-event-hero-img">
-  {% else %}
-    <div class="gp-event-hero-placeholder"></div>
-  {% endif %}
+  <div class="gp-event-hero-media" data-editable-image data-entity="event" data-entity-id="{{ event.id }}" data-field="cover_image" role="img" aria-label="Cover image">
+    {% if cover_url %}
+      <img src="{{ cover_url }}" alt="{{ event.title }}" class="gp-event-hero-img">
+    {% else %}
+      <div class="gp-event-hero-placeholder"></div>
+    {% endif %}
+  </div>
   <div class="gp-event-hero-gradient"></div>
 
   <div class="gp-event-hero-content">
@@ -72,9 +69,14 @@
       </div>
       <div class="gp-event-recap-grid" id="gp-event-recap-grid"{% if not photos %} hidden{% endif %}>
         {% for p in photos %}
-          <a class="gp-event-recap-item" href="{{ site_image(p.url) }}" target="_blank" rel="noopener noreferrer">
-            <img src="{{ site_image(p.url) }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
-          </a>
+          <div class="gp-event-recap-item">
+            <a href="{{ site_image(p.url) }}" target="_blank" rel="noopener noreferrer">
+              <img src="{{ site_image(p.url) }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
+            </a>
+            {% if can_edit %}
+            <button type="button" class="gp-event-recap-remove" data-media-id="{{ p.id }}" title="Remove photo">&times;</button>
+            {% endif %}
+          </div>
         {% endfor %}
       </div>
       <p class="gp-empty-note" id="gp-event-recap-empty"{% if photos %} hidden{% endif %}>No photos added yet.</p>
@@ -99,9 +101,14 @@
       <a class="gp-textlink" href="{{ url_for('home') }}#gallery-preview">
         <span class="gp-chevron">&lsaquo;</span> Back to Gallery
       </a>
-      <a class="gp-textlink" href="{{ url_for('home') }}#contact">
-        Connect with us <span class="gp-arrow">&#8599;</span>
-      </a>
+      <div class="gp-event-footer-right">
+        {% if can_edit %}
+        <button type="button" class="gp-textlink gp-textlink-danger" id="gp-delete-event" data-event-id="{{ event.id }}">Delete Event</button>
+        {% endif %}
+        <a class="gp-textlink" href="{{ url_for('home') }}#contact">
+          Connect with us <span class="gp-arrow">&#8599;</span>
+        </a>
+      </div>
     </div>
   </div>
 </section>
