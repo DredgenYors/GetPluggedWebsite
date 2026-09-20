@@ -1247,11 +1247,11 @@ body > footer{
 .gp-hero{
   position: relative;
   z-index: 1;
-  min-height: 90vh;
+  min-height: 76vh;
   display: flex;
   align-items: flex-end;
   padding-bottom: 5rem;
-  padding-top: 9rem;
+  padding-top: 7rem;
 }
 
 .gp-hero-inner{ width: 100%; }
