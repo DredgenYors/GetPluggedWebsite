@@ -929,7 +929,7 @@ body > footer{
 }
 
 .gp-nav-inner{
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 1.5rem;
   height: 84px;
@@ -958,8 +958,18 @@ body > footer{
 /* Bootstrap's .collapse:not(.show){display:none} outranks the rule above by
    specificity, hiding the nav on desktop until the hamburger's JS adds
    .show. Force it visible at desktop widths; mobile keeps Bootstrap's
-   collapse/show toggle behavior untouched below. */
-@media (min-width: 992px){
+   collapse/show toggle behavior untouched below.
+
+   The breakpoint (1500px) is intentionally generous: the nav's item count
+   varies (Tickets only when an event is confirmed; Admin/Edit Page/Log Out
+   only when logged in), so there's no single width where the full one-line
+   nav just barely fits for every visitor - a wide margin avoids the items
+   wrapping to a second line, which overflows the nav's fixed height and
+   spills into the page below it. Paired with .gp-nav-inner's 1600px
+   max-width, which also had to grow - it was capping the available room
+   even on very wide windows, so raising the breakpoint alone wasn't
+   enough for the full (logged-in) nav to ever fit on one line. */
+@media (min-width: 1500px){
   .gp-nav-collapse.collapse:not(.show){
     display: flex !important;
   }
@@ -1000,9 +1010,13 @@ body > footer{
 .gp-nav-item-button{
   background: none;
   border: none;
-  font: inherit;
-  color: inherit;
+  padding-block: 0;
   cursor: pointer;
+  /* .gp-nav-item already sets font-family/size/etc; a browser's default
+     button font-size is otherwise much larger and would win the cascade
+     (same specificity as .gp-nav-item, declared later) if repeated here.
+     padding-block (not the shorthand) avoids clobbering the padding-left
+     that .gp-nav-item-utility sets for this same element's divider. */
 }
 
 .gp-nav-cta{
@@ -1043,7 +1057,7 @@ body > footer{
   background: var(--gp-charcoal);
 }
 
-@media (max-width: 991.98px){
+@media (max-width: 1499.98px){
   .gp-nav-toggle{ display: flex; }
 
   .gp-nav-collapse{
