@@ -563,6 +563,13 @@ def admin_inline_delete_media(media_id):
     if not media:
         return jsonify({"ok": False, "error": "Not found."}), 404
 
+    # Clean up the uploaded file too, if this row points at one (as opposed
+    # to an external URL from the old add-media form).
+    if media.url.startswith("uploads/"):
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], os.path.basename(media.url))
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
     db.session.delete(media)
     db.session.commit()
     return jsonify({"ok": True})

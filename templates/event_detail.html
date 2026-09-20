@@ -13,6 +13,9 @@
     {% else %}
       <div class="gp-event-hero-placeholder"></div>
     {% endif %}
+    {% if can_edit %}
+    <button type="button" class="gp-event-hero-cover-edit">Edit Cover Image</button>
+    {% endif %}
   </div>
   <div class="gp-event-hero-gradient"></div>
 
