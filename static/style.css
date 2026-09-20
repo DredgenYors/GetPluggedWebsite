@@ -950,6 +950,7 @@ body > footer{
 .gp-nav-collapse{
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 2rem;
   flex-wrap: wrap;
   margin-left: auto;
