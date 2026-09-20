@@ -1,0 +1,87 @@
+<div class="gp-modal-box">
+  <div class="gp-modal-hero">
+    {% if cover %}
+      <img src="{{ cover.url }}" alt="{{ event.title }}" class="gp-modal-hero-img">
+    {% else %}
+      <div class="gp-modal-hero-placeholder"></div>
+    {% endif %}
+    <div class="gp-modal-hero-gradient"></div>
+
+    <div class="gp-modal-hero-content">
+      <span class="gp-modal-hero-date">{{ event.date.strftime('%b %d, %Y') }}</span>
+      <h2 class="gp-modal-hero-title">{{ event.title }}</h2>
+      {% if event.location %}<p class="gp-modal-hero-venue">{{ event.location }}</p>{% endif %}
+    </div>
+
+    <button type="button" class="gp-modal-close" aria-label="Close">&times;</button>
+  </div>
+
+  <div class="gp-modal-body">
+    <div class="gp-modal-body-grid">
+      <div>
+        <p class="gp-label-accent">Event</p>
+        {% if artists %}
+          <p class="gp-modal-description">
+            Featuring
+            {% for artist in artists %}{{ artist.display_name }}{% if not loop.last %}, {% endif %}{% endfor %}.
+          </p>
+        {% else %}
+          <p class="gp-modal-description">More details on this event coming soon.</p>
+        {% endif %}
+      </div>
+
+      <div class="gp-modal-meta">
+        <div>
+          <div class="gp-modal-meta-label">Date</div>
+          <div class="gp-modal-meta-value">{{ event.date.strftime('%b %d, %Y') }}</div>
+        </div>
+        {% if event.location %}
+        <div>
+          <div class="gp-modal-meta-label">Venue</div>
+          <div class="gp-modal-meta-value">{{ event.location }}</div>
+        </div>
+        {% endif %}
+        <div>
+          <div class="gp-modal-meta-label">Type</div>
+          <div class="gp-modal-meta-value">Event</div>
+        </div>
+      </div>
+    </div>
+
+    {% if photos %}
+    <div class="gp-modal-recap">
+      <p class="gp-modal-recap-label">Recap &mdash; Photos</p>
+      <div class="gp-modal-recap-grid">
+        {% for p in photos %}
+          <a class="gp-modal-recap-item" href="{{ p.url }}" target="_blank" rel="noopener noreferrer">
+            <img src="{{ p.url }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if videos %}
+    <div class="gp-modal-recap">
+      <p class="gp-modal-recap-label">Recap &mdash; Videos</p>
+      <div class="gp-modal-recap-grid">
+        {% for v in videos %}
+          <a class="gp-modal-recap-item gp-modal-recap-video" href="{{ v.url }}" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-play"></i>
+            <span>{{ v.caption if v.caption else "Video " ~ loop.index }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="gp-modal-footer">
+      <button type="button" class="gp-textlink gp-modal-back">
+        <span class="gp-chevron">&lsaquo;</span> Back to Gallery
+      </button>
+      <a class="gp-textlink" href="{{ url_for('home') }}#contact">
+        Connect with us <span class="gp-arrow">&#8599;</span>
+      </a>
+    </div>
+  </div>
+</div>

@@ -498,6 +498,34 @@ def event_detail(event_id):
         cover=cover,
     )
 
+@app.route("/gallery/<int:event_id>/modal")
+def event_detail_modal(event_id):
+    """Same event content as event_detail, rendered as a bare fragment for
+    the home page's Gallery preview to fetch into its popup modal (matching
+    the original Figma design, where clicking an experience opens a smaller
+    overlay instead of navigating to a full page)."""
+    event = Event.query.get_or_404(event_id)
+
+    artists = (
+        Artist.query
+        .join(event_artists, Artist.id == event_artists.c.artist_id)
+        .filter(event_artists.c.event_id == event.id)
+        .order_by(Artist.display_name.asc())
+        .all()
+    )
+    photos = Media.query.filter_by(event_id=event.id, media_type="photo").order_by(Media.id.desc()).all()
+    videos = Media.query.filter_by(event_id=event.id, media_type="video").order_by(Media.id.desc()).all()
+    cover = photos[0] if photos else None
+
+    return render_template(
+        "_event_modal.html",
+        event=event,
+        artists=artists,
+        photos=photos,
+        videos=videos,
+        cover=cover,
+    )
+
 @app.route("/tickets")
 def tickets():
     return render_template("tickets.html")

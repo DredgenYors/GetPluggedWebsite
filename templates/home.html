@@ -294,9 +294,15 @@
   </div>
 </section>
 
+<!-- ===== GALLERY MODAL (populated via fetch when an experience is clicked) ===== -->
+<div id="gp-gallery-modal-overlay" class="gp-modal-overlay" hidden>
+  <div id="gp-gallery-modal-content"></div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/gallery-modal.js') }}"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById("gp-intro-overlay");
