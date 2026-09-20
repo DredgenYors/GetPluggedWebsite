@@ -45,6 +45,14 @@ def save_uploaded_image(file_storage, prefix):
     file_storage.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
     return f"uploads/{filename}"
 
+def delete_uploaded_file(path):
+    """Remove a previously-uploaded file given its stored "uploads/..." path.
+    No-ops for empty values or external (http/https) URLs."""
+    if not path or not path.startswith("uploads/"):
+        return
+    file_path = os.path.join(app.config["UPLOAD_FOLDER"], os.path.basename(path))
+    if os.path.isfile(file_path):
+        os.remove(file_path)
 
 # Whitelist of SiteSettings text columns that can be edited inline, on the page
 # itself, in "Edit Mode" -> max length allowed for each (matches the model).
@@ -534,6 +542,10 @@ def admin_inline_delete_event():
     if not event:
         return jsonify({"ok": False, "error": "Event not found."}), 404
 
+    delete_uploaded_file(event.cover_image)
+    for media in event.media_items:
+        delete_uploaded_file(media.url)
+
     db.session.delete(event)
     db.session.commit()
     return jsonify({"ok": True, "redirect": url_for("home") + "#gallery-preview"})
@@ -565,10 +577,7 @@ def admin_inline_delete_media(media_id):
 
     # Clean up the uploaded file too, if this row points at one (as opposed
     # to an external URL from the old add-media form).
-    if media.url.startswith("uploads/"):
-        file_path = os.path.join(app.config["UPLOAD_FOLDER"], os.path.basename(media.url))
-        if os.path.isfile(file_path):
-            os.remove(file_path)
+    delete_uploaded_file(media.url)
 
     db.session.delete(media)
     db.session.commit()
@@ -586,6 +595,7 @@ def admin_inline_edit_event_cover(event_id):
     if not path:
         return jsonify({"ok": False, "error": "Please choose an image file (png, jpg, gif, or webp)."}), 400
 
+    delete_uploaded_file(event.cover_image)
     event.cover_image = path
     db.session.commit()
 

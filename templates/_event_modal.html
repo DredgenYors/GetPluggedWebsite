@@ -1,14 +1,14 @@
 {% set can_edit = current_user.is_authenticated and current_user.is_admin() %}
 <div class="gp-modal-box">
   <div class="gp-modal-hero">
-    <div class="gp-event-hero-media" data-editable-image data-entity="event" data-entity-id="{{ event.id }}" data-field="cover_image" role="img" aria-label="Cover image">
+    <div class="gp-event-hero-media" data-editable-image data-entity="event" data-entity-id="{{ event.id }}" data-field="cover_image" data-img-class="gp-modal-hero-img" role="img" aria-label="Cover image">
       {% if cover_url %}
         <img src="{{ cover_url }}" alt="{{ event.title }}" class="gp-modal-hero-img">
       {% else %}
         <div class="gp-modal-hero-placeholder"></div>
       {% endif %}
       {% if can_edit %}
-      <button type="button" class="gp-event-hero-cover-edit">Edit Cover Image</button>
+      <button type="button" class="gp-event-hero-cover-edit" data-persist>Edit Cover Image</button>
       {% endif %}
     </div>
     <div class="gp-modal-hero-gradient"></div>

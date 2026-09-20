@@ -241,6 +241,29 @@
     input.addEventListener("keydown", onKeydown);
   }
 
+  // An event's cover image also shows on its Gallery preview card back on
+  // the home page - a plain <img> with no data-editable-image of its own,
+  // so it needs its own sync instead of the generic findSiblings() path.
+  function syncGalleryCardCover(entityId, url) {
+    const card = document.querySelector(`.gp-gallery-card[data-event-id="${entityId}"]`);
+    if (!card) return;
+
+    const existingImg = card.querySelector("img");
+    if (existingImg) {
+      existingImg.src = url;
+      return;
+    }
+
+    const placeholder = card.querySelector(".gp-gallery-card-placeholder");
+    if (placeholder) placeholder.remove();
+
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "";
+    img.loading = "lazy";
+    card.insertBefore(img, card.firstChild);
+  }
+
   function startEditingImage(wrapper) {
     const fileInput = document.createElement("input");
     fileInput.type = "file";
@@ -265,13 +288,21 @@
           if (existingImg) {
             existingImg.src = result.url;
           } else {
-            wrapper.innerHTML = "";
+            // Clear old placeholder content, but keep any child explicitly
+            // marked to persist (e.g. the event hero's "Edit Cover Image"
+            // button) instead of wiping the wrapper wholesale.
+            Array.from(wrapper.children).forEach((child) => {
+              if (!child.hasAttribute("data-persist")) child.remove();
+            });
             const img = document.createElement("img");
             img.src = result.url;
             img.alt = "";
-            wrapper.appendChild(img);
+            img.className = wrapper.dataset.imgClass || "";
+            wrapper.insertBefore(img, wrapper.firstChild);
           }
         }
+        const { entity, entityId } = entityOf(wrapper);
+        if (entity === "event") syncGalleryCardCover(entityId, result.url);
         showToast("Image updated");
       } else {
         showToast(result.error || "Couldn't upload", true);

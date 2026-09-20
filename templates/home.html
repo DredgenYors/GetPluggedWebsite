@@ -117,7 +117,7 @@
     {% if gallery_preview or (current_user.is_authenticated and current_user.is_admin()) %}
     <div class="gp-gallery-grid">
       {% for item in gallery_preview %}
-        <a class="gp-gallery-card" href="{{ url_for('event_detail', event_id=item.event.id) }}">
+        <a class="gp-gallery-card" href="{{ url_for('event_detail', event_id=item.event.id) }}" data-event-id="{{ item.event.id }}">
           {% if item.cover_url %}
             <img src="{{ item.cover_url }}" alt="{{ item.event.title }}" loading="lazy">
           {% else %}
