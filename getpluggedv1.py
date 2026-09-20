@@ -335,9 +335,9 @@ def super_admin_required(f):
 
 upcoming_events = [
     {
-        'title': 'Upcoming Confirmed Sample Event 1',
-        'date': 'Date: xxxx - xx - xx',
-        'location': 'Sample Location 1',
+        'title': 'THE OUTLET VOL. 2',
+        'date': 'OCT 18, 2025',
+        'location': 'Kulture Gallery - Bloomfield, NJ',
     },
 ]
 
