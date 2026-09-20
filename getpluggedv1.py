@@ -552,6 +552,23 @@ def admin_inline_delete_event():
     db.session.commit()
     return jsonify({"ok": True, "redirect": url_for("home") + "#gallery-preview"})
 
+@app.route("/admin/events/<int:event_id>/inline-add-photo", methods=["POST"])
+@admin_required
+def admin_inline_add_event_photo(event_id):
+    """Upload a photo straight from the event's own page, added to its Recap grid."""
+    event = Event.query.get_or_404(event_id)
+
+    file_storage = request.files.get("file")
+    path = save_uploaded_image(file_storage, "event_photo")
+    if not path:
+        return jsonify({"ok": False, "error": "Please choose an image file (png, jpg, gif, or webp)."}), 400
+
+    media = Media(event_id=event.id, media_type="photo", url=path, caption="")
+    db.session.add(media)
+    db.session.commit()
+
+    return jsonify({"ok": True, "url": site_image(path)})
+
 # Event fields editable in place on /gallery/<id>: max length (strings) or "date".
 EVENT_INLINE_FIELDS = {"title": 200, "location": 200, "date": "date"}
 

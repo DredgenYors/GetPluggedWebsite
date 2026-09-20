@@ -366,6 +366,65 @@
       });
     }
 
+    const addPhotoBtn = document.getElementById("gp-add-photo");
+    if (addPhotoBtn) {
+      addPhotoBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/png,image/jpeg,image/gif,image/webp";
+        fileInput.style.display = "none";
+        document.body.appendChild(fileInput);
+
+        fileInput.addEventListener("change", async () => {
+          const file = fileInput.files[0];
+          fileInput.remove();
+          if (!file) return;
+
+          addPhotoBtn.classList.add("gp-edit-saving");
+          const fd = new FormData();
+          fd.append("file", file);
+          let result;
+          try {
+            const res = await fetch(`/admin/events/${addPhotoBtn.dataset.eventId}/inline-add-photo`, {
+              method: "POST",
+              headers: { "X-CSRFToken": csrfToken },
+              body: fd,
+            });
+            result = await res.json();
+          } catch (err) {
+            result = { ok: false, error: "Network error." };
+          }
+          addPhotoBtn.classList.remove("gp-edit-saving");
+
+          if (result.ok) {
+            const grid = document.getElementById("gp-event-recap-grid");
+            const emptyNote = document.getElementById("gp-event-recap-empty");
+            const link = document.createElement("a");
+            link.className = "gp-event-recap-item";
+            link.href = result.url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            const img = document.createElement("img");
+            img.src = result.url;
+            img.loading = "lazy";
+            img.alt = "";
+            link.appendChild(img);
+            grid.appendChild(link);
+            grid.hidden = false;
+            if (emptyNote) emptyNote.hidden = true;
+            grid.scrollTo({ left: grid.scrollWidth, behavior: "smooth" });
+            showToast("Photo added");
+          } else {
+            showToast(result.error || "Couldn't upload", true);
+          }
+        });
+
+        fileInput.click();
+      });
+    }
+
     document.body.addEventListener("change", async (e) => {
       const toggle = e.target.closest(".gp-row-link-toggle");
       if (!toggle) return;

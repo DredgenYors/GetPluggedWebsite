@@ -1,7 +1,7 @@
 <div class="gp-modal-box">
   <div class="gp-modal-hero">
     {% if cover %}
-      <img src="{{ cover.url }}" alt="{{ event.title }}" class="gp-modal-hero-img">
+      <img src="{{ site_image(cover.url) }}" alt="{{ event.title }}" class="gp-modal-hero-img">
     {% else %}
       <div class="gp-modal-hero-placeholder"></div>
     {% endif %}
@@ -53,8 +53,8 @@
       <p class="gp-modal-recap-label">Recap &mdash; Photos</p>
       <div class="gp-modal-recap-grid">
         {% for p in photos %}
-          <a class="gp-modal-recap-item" href="{{ p.url }}" target="_blank" rel="noopener noreferrer">
-            <img src="{{ p.url }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
+          <a class="gp-modal-recap-item" href="{{ site_image(p.url) }}" target="_blank" rel="noopener noreferrer">
+            <img src="{{ site_image(p.url) }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
           </a>
         {% endfor %}
       </div>

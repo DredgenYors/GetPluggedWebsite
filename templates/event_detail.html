@@ -13,7 +13,7 @@
 <!-- ===== EVENT HERO ===== -->
 <section class="gp-event-hero">
   {% if cover %}
-    <img src="{{ cover.url }}" alt="{{ event.title }}" class="gp-event-hero-img">
+    <img src="{{ site_image(cover.url) }}" alt="{{ event.title }}" class="gp-event-hero-img">
   {% else %}
     <div class="gp-event-hero-placeholder"></div>
   {% endif %}
@@ -64,18 +64,20 @@
 
     <!-- Recap: Photos -->
     <div class="gp-event-recap">
-      <p class="gp-event-recap-label">Recap &mdash; Photos</p>
-      {% if photos %}
-        <div class="gp-event-recap-grid">
-          {% for p in photos %}
-            <a class="gp-event-recap-item" href="{{ p.url }}" target="_blank" rel="noopener noreferrer">
-              <img src="{{ p.url }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
-            </a>
-          {% endfor %}
-        </div>
-      {% else %}
-        <p class="gp-empty-note">No photos added yet.</p>
-      {% endif %}
+      <div class="gp-event-recap-head">
+        <p class="gp-event-recap-label">Recap &mdash; Photos</p>
+        {% if can_edit %}
+        <button type="button" class="gp-event-recap-add" id="gp-add-photo" data-event-id="{{ event.id }}">+ Add Photo</button>
+        {% endif %}
+      </div>
+      <div class="gp-event-recap-grid" id="gp-event-recap-grid"{% if not photos %} hidden{% endif %}>
+        {% for p in photos %}
+          <a class="gp-event-recap-item" href="{{ site_image(p.url) }}" target="_blank" rel="noopener noreferrer">
+            <img src="{{ site_image(p.url) }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
+          </a>
+        {% endfor %}
+      </div>
+      <p class="gp-empty-note" id="gp-event-recap-empty"{% if photos %} hidden{% endif %}>No photos added yet.</p>
     </div>
 
     <!-- Recap: Videos -->
