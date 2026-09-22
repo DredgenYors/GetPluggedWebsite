@@ -346,15 +346,21 @@
     const img = wrapper.querySelector("img");
     if (!img) return;
 
+    // The rectangle preview needs to know the actual shape it's being
+    // cropped into - measure the real hero container before it gets
+    // covered by the picker overlay, rather than guessing an aspect ratio.
+    const heroRect = wrapper.getBoundingClientRect();
+    const targetAR = heroRect.width / heroRect.height;
+
     const { entity, entityId } = entityOf(wrapper);
     const overlay = document.createElement("div");
     overlay.className = "gp-focus-picker-overlay";
     overlay.innerHTML =
       '<div class="gp-focus-picker-box">' +
-      '<p class="gp-focus-picker-hint">Click the part of the photo you want to stay in view when it gets cropped.</p>' +
+      '<p class="gp-focus-picker-hint">Click the part of the photo you want to stay in view when it gets cropped. The green box shows what will actually be visible.</p>' +
       '<div class="gp-focus-picker-imgwrap">' +
       `<img src="${img.src}" alt="">` +
-      '<div class="gp-focus-picker-crosshair"></div>' +
+      '<div class="gp-focus-picker-crop"></div>' +
       "</div>" +
       '<div class="gp-focus-picker-footer">' +
       '<button type="button" class="gp-focus-picker-cancel">Cancel</button>' +
@@ -364,12 +370,43 @@
 
     const pickerImg = overlay.querySelector(".gp-focus-picker-imgwrap img");
     const imgWrap = overlay.querySelector(".gp-focus-picker-imgwrap");
-    const crosshair = overlay.querySelector(".gp-focus-picker-crosshair");
+    const cropRect = overlay.querySelector(".gp-focus-picker-crop");
+
+    // How much of the image (0-1) survives an object-fit:cover crop into
+    // targetAR: whichever axis is "extra" relative to the target shape gets
+    // trimmed, the other stays fully visible - mirrors the browser's own
+    // object-fit:cover + object-position math exactly.
+    function drawCropRect(xPct, yPct) {
+      const naturalW = pickerImg.naturalWidth;
+      const naturalH = pickerImg.naturalHeight;
+      if (!naturalW || !naturalH) return;
+      const imgAR = naturalW / naturalH;
+
+      let visibleFracX = 1;
+      let visibleFracY = 1;
+      if (imgAR >= targetAR) {
+        visibleFracX = targetAR / imgAR;
+      } else {
+        visibleFracY = imgAR / targetAR;
+      }
+
+      const left = (xPct / 100) * (1 - visibleFracX) * 100;
+      const top = (yPct / 100) * (1 - visibleFracY) * 100;
+
+      cropRect.style.left = left + "%";
+      cropRect.style.top = top + "%";
+      cropRect.style.width = visibleFracX * 100 + "%";
+      cropRect.style.height = visibleFracY * 100 + "%";
+    }
 
     const curX = parseFloat(wrapper.dataset.focusX || "50");
     const curY = parseFloat(wrapper.dataset.focusY || "50");
-    crosshair.style.left = curX + "%";
-    crosshair.style.top = curY + "%";
+
+    if (pickerImg.complete) {
+      drawCropRect(curX, curY);
+    } else {
+      pickerImg.addEventListener("load", () => drawCropRect(curX, curY), { once: true });
+    }
 
     function cleanup() {
       overlay.remove();
@@ -390,8 +427,7 @@
       const rect = pickerImg.getBoundingClientRect();
       const x = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
       const y = Math.min(100, Math.max(0, ((e.clientY - rect.top) / rect.height) * 100));
-      crosshair.style.left = x + "%";
-      crosshair.style.top = y + "%";
+      drawCropRect(x, y);
 
       let result;
       try {

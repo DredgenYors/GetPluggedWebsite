@@ -2369,8 +2369,10 @@ body.gp-modal-open{ overflow: hidden; }
   inset: 0;
   z-index: 3000;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
+  overflow-y: auto;
   padding: 2rem 1.5rem;
   background: rgba(38,35,33,0.92);
   backdrop-filter: blur(8px);
@@ -2380,6 +2382,7 @@ body.gp-modal-open{ overflow: hidden; }
 .gp-focus-picker-box{
   width: 100%;
   max-width: 40rem;
+  flex-shrink: 0;
   background: var(--gp-cream);
   border: 1px solid var(--gp-border-warm);
   padding: 1.5rem;
@@ -2395,6 +2398,7 @@ body.gp-modal-open{ overflow: hidden; }
 
 .gp-focus-picker-imgwrap{
   position: relative;
+  overflow: hidden;
   line-height: 0;
   cursor: crosshair;
   background: var(--gp-muted-bg);
@@ -2407,38 +2411,16 @@ body.gp-modal-open{ overflow: hidden; }
   pointer-events: none;
 }
 
-.gp-focus-picker-crosshair{
+/* The rectangle that previews what will actually stay visible once the
+   image is cropped to the calling container's aspect ratio - dims
+   everything outside it via an oversized box-shadow, so it's honest about
+   how little of the photo might survive a very wide/short crop instead of
+   implying any point can be freely centered in both directions. */
+.gp-focus-picker-crop{
   position: absolute;
-  width: 1.75rem;
-  height: 1.75rem;
-  margin: -0.875rem 0 0 -0.875rem;
   border: 2px solid var(--gp-green);
-  border-radius: 50%;
-  background: rgba(64,182,72,0.25);
+  box-shadow: 0 0 0 999px rgba(38,35,33,0.55);
   pointer-events: none;
-}
-
-.gp-focus-picker-crosshair::before,
-.gp-focus-picker-crosshair::after{
-  content: "";
-  position: absolute;
-  background: var(--gp-green);
-}
-
-.gp-focus-picker-crosshair::before{
-  left: 50%;
-  top: -0.4rem;
-  bottom: -0.4rem;
-  width: 1px;
-  transform: translateX(-50%);
-}
-
-.gp-focus-picker-crosshair::after{
-  top: 50%;
-  left: -0.4rem;
-  right: -0.4rem;
-  height: 1px;
-  transform: translateY(-50%);
 }
 
 .gp-focus-picker-footer{
