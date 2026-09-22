@@ -119,7 +119,7 @@
       {% for item in gallery_preview %}
         <a class="gp-gallery-card" href="{{ url_for('event_detail', event_id=item.event.id) }}" data-event-id="{{ item.event.id }}">
           {% if item.cover_url %}
-            <img src="{{ item.cover_url }}" alt="{{ item.event.title }}" loading="lazy">
+            <img src="{{ item.cover_url }}" alt="{{ item.event.title }}" loading="lazy" style="object-position: {{ item.event.cover_focus_x }}% {{ item.event.cover_focus_y }}%;">
           {% else %}
             <div class="gp-gallery-card-placeholder"></div>
           {% endif %}

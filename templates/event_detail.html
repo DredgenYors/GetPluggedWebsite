@@ -7,14 +7,19 @@
 
 <!-- ===== EVENT HERO ===== -->
 <section class="gp-event-hero">
-  <div class="gp-event-hero-media" data-editable-image data-entity="event" data-entity-id="{{ event.id }}" data-field="cover_image" data-img-class="gp-event-hero-img" role="img" aria-label="Cover image">
+  <div class="gp-event-hero-media" data-editable-image data-entity="event" data-entity-id="{{ event.id }}" data-field="cover_image" data-img-class="gp-event-hero-img" data-focus-x="{{ event.cover_focus_x }}" data-focus-y="{{ event.cover_focus_y }}" role="img" aria-label="Cover image">
     {% if cover_url %}
-      <img src="{{ cover_url }}" alt="{{ event.title }}" class="gp-event-hero-img">
+      <img src="{{ cover_url }}" alt="{{ event.title }}" class="gp-event-hero-img" style="object-position: {{ event.cover_focus_x }}% {{ event.cover_focus_y }}%;">
     {% else %}
       <div class="gp-event-hero-placeholder"></div>
     {% endif %}
     {% if can_edit %}
-    <button type="button" class="gp-event-hero-cover-edit" data-persist>Edit Cover Image</button>
+    <div class="gp-event-hero-controls" data-persist>
+      <button type="button" class="gp-event-hero-cover-edit" data-persist>Edit Cover Image</button>
+      {% if cover_url %}
+      <button type="button" class="gp-event-hero-cover-focus" data-persist>Adjust Focus</button>
+      {% endif %}
+    </div>
     {% endif %}
   </div>
   <div class="gp-event-hero-gradient"></div>

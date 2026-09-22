@@ -1896,12 +1896,21 @@ body > footer{
   cursor: default;
 }
 
-.gp-event-hero-cover-edit{
+.gp-event-hero-controls{
   display: none;
   position: absolute;
   z-index: 1;
   top: 1.5rem;
   left: 1.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.gp-edit-mode .gp-event-hero-controls{ display: flex; }
+
+.gp-event-hero-cover-edit,
+.gp-event-hero-cover-focus{
   font-family: 'Space Mono', monospace;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
@@ -1914,9 +1923,8 @@ body > footer{
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.gp-edit-mode .gp-event-hero-cover-edit{ display: inline-block; }
-
-.gp-event-hero-cover-edit:hover{
+.gp-event-hero-cover-edit:hover,
+.gp-event-hero-cover-focus:hover{
   background: rgba(38,35,33,0.85);
   border-color: var(--gp-green);
 }
@@ -2351,6 +2359,108 @@ body.gp-modal-open{ overflow: hidden; }
   cursor: pointer;
   padding: 0;
 }
+
+/* ==========================================================================
+   COVER IMAGE FOCUS PICKER (admin only)
+   ========================================================================== */
+
+.gp-focus-picker-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  background: rgba(38,35,33,0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.gp-focus-picker-box{
+  width: 100%;
+  max-width: 40rem;
+  background: var(--gp-cream);
+  border: 1px solid var(--gp-border-warm);
+  padding: 1.5rem;
+}
+
+.gp-focus-picker-hint{
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--gp-charcoal);
+  margin: 0 0 1rem;
+}
+
+.gp-focus-picker-imgwrap{
+  position: relative;
+  line-height: 0;
+  cursor: crosshair;
+  background: var(--gp-muted-bg);
+}
+
+.gp-focus-picker-imgwrap img{
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.gp-focus-picker-crosshair{
+  position: absolute;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.875rem 0 0 -0.875rem;
+  border: 2px solid var(--gp-green);
+  border-radius: 50%;
+  background: rgba(64,182,72,0.25);
+  pointer-events: none;
+}
+
+.gp-focus-picker-crosshair::before,
+.gp-focus-picker-crosshair::after{
+  content: "";
+  position: absolute;
+  background: var(--gp-green);
+}
+
+.gp-focus-picker-crosshair::before{
+  left: 50%;
+  top: -0.4rem;
+  bottom: -0.4rem;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.gp-focus-picker-crosshair::after{
+  top: 50%;
+  left: -0.4rem;
+  right: -0.4rem;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.gp-focus-picker-footer{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+
+.gp-focus-picker-cancel{
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gp-muted-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.gp-focus-picker-cancel:hover{ color: var(--gp-charcoal); }
 
 /* ==========================================================================
    INLINE EDIT MODE (admin only)

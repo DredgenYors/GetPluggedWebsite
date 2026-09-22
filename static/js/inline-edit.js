@@ -244,13 +244,16 @@
   // An event's cover image also shows on its Gallery preview card back on
   // the home page - a plain <img> with no data-editable-image of its own,
   // so it needs its own sync instead of the generic findSiblings() path.
-  function syncGalleryCardCover(entityId, url) {
+  function syncGalleryCardCover(entityId, url, focusX, focusY) {
     const card = document.querySelector(`.gp-gallery-card[data-event-id="${entityId}"]`);
     if (!card) return;
+
+    const objectPosition = focusX != null && focusY != null ? `${focusX}% ${focusY}%` : null;
 
     const existingImg = card.querySelector("img");
     if (existingImg) {
       existingImg.src = url;
+      if (objectPosition) existingImg.style.objectPosition = objectPosition;
       return;
     }
 
@@ -261,6 +264,7 @@
     img.src = url;
     img.alt = "";
     img.loading = "lazy";
+    if (objectPosition) img.style.objectPosition = objectPosition;
     card.insertBefore(img, card.firstChild);
   }
 
@@ -281,16 +285,23 @@
       wrapper.classList.remove("gp-edit-saving");
 
       if (result.ok) {
+        // A freshly uploaded cover resets to a centered focus point
+        // server-side (a new photo's important content is never guaranteed
+        // to be where the old one's was) - mirror that here.
+        const objectPosition = result.focus_x != null ? `${result.focus_x}% ${result.focus_y}%` : null;
+
         if (wrapper.tagName === "IMG") {
           wrapper.src = result.url;
+          if (objectPosition) wrapper.style.objectPosition = objectPosition;
         } else {
           const existingImg = wrapper.querySelector("img");
           if (existingImg) {
             existingImg.src = result.url;
+            if (objectPosition) existingImg.style.objectPosition = objectPosition;
           } else {
             // Clear old placeholder content, but keep any child explicitly
-            // marked to persist (e.g. the event hero's "Edit Cover Image"
-            // button) instead of wiping the wrapper wholesale.
+            // marked to persist (e.g. the event hero's edit controls)
+            // instead of wiping the wrapper wholesale.
             Array.from(wrapper.children).forEach((child) => {
               if (!child.hasAttribute("data-persist")) child.remove();
             });
@@ -298,11 +309,30 @@
             img.src = result.url;
             img.alt = "";
             img.className = wrapper.dataset.imgClass || "";
+            if (objectPosition) img.style.objectPosition = objectPosition;
             wrapper.insertBefore(img, wrapper.firstChild);
           }
         }
+        if (result.focus_x != null) {
+          wrapper.dataset.focusX = result.focus_x;
+          wrapper.dataset.focusY = result.focus_y;
+        }
+
+        // The very first cover a placeholder-state event gets won't have an
+        // "Adjust Focus" button yet (it's only server-rendered once there's
+        // a cover to adjust) - add it now instead of requiring a reload.
+        const controls = wrapper.querySelector(".gp-event-hero-controls");
+        if (controls && !controls.querySelector(".gp-event-hero-cover-focus")) {
+          const focusBtn = document.createElement("button");
+          focusBtn.type = "button";
+          focusBtn.className = "gp-event-hero-cover-focus";
+          focusBtn.setAttribute("data-persist", "");
+          focusBtn.textContent = "Adjust Focus";
+          controls.appendChild(focusBtn);
+        }
+
         const { entity, entityId } = entityOf(wrapper);
-        if (entity === "event") syncGalleryCardCover(entityId, result.url);
+        if (entity === "event") syncGalleryCardCover(entityId, result.url, result.focus_x, result.focus_y);
         showToast("Image updated");
       } else {
         showToast(result.error || "Couldn't upload", true);
@@ -310,6 +340,83 @@
     });
 
     fileInput.click();
+  }
+
+  function startAdjustingFocus(wrapper) {
+    const img = wrapper.querySelector("img");
+    if (!img) return;
+
+    const { entity, entityId } = entityOf(wrapper);
+    const overlay = document.createElement("div");
+    overlay.className = "gp-focus-picker-overlay";
+    overlay.innerHTML =
+      '<div class="gp-focus-picker-box">' +
+      '<p class="gp-focus-picker-hint">Click the part of the photo you want to stay in view when it gets cropped.</p>' +
+      '<div class="gp-focus-picker-imgwrap">' +
+      `<img src="${img.src}" alt="">` +
+      '<div class="gp-focus-picker-crosshair"></div>' +
+      "</div>" +
+      '<div class="gp-focus-picker-footer">' +
+      '<button type="button" class="gp-focus-picker-cancel">Cancel</button>' +
+      "</div>" +
+      "</div>";
+    document.body.appendChild(overlay);
+
+    const pickerImg = overlay.querySelector(".gp-focus-picker-imgwrap img");
+    const imgWrap = overlay.querySelector(".gp-focus-picker-imgwrap");
+    const crosshair = overlay.querySelector(".gp-focus-picker-crosshair");
+
+    const curX = parseFloat(wrapper.dataset.focusX || "50");
+    const curY = parseFloat(wrapper.dataset.focusY || "50");
+    crosshair.style.left = curX + "%";
+    crosshair.style.top = curY + "%";
+
+    function cleanup() {
+      overlay.remove();
+      document.removeEventListener("keydown", onKeydown);
+    }
+
+    function onKeydown(e) {
+      if (e.key === "Escape") cleanup();
+    }
+    document.addEventListener("keydown", onKeydown);
+
+    overlay.querySelector(".gp-focus-picker-cancel").addEventListener("click", cleanup);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) cleanup();
+    });
+
+    imgWrap.addEventListener("click", async (e) => {
+      const rect = pickerImg.getBoundingClientRect();
+      const x = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+      const y = Math.min(100, Math.max(0, ((e.clientY - rect.top) / rect.height) * 100));
+      crosshair.style.left = x + "%";
+      crosshair.style.top = y + "%";
+
+      let result;
+      try {
+        const res = await fetch(`/admin/events/${entityId}/inline-edit-cover-focus`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+          body: JSON.stringify({ x, y }),
+        });
+        result = await res.json();
+      } catch (err) {
+        result = { ok: false, error: "Network error." };
+      }
+
+      if (result.ok) {
+        const objectPosition = `${result.x}% ${result.y}%`;
+        img.style.objectPosition = objectPosition;
+        wrapper.dataset.focusX = result.x;
+        wrapper.dataset.focusY = result.y;
+        if (entity === "event") syncGalleryCardCover(entityId, img.src, result.x, result.y);
+        showToast("Focus updated");
+        cleanup();
+      } else {
+        showToast(result.error || "Couldn't save", true);
+      }
+    });
   }
 
   async function createRecord(url, button, errorLabel) {
@@ -538,6 +645,14 @@
           "Delete this event? This can't be undone.",
           "event"
         );
+        return;
+      }
+
+      const focusBtn = e.target.closest(".gp-event-hero-cover-focus");
+      if (focusBtn) {
+        e.preventDefault();
+        const heroWrap = focusBtn.closest("[data-editable-image]");
+        if (heroWrap) startAdjustingFocus(heroWrap);
         return;
       }
 

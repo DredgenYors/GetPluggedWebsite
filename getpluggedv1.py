@@ -266,6 +266,12 @@ class Event(db.Model):
     date = db.Column(db.Date, nullable=False)
     location = db.Column(db.String(200), default="", nullable=False)
     cover_image = db.Column(db.String(300), default="", nullable=False)
+    # Where object-fit:cover should keep centered when the image gets
+    # cropped to fit a container (the hero, the modal, the Gallery card) -
+    # percentages in the image's own coordinate space, matching CSS
+    # object-position.
+    cover_focus_x = db.Column(db.Float, default=50.0, nullable=False)
+    cover_focus_y = db.Column(db.Float, default=50.0, nullable=False)
 
     artists = db.relationship("Artist", secondary=event_artists, backref="events")
     media_items = db.relationship("Media", backref="event", cascade="all, delete-orphan")
@@ -597,9 +603,38 @@ def admin_inline_edit_event_cover(event_id):
 
     delete_uploaded_file(event.cover_image)
     event.cover_image = path
+    # A new image's important content is almost certainly not in the same
+    # place as the old one's, so reset to center rather than keep a stale
+    # focus point from a different photo.
+    event.cover_focus_x = 50.0
+    event.cover_focus_y = 50.0
     db.session.commit()
 
-    return jsonify({"ok": True, "url": site_image(path)})
+    return jsonify({"ok": True, "url": site_image(path), "focus_x": event.cover_focus_x, "focus_y": event.cover_focus_y})
+
+@app.route("/admin/events/<int:event_id>/inline-edit-cover-focus", methods=["POST"])
+@admin_required
+def admin_inline_edit_event_cover_focus(event_id):
+    """Save where the cover image should stay centered when object-fit:cover
+    crops it, so admins can choose what stays visible in a smaller/differently
+    shaped container (the popup's hero) than the full photo."""
+    event = Event.query.get_or_404(event_id)
+    data = request.get_json(silent=True) or {}
+
+    try:
+        x = float(data.get("x"))
+        y = float(data.get("y"))
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "Invalid position."}), 400
+
+    if not (0 <= x <= 100 and 0 <= y <= 100):
+        return jsonify({"ok": False, "error": "Invalid position."}), 400
+
+    event.cover_focus_x = x
+    event.cover_focus_y = y
+    db.session.commit()
+
+    return jsonify({"ok": True, "x": event.cover_focus_x, "y": event.cover_focus_y})
 
 # Event fields editable in place on /gallery/<id>: max length (strings) or "date".
 EVENT_INLINE_FIELDS = {"title": 200, "location": 200, "date": "date"}
