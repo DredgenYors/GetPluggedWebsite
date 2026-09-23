@@ -2224,6 +2224,10 @@ body.gp-modal-open{ overflow: hidden; }
   background: var(--gp-cream);
   border: 1px solid var(--gp-border-warm);
   animation: gpModalFadeUp 0.25s ease;
+  /* Hard guarantee: nothing inside (an overflowing description, or any
+     future content) can ever widen the box past its own width - it gets
+     clipped here rather than pushing the hero/box wider. */
+  overflow-x: hidden;
 }
 
 @keyframes gpModalFadeUp{
