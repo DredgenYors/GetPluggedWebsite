@@ -2396,31 +2396,20 @@ body.gp-modal-open{ overflow: hidden; }
   margin: 0 0 1rem;
 }
 
-.gp-focus-picker-imgwrap{
-  position: relative;
-  overflow: hidden;
-  line-height: 0;
-  cursor: crosshair;
+/* Shaped to match the real hero/card it's cropping into (aspect-ratio is
+   set inline per event) and sized to a comfortable viewing height - the
+   image inside overflows on whichever axis has slack, and scrolling that
+   overflow directly chooses the focus point, the same window you'll
+   actually see in the final crop rather than a shrunk-down whole photo. */
+.gp-focus-picker-viewport{
+  width: 100%;
+  max-height: 60vh;
+  overflow: auto;
   background: var(--gp-muted-bg);
 }
 
-.gp-focus-picker-imgwrap img{
+.gp-focus-picker-viewport img{
   display: block;
-  width: 100%;
-  height: auto;
-  pointer-events: none;
-}
-
-/* The rectangle that previews what will actually stay visible once the
-   image is cropped to the calling container's aspect ratio - dims
-   everything outside it via an oversized box-shadow, so it's honest about
-   how little of the photo might survive a very wide/short crop instead of
-   implying any point can be freely centered in both directions. */
-.gp-focus-picker-crop{
-  position: absolute;
-  border: 2px solid var(--gp-green);
-  box-shadow: 0 0 0 999px rgba(38,35,33,0.55);
-  pointer-events: none;
 }
 
 .gp-focus-picker-footer{

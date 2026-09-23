@@ -346,9 +346,8 @@
     const img = wrapper.querySelector("img");
     if (!img) return;
 
-    // The rectangle preview needs to know the actual shape it's being
-    // cropped into - measure the real hero container before it gets
-    // covered by the picker overlay, rather than guessing an aspect ratio.
+    // The viewport needs to be shaped like the real hero container it's
+    // cropping into - measure it before it gets covered by the picker.
     const heroRect = wrapper.getBoundingClientRect();
     const targetAR = heroRect.width / heroRect.height;
 
@@ -357,10 +356,9 @@
     overlay.className = "gp-focus-picker-overlay";
     overlay.innerHTML =
       '<div class="gp-focus-picker-box">' +
-      '<p class="gp-focus-picker-hint">Click the part of the photo you want to stay in view when it gets cropped - the green box shows what will actually be visible. Click as many times as you like, then Exit when you\'re done.</p>' +
-      '<div class="gp-focus-picker-imgwrap">' +
+      '<p class="gp-focus-picker-hint">Scroll to choose what stays in view when the photo is cropped - this window is shaped just like the final crop. Exit when you\'re done.</p>' +
+      '<div class="gp-focus-picker-viewport">' +
       `<img src="${img.src}" alt="">` +
-      '<div class="gp-focus-picker-crop"></div>' +
       "</div>" +
       '<div class="gp-focus-picker-footer">' +
       '<button type="button" class="gp-focus-picker-exit">Exit</button>' +
@@ -368,44 +366,42 @@
       "</div>";
     document.body.appendChild(overlay);
 
-    const pickerImg = overlay.querySelector(".gp-focus-picker-imgwrap img");
-    const imgWrap = overlay.querySelector(".gp-focus-picker-imgwrap");
-    const cropRect = overlay.querySelector(".gp-focus-picker-crop");
+    const viewport = overlay.querySelector(".gp-focus-picker-viewport");
+    const pickerImg = viewport.querySelector("img");
+    viewport.style.aspectRatio = targetAR;
 
-    // How much of the image (0-1) survives an object-fit:cover crop into
-    // targetAR: whichever axis is "extra" relative to the target shape gets
-    // trimmed, the other stays fully visible - mirrors the browser's own
-    // object-fit:cover + object-position math exactly.
-    function drawCropRect(xPct, yPct) {
+    const curX = parseFloat(wrapper.dataset.focusX || "50");
+    const curY = parseFloat(wrapper.dataset.focusY || "50");
+
+    // Scale the image so the axis with no slack fills the viewport exactly
+    // and the other overflows - scrolling that overflow IS choosing the
+    // focus point, the same way object-fit:cover would crop it.
+    function layoutImage() {
       const naturalW = pickerImg.naturalWidth;
       const naturalH = pickerImg.naturalHeight;
       if (!naturalW || !naturalH) return;
       const imgAR = naturalW / naturalH;
 
-      let visibleFracX = 1;
-      let visibleFracY = 1;
       if (imgAR >= targetAR) {
-        visibleFracX = targetAR / imgAR;
+        pickerImg.style.width = "auto";
+        pickerImg.style.height = "100%";
       } else {
-        visibleFracY = imgAR / targetAR;
+        pickerImg.style.width = "100%";
+        pickerImg.style.height = "auto";
       }
 
-      const left = (xPct / 100) * (1 - visibleFracX) * 100;
-      const top = (yPct / 100) * (1 - visibleFracY) * 100;
-
-      cropRect.style.left = left + "%";
-      cropRect.style.top = top + "%";
-      cropRect.style.width = visibleFracX * 100 + "%";
-      cropRect.style.height = visibleFracY * 100 + "%";
+      requestAnimationFrame(() => {
+        const maxLeft = viewport.scrollWidth - viewport.clientWidth;
+        const maxTop = viewport.scrollHeight - viewport.clientHeight;
+        viewport.scrollLeft = (curX / 100) * maxLeft;
+        viewport.scrollTop = (curY / 100) * maxTop;
+      });
     }
 
-    const curX = parseFloat(wrapper.dataset.focusX || "50");
-    const curY = parseFloat(wrapper.dataset.focusY || "50");
-
     if (pickerImg.complete) {
-      drawCropRect(curX, curY);
+      layoutImage();
     } else {
-      pickerImg.addEventListener("load", () => drawCropRect(curX, curY), { once: true });
+      pickerImg.addEventListener("load", layoutImage, { once: true });
     }
 
     function cleanup() {
@@ -423,36 +419,37 @@
       if (e.target === overlay) cleanup();
     });
 
-    imgWrap.addEventListener("click", async (e) => {
-      const rect = pickerImg.getBoundingClientRect();
-      const x = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
-      const y = Math.min(100, Math.max(0, ((e.clientY - rect.top) / rect.height) * 100));
-      drawCropRect(x, y);
+    let saveTimer = null;
+    viewport.addEventListener("scroll", () => {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(async () => {
+        const maxLeft = viewport.scrollWidth - viewport.clientWidth;
+        const maxTop = viewport.scrollHeight - viewport.clientHeight;
+        const x = maxLeft > 0 ? (viewport.scrollLeft / maxLeft) * 100 : 50;
+        const y = maxTop > 0 ? (viewport.scrollTop / maxTop) * 100 : 50;
 
-      let result;
-      try {
-        const res = await fetch(`/admin/events/${entityId}/inline-edit-cover-focus`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
-          body: JSON.stringify({ x, y }),
-        });
-        result = await res.json();
-      } catch (err) {
-        result = { ok: false, error: "Network error." };
-      }
+        let result;
+        try {
+          const res = await fetch(`/admin/events/${entityId}/inline-edit-cover-focus`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+            body: JSON.stringify({ x, y }),
+          });
+          result = await res.json();
+        } catch (err) {
+          result = { ok: false, error: "Network error." };
+        }
 
-      if (result.ok) {
-        const objectPosition = `${result.x}% ${result.y}%`;
-        img.style.objectPosition = objectPosition;
-        wrapper.dataset.focusX = result.x;
-        wrapper.dataset.focusY = result.y;
-        if (entity === "event") syncGalleryCardCover(entityId, img.src, result.x, result.y);
-        showToast("Focus updated");
-        // Stay open - let them try as many spots as they want and exit
-        // themselves instead of bouncing them out after every click.
-      } else {
-        showToast(result.error || "Couldn't save", true);
-      }
+        if (result.ok) {
+          const objectPosition = `${result.x}% ${result.y}%`;
+          img.style.objectPosition = objectPosition;
+          wrapper.dataset.focusX = result.x;
+          wrapper.dataset.focusY = result.y;
+          if (entity === "event") syncGalleryCardCover(entityId, img.src, result.x, result.y);
+        } else {
+          showToast(result.error || "Couldn't save", true);
+        }
+      }, 300);
     });
   }
 

@@ -10,7 +10,7 @@
   }
 
   function openModal(url) {
-    fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+    fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }, cache: "no-store" })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load event");
         return res.text();
