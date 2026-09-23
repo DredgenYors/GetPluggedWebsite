@@ -346,8 +346,8 @@
     const img = wrapper.querySelector("img");
     if (!img) return;
 
-    // The viewport needs to be shaped like the real hero container it's
-    // cropping into - measure it before it gets covered by the picker.
+    // The crop box needs to know the actual shape it's being cropped into -
+    // measure the real hero container before it gets covered by the picker.
     const heroRect = wrapper.getBoundingClientRect();
     const targetAR = heroRect.width / heroRect.height;
 
@@ -356,9 +356,10 @@
     overlay.className = "gp-focus-picker-overlay";
     overlay.innerHTML =
       '<div class="gp-focus-picker-box">' +
-      '<p class="gp-focus-picker-hint">Scroll to choose what stays in view when the photo is cropped - this window is shaped just like the final crop. Exit when you\'re done.</p>' +
-      '<div class="gp-focus-picker-viewport">' +
+      '<p class="gp-focus-picker-hint">Drag the green box (or scroll over the photo) to choose what stays in view when it gets cropped. Exit when you\'re done.</p>' +
+      '<div class="gp-focus-picker-imgwrap">' +
       `<img src="${img.src}" alt="">` +
+      '<div class="gp-focus-picker-crop"></div>' +
       "</div>" +
       '<div class="gp-focus-picker-footer">' +
       '<button type="button" class="gp-focus-picker-exit">Exit</button>' +
@@ -366,42 +367,48 @@
       "</div>";
     document.body.appendChild(overlay);
 
-    const viewport = overlay.querySelector(".gp-focus-picker-viewport");
-    const pickerImg = viewport.querySelector("img");
-    viewport.style.aspectRatio = targetAR;
+    const pickerImg = overlay.querySelector(".gp-focus-picker-imgwrap img");
+    const imgWrap = overlay.querySelector(".gp-focus-picker-imgwrap");
+    const cropBox = overlay.querySelector(".gp-focus-picker-crop");
 
-    const curX = parseFloat(wrapper.dataset.focusX || "50");
-    const curY = parseFloat(wrapper.dataset.focusY || "50");
+    // How much of the image (0-1) survives an object-fit:cover crop into
+    // targetAR: whichever axis is "extra" relative to the target shape gets
+    // trimmed, the other stays fully visible - mirrors the browser's own
+    // object-fit:cover + object-position math exactly.
+    let visibleFracX = 1;
+    let visibleFracY = 1;
+    let posX = parseFloat(wrapper.dataset.focusX || "50");
+    let posY = parseFloat(wrapper.dataset.focusY || "50");
 
-    // Scale the image so the axis with no slack fills the viewport exactly
-    // and the other overflows - scrolling that overflow IS choosing the
-    // focus point, the same way object-fit:cover would crop it.
-    function layoutImage() {
+    function applyBox() {
+      const left = (posX / 100) * (1 - visibleFracX) * 100;
+      const top = (posY / 100) * (1 - visibleFracY) * 100;
+      cropBox.style.left = left + "%";
+      cropBox.style.top = top + "%";
+      cropBox.style.width = visibleFracX * 100 + "%";
+      cropBox.style.height = visibleFracY * 100 + "%";
+    }
+
+    function layoutBox() {
       const naturalW = pickerImg.naturalWidth;
       const naturalH = pickerImg.naturalHeight;
       if (!naturalW || !naturalH) return;
       const imgAR = naturalW / naturalH;
 
       if (imgAR >= targetAR) {
-        pickerImg.style.width = "auto";
-        pickerImg.style.height = "100%";
+        visibleFracX = targetAR / imgAR;
+        visibleFracY = 1;
       } else {
-        pickerImg.style.width = "100%";
-        pickerImg.style.height = "auto";
+        visibleFracX = 1;
+        visibleFracY = imgAR / targetAR;
       }
-
-      requestAnimationFrame(() => {
-        const maxLeft = viewport.scrollWidth - viewport.clientWidth;
-        const maxTop = viewport.scrollHeight - viewport.clientHeight;
-        viewport.scrollLeft = (curX / 100) * maxLeft;
-        viewport.scrollTop = (curY / 100) * maxTop;
-      });
+      applyBox();
     }
 
     if (pickerImg.complete) {
-      layoutImage();
+      layoutBox();
     } else {
-      pickerImg.addEventListener("load", layoutImage, { once: true });
+      pickerImg.addEventListener("load", layoutBox, { once: true });
     }
 
     function cleanup() {
@@ -420,20 +427,15 @@
     });
 
     let saveTimer = null;
-    viewport.addEventListener("scroll", () => {
+    function queueSave() {
       clearTimeout(saveTimer);
       saveTimer = setTimeout(async () => {
-        const maxLeft = viewport.scrollWidth - viewport.clientWidth;
-        const maxTop = viewport.scrollHeight - viewport.clientHeight;
-        const x = maxLeft > 0 ? (viewport.scrollLeft / maxLeft) * 100 : 50;
-        const y = maxTop > 0 ? (viewport.scrollTop / maxTop) * 100 : 50;
-
         let result;
         try {
           const res = await fetch(`/admin/events/${entityId}/inline-edit-cover-focus`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
-            body: JSON.stringify({ x, y }),
+            body: JSON.stringify({ x: posX, y: posY }),
           });
           result = await res.json();
         } catch (err) {
@@ -450,7 +452,68 @@
           showToast(result.error || "Couldn't save", true);
         }
       }, 300);
+    }
+
+    // Moving the box a given number of image-relative percentage points
+    // means moving posX/posY by more than that within the "slack" range
+    // (a fully-covered axis has no room to move at all) - matches the
+    // inverse of the left/top formula in applyBox().
+    function nudge(deltaXPct, deltaYPct) {
+      if (visibleFracX < 1) {
+        posX = Math.min(100, Math.max(0, posX + deltaXPct / (1 - visibleFracX)));
+      }
+      if (visibleFracY < 1) {
+        posY = Math.min(100, Math.max(0, posY + deltaYPct / (1 - visibleFracY)));
+      }
+      applyBox();
+      queueSave();
+    }
+
+    let dragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+
+    imgWrap.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      cropBox.classList.add("dragging");
+      imgWrap.setPointerCapture(e.pointerId);
     });
+
+    imgWrap.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const rect = pickerImg.getBoundingClientRect();
+      const deltaXPct = ((e.clientX - dragStartX) / rect.width) * 100;
+      const deltaYPct = ((e.clientY - dragStartY) / rect.height) * 100;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      nudge(deltaXPct, deltaYPct);
+    });
+
+    function endDrag() {
+      dragging = false;
+      cropBox.classList.remove("dragging");
+    }
+    imgWrap.addEventListener("pointerup", endDrag);
+    imgWrap.addEventListener("pointercancel", endDrag);
+
+    imgWrap.addEventListener(
+      "wheel",
+      (e) => {
+        e.preventDefault();
+        // A single mouse-wheel notch is a much bigger delta than a
+        // trackpad's continuous scroll, and it's already amplified by
+        // nudge() dividing by the slack range - damp it so one notch is a
+        // small step rather than jumping most of the way across.
+        const WHEEL_SENSITIVITY = 0.15;
+        const rect = pickerImg.getBoundingClientRect();
+        const deltaXPct = (e.deltaX / rect.width) * 100 * WHEEL_SENSITIVITY;
+        const deltaYPct = (e.deltaY / rect.height) * 100 * WHEEL_SENSITIVITY;
+        nudge(deltaXPct, deltaYPct);
+      },
+      { passive: false }
+    );
   }
 
   async function createRecord(url, button, errorLabel) {
