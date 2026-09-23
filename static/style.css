@@ -2242,7 +2242,13 @@ body.gp-modal-open{ overflow: hidden; }
 }
 
 .gp-modal-hero{
-  position: relative;
+  /* Sticky (not just relative) so it - and the close button inside it -
+     always stay visible at the top of the box's own scroll area, no matter
+     how far the user scrolls to read a long description, instead of
+     scrolling away with the rest of the content. */
+  position: sticky;
+  top: 0;
+  z-index: 2;
   height: 20rem;
   overflow: hidden;
   background: var(--gp-surface);
