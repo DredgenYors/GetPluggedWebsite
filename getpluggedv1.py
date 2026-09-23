@@ -265,6 +265,7 @@ class Event(db.Model):
     title = db.Column(db.String(200), nullable=False)
     date = db.Column(db.Date, nullable=False)
     location = db.Column(db.String(200), default="", nullable=False)
+    description = db.Column(db.Text, default="", nullable=False)
     cover_image = db.Column(db.String(300), default="", nullable=False)
     # Where object-fit:cover should keep centered when the image gets
     # cropped to fit a container (the hero, the modal, the Gallery card) -
@@ -637,7 +638,7 @@ def admin_inline_edit_event_cover_focus(event_id):
     return jsonify({"ok": True, "x": event.cover_focus_x, "y": event.cover_focus_y})
 
 # Event fields editable in place on /gallery/<id>: max length (strings) or "date".
-EVENT_INLINE_FIELDS = {"title": 200, "location": 200, "date": "date"}
+EVENT_INLINE_FIELDS = {"title": 200, "location": 200, "description": 4000, "date": "date"}
 
 @app.route("/admin/inline-edit-event", methods=["POST"])
 @admin_required
@@ -673,7 +674,10 @@ def admin_inline_edit_event():
         if len(value) > max_len:
             return jsonify({"ok": False, "error": f"Too long (max {max_len} characters)."}), 400
         setattr(event, field, value)
-        display_value = value or "Add location"
+        # Let the client fall back to its own field-specific empty-state
+        # placeholder (e.g. "Add location" vs "Add a description...")
+        # instead of assuming one here.
+        display_value = value
 
     db.session.commit()
     return jsonify({"ok": True, "value": display_value, "raw_value": value})

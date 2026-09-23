@@ -33,14 +33,7 @@
     <div class="gp-modal-body-grid">
       <div>
         <p class="gp-label-accent">Event</p>
-        {% if artists %}
-          <p class="gp-modal-description">
-            Featuring
-            {% for artist in artists %}{{ artist.display_name }}{% if not loop.last %}, {% endif %}{% endfor %}.
-          </p>
-        {% else %}
-          <p class="gp-modal-description">More details on this event coming soon.</p>
-        {% endif %}
+        <p class="gp-modal-description" data-editable data-type="textarea" data-entity="event" data-entity-id="{{ event.id }}" data-field="description" data-allow-empty="true" data-empty-placeholder="Add a description for this event.">{{ event.description or "Add a description for this event." }}</p>
       </div>
 
       <div class="gp-modal-meta">

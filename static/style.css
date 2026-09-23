@@ -2004,6 +2004,7 @@ body > footer{
   line-height: 1.7;
   max-width: 65ch;
   margin: 0;
+  white-space: pre-wrap;
 }
 
 .gp-event-meta{
@@ -2324,6 +2325,7 @@ body.gp-modal-open{ overflow: hidden; }
   color: var(--gp-muted-text);
   line-height: 1.6;
   margin: 0.75rem 0 0;
+  white-space: pre-wrap;
 }
 
 .gp-modal-meta{

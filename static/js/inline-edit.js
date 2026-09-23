@@ -109,13 +109,65 @@
     });
   }
 
+  // contentEditable's default Enter behavior wraps each line in its own
+  // <div>/<p>, and plain el.textContent silently drops the boundary between
+  // sibling block elements - "line one[Enter]line two" reads back as
+  // "line onetwo" with the break gone. Force <br> as the paragraph
+  // separator so multi-line fields are readable via a childNodes walk that
+  // turns each <br> into an explicit "\n" instead.
+  function getEditableValue(el, isMultiline) {
+    if (!isMultiline) return el.textContent.trim();
+    let text = "";
+    el.childNodes.forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        text += node.textContent;
+      } else if (node.nodeName === "BR") {
+        text += "\n";
+      } else {
+        text += node.textContent;
+      }
+    });
+    return text.trim();
+  }
+
+  // execCommand("insertHTML", ..., "<br>") inserts the element but doesn't
+  // reliably leave the cursor positioned after it in every context (text
+  // typed right after can land before the break instead of following it) -
+  // insert via Range/Selection directly and place the caret ourselves so
+  // it's exact regardless of that quirk.
+  function insertLineBreakAtCaret() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const br = document.createElement("br");
+    range.insertNode(br);
+    range.setStartAfter(br);
+    range.setEndAfter(br);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function insertTextAtCaret(text) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const node = document.createTextNode(text);
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.setEndAfter(node);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
   function startEditingText(el) {
     if (el.classList.contains("gp-editing")) return;
 
     const isMultiline = el.dataset.type === "textarea";
     const allowEmpty = el.dataset.allowEmpty === "true";
     const emptyPlaceholder = el.dataset.emptyPlaceholder || "";
-    const original = el.textContent.trim();
+    const original = getEditableValue(el, isMultiline);
 
     el.classList.add("gp-editing");
     el.contentEditable = "true";
@@ -131,13 +183,27 @@
     function onPaste(e) {
       e.preventDefault();
       const text = (e.clipboardData || window.clipboardData).getData("text/plain");
-      document.execCommand("insertText", false, text);
+      if (isMultiline) {
+        const lines = text.split(/\r\n|\r|\n/);
+        lines.forEach((line, i) => {
+          if (i > 0) insertLineBreakAtCaret();
+          if (line) insertTextAtCaret(line);
+        });
+      } else {
+        insertTextAtCaret(text);
+      }
     }
 
     function onKeydown(e) {
       if (!isMultiline && e.key === "Enter") {
         e.preventDefault();
         el.blur();
+        return;
+      }
+      if (isMultiline && e.key === "Enter") {
+        e.preventDefault();
+        insertLineBreakAtCaret();
+        return;
       }
       if (e.key === "Escape") {
         e.preventDefault();
@@ -153,7 +219,7 @@
       el.contentEditable = "false";
       el.classList.remove("gp-editing");
 
-      let newValue = el.textContent.trim();
+      let newValue = getEditableValue(el, isMultiline);
       if (newValue === original) return;
 
       if (!newValue && !allowEmpty) {
