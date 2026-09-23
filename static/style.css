@@ -2430,7 +2430,7 @@ body.gp-modal-open{ overflow: hidden; }
   margin-top: 1.25rem;
 }
 
-.gp-focus-picker-cancel{
+.gp-focus-picker-exit{
   font-family: 'Space Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.08em;
@@ -2442,7 +2442,7 @@ body.gp-modal-open{ overflow: hidden; }
   padding: 0;
 }
 
-.gp-focus-picker-cancel:hover{ color: var(--gp-charcoal); }
+.gp-focus-picker-exit:hover{ color: var(--gp-charcoal); }
 
 /* ==========================================================================
    INLINE EDIT MODE (admin only)

@@ -357,13 +357,13 @@
     overlay.className = "gp-focus-picker-overlay";
     overlay.innerHTML =
       '<div class="gp-focus-picker-box">' +
-      '<p class="gp-focus-picker-hint">Click the part of the photo you want to stay in view when it gets cropped. The green box shows what will actually be visible.</p>' +
+      '<p class="gp-focus-picker-hint">Click the part of the photo you want to stay in view when it gets cropped - the green box shows what will actually be visible. Click as many times as you like, then Exit when you\'re done.</p>' +
       '<div class="gp-focus-picker-imgwrap">' +
       `<img src="${img.src}" alt="">` +
       '<div class="gp-focus-picker-crop"></div>' +
       "</div>" +
       '<div class="gp-focus-picker-footer">' +
-      '<button type="button" class="gp-focus-picker-cancel">Cancel</button>' +
+      '<button type="button" class="gp-focus-picker-exit">Exit</button>' +
       "</div>" +
       "</div>";
     document.body.appendChild(overlay);
@@ -418,7 +418,7 @@
     }
     document.addEventListener("keydown", onKeydown);
 
-    overlay.querySelector(".gp-focus-picker-cancel").addEventListener("click", cleanup);
+    overlay.querySelector(".gp-focus-picker-exit").addEventListener("click", cleanup);
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) cleanup();
     });
@@ -448,7 +448,8 @@
         wrapper.dataset.focusY = result.y;
         if (entity === "event") syncGalleryCardCover(entityId, img.src, result.x, result.y);
         showToast("Focus updated");
-        cleanup();
+        // Stay open - let them try as many spots as they want and exit
+        // themselves instead of bouncing them out after every click.
       } else {
         showToast(result.error || "Couldn't save", true);
       }
