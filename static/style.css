@@ -2220,6 +2220,12 @@ body.gp-modal-open{ overflow: hidden; }
   position: relative;
   width: 100%;
   max-width: 64rem;
+  /* Always leave breathing room above and below, whether the content is
+     short (the box just centers smaller, no forced stretching to fill the
+     viewport) or long enough to overflow (the box itself scrolls
+     internally, capped here, instead of growing edge-to-edge). */
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
   flex-shrink: 0;
   background: var(--gp-cream);
   border: 1px solid var(--gp-border-warm);
