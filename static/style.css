@@ -1996,6 +1996,13 @@ body > footer{
   margin-bottom: 3rem;
 }
 
+/* Grid items default to min-width:auto, so an unbroken run of text (a long
+   word, a URL) refuses to shrink below its own width and grows the track
+   instead of wrapping - pushing the meta column beside it out of the box.
+   min-width:0 lets the column shrink to its track's real size; overflow-wrap
+   then wraps content that doesn't fit rather than overflowing it. */
+.gp-event-body-grid > *{ min-width: 0; }
+
 .gp-event-type{ margin: 0 0 1rem; }
 
 .gp-event-description{
@@ -2005,6 +2012,7 @@ body > footer{
   max-width: 65ch;
   margin: 0;
   white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 .gp-event-meta{
@@ -2317,6 +2325,8 @@ body.gp-modal-open{ overflow: hidden; }
   margin-bottom: 2.5rem;
 }
 
+.gp-modal-body-grid > *{ min-width: 0; }
+
 @media (min-width: 768px){
   .gp-modal-body-grid{ grid-template-columns: 2fr 1fr; }
 }
@@ -2326,6 +2336,7 @@ body.gp-modal-open{ overflow: hidden; }
   line-height: 1.6;
   margin: 0.75rem 0 0;
   white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 .gp-modal-meta{
