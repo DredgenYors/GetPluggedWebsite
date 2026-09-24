@@ -846,7 +846,7 @@ def login():
 
             login_user(user)
             next_url = request.args.get("next")
-            return redirect(next_url or url_for("admin_home"))
+            return redirect(next_url or url_for("admin_users"))
         
         flash("Invalid username or password.", "danger")
     else:

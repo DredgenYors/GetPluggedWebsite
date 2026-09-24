@@ -2,37 +2,41 @@
 {% block title %}Login - Admin{% endblock %}
 
 {% block content %}
-<div class="container gp-page-container" style="max-width: 420px;">
-  <h2 class="mb-4">Admin Login</h2>
+<section class="gp-section gp-auth-section">
+  <div class="gp-section-inner gp-auth-inner">
+    <span class="gp-eyebrow">ADMIN ACCESS</span>
+    <div class="gp-rule"></div>
+    <h1 class="gp-auth-title">Log In</h1>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }} mb-3">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="gp-auth-alert gp-auth-alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
-  <form method="POST" action="{{ url_for('login') }}">
-    {{ form.hidden_tag() }}
+    <form method="POST" action="{{ url_for('login') }}" class="gp-auth-form">
+      {{ form.hidden_tag() }}
 
-    <div class="mb-3">
-      {{ form.username.label(class="form-label") }}
-      {{ form.username(class="form-control", required=True) }}
-      {% for err in form.username.errors %}
-        <div class="text-danger small">{{ err }}</div>
-      {% endfor %}
-    </div>
+      <div class="gp-auth-field">
+        {{ form.username.label(class="gp-auth-label") }}
+        {{ form.username(class="gp-auth-input", required=True, autocomplete="username") }}
+        {% for err in form.username.errors %}
+          <div class="gp-auth-error">{{ err }}</div>
+        {% endfor %}
+      </div>
 
-    <div class="mb-3">
-      {{ form.password.label(class="form-label") }}
-      {{ form.password(class="form-control", required=True) }}
-      {% for err in form.password.errors %}
-        <div class="text-danger small">{{ err }}</div>
-      {% endfor %}
-    </div>
+      <div class="gp-auth-field">
+        {{ form.password.label(class="gp-auth-label") }}
+        {{ form.password(class="gp-auth-input", required=True, autocomplete="current-password") }}
+        {% for err in form.password.errors %}
+          <div class="gp-auth-error">{{ err }}</div>
+        {% endfor %}
+      </div>
 
-    {{ form.submit(class="btn btn-success w-100") }}
-  </form>
-</div>
+      {{ form.submit(class="gp-btn gp-btn-solid gp-auth-submit") }}
+    </form>
+  </div>
+</section>
 {% endblock %}
