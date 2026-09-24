@@ -75,14 +75,14 @@
 
                     {% if site_settings.events_confirmed %}
                     <li>
-                        <a class="gp-nav-item gp-nav-item-utility {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
                            href="{{ url_for('tickets') }}">Tickets</a>
                     </li>
                     {% endif %}
 
                     {% if current_user.is_authenticated %}
                     <li>
-                        <a class="gp-nav-item gp-nav-item-utility {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
+                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
                            href="{{ url_for('admin_home') }}">Admin</a>
                     </li>
                     {% if current_user.is_admin() %}
