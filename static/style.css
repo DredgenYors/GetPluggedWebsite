@@ -2006,7 +2006,10 @@ body > footer{
   display: none;
   position: absolute;
   z-index: 1;
-  top: 1.5rem;
+  /* The fixed nav (84px) sits on top of this hero (it starts at the very
+     top of the page, behind the nav) - offset below it so these buttons
+     aren't hidden under the nav's opaque background. */
+  top: calc(84px + 1.5rem);
   left: 1.5rem;
   flex-direction: column;
   align-items: flex-start;

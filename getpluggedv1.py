@@ -107,6 +107,11 @@ INLINE_IMAGE_FIELDS = {
     "tickets_image": "tickets",
 }
 
+# SiteSettings image fields that also have a focal-point picker -> their x/y column names.
+SETTINGS_IMAGE_FOCUS_FIELDS = {
+    "tickets_image": ("tickets_focus_x", "tickets_focus_y"),
+}
+
 class SiteSettings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     events_confirmed = db.Column(db.Boolean, default=False, nullable=False)
@@ -211,6 +216,8 @@ class SiteSettings(db.Model):
 
     # ---- Tickets page ----
     tickets_image = db.Column(db.String(500), default="", nullable=False)
+    tickets_focus_x = db.Column(db.Float, default=50.0, nullable=False)
+    tickets_focus_y = db.Column(db.Float, default=50.0, nullable=False)
     tickets_eyebrow = db.Column(db.String(100), default="Tickets", nullable=False)
     tickets_heading = db.Column(db.String(200), default="Get Your Tickets", nullable=False)
     tickets_subheading = db.Column(db.String(400), default="Secure your spot at our next event. Tickets are available now.", nullable=False)
@@ -823,10 +830,51 @@ def admin_inline_edit_image():
         return jsonify({"ok": False, "error": "Please choose an image file (png, jpg, gif, or webp)."}), 400
 
     settings = get_settings()
+    delete_uploaded_file(getattr(settings, field))
     setattr(settings, field, path)
+
+    response = {"ok": True, "url": site_image(path)}
+    focus_fields = SETTINGS_IMAGE_FOCUS_FIELDS.get(field)
+    if focus_fields:
+        x_col, y_col = focus_fields
+        # A new image's important content is almost certainly not in the
+        # same place as the old one's, so reset to center.
+        setattr(settings, x_col, 50.0)
+        setattr(settings, y_col, 50.0)
+        response["focus_x"] = 50.0
+        response["focus_y"] = 50.0
+
     db.session.commit()
 
-    return jsonify({"ok": True, "url": site_image(path)})
+    return jsonify(response)
+
+@app.route("/admin/inline-edit-image-focus", methods=["POST"])
+@admin_required
+def admin_inline_edit_image_focus():
+    """Save where a SiteSettings image should stay centered when object-fit:cover
+    crops it (mirrors /admin/events/<id>/inline-edit-cover-focus for the Event cover)."""
+    data = request.get_json(silent=True) or {}
+    field = data.get("field")
+    focus_fields = SETTINGS_IMAGE_FOCUS_FIELDS.get(field)
+    if not focus_fields:
+        return jsonify({"ok": False, "error": "Unknown field."}), 400
+
+    try:
+        x = float(data.get("x"))
+        y = float(data.get("y"))
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "Invalid position."}), 400
+
+    if not (0 <= x <= 100 and 0 <= y <= 100):
+        return jsonify({"ok": False, "error": "Invalid position."}), 400
+
+    settings = get_settings()
+    x_col, y_col = focus_fields
+    setattr(settings, x_col, x)
+    setattr(settings, y_col, y)
+    db.session.commit()
+
+    return jsonify({"ok": True, "x": getattr(settings, x_col), "y": getattr(settings, y_col)})
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

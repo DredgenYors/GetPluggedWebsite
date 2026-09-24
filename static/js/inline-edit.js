@@ -498,10 +498,18 @@
       saveTimer = setTimeout(async () => {
         let result;
         try {
-          const res = await fetch(`/admin/events/${entityId}/inline-edit-cover-focus`, {
+          const url =
+            entity === "event"
+              ? `/admin/events/${entityId}/inline-edit-cover-focus`
+              : "/admin/inline-edit-image-focus";
+          const body =
+            entity === "event"
+              ? { x: posX, y: posY }
+              : { field: wrapper.dataset.field, x: posX, y: posY };
+          const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
-            body: JSON.stringify({ x: posX, y: posY }),
+            body: JSON.stringify(body),
           });
           result = await res.json();
         } catch (err) {
