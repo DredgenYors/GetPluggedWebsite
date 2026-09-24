@@ -73,13 +73,6 @@
                            href="{{ url_for('home') }}#contact">{{ site_settings.nav_label_contact }}</a>
                     </li>
 
-                    {% if site_settings.events_confirmed %}
-                    <li>
-                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
-                           href="{{ url_for('tickets') }}">Tickets</a>
-                    </li>
-                    {% endif %}
-
                     {% if current_user.is_authenticated %}
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
@@ -126,9 +119,6 @@
                 {% endif %}
                 {% if site_settings.tiktok_url %}
                 <a href="{{ site_settings.tiktok_url }}" target="_blank" rel="noopener noreferrer">TikTok</a>
-                {% endif %}
-                {% if site_settings.email %}
-                <a href="mailto:{{ site_settings.email }}">{{ site_settings.email }}</a>
                 {% endif %}
             </div>
         </div>
