@@ -15,6 +15,40 @@
   --gp-avatar-size: 80px;
 }
 
+/* ==========================================================================
+   SCROLLBARS (site-wide - the page itself, and any scrollable element:
+   modals, the focus picker, admin tables, etc.)
+   ========================================================================== */
+
+html{
+  scrollbar-width: thin;
+  scrollbar-color: var(--gp-charcoal) var(--gp-surface);
+}
+
+::-webkit-scrollbar{
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track{
+  background: var(--gp-surface);
+}
+
+::-webkit-scrollbar-thumb{
+  background-color: var(--gp-charcoal);
+  background-clip: padding-box;
+  border: 2px solid var(--gp-surface);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background-color: var(--gp-green);
+}
+
+::-webkit-scrollbar-corner{
+  background: var(--gp-surface);
+}
+
 /* Global Styles */
 body {
     font-family: 'Inter', Arial, Helvetica, sans-serif;
