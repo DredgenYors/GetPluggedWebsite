@@ -9,29 +9,6 @@
         <div class="fw-bold mb-3">Admin Directory</div>
 
         <div class="d-grid gap-2">
-          <a class="btn btn-outline-light btn-sm" href="{{ url_for('admin_home') }}">Dashboard</a>
-          <a class="btn btn-outline-light btn-sm"
-            href="{{ url_for('admin_artists') }}"
-            {% if request.endpoint == 'admin_home' %}
-              data-bs-toggle="tooltip"
-              data-bs-placement="bottom"
-              data-bs-custom-class="gp-tooltip gp-tooltip--sidebar"
-              title="View, add, edit, or remove artists"
-            {% endif %}>
-            Artists
-          </a>
-
-          <a class="btn btn-outline-light btn-sm"
-            href="{{ url_for('admin_events') }}"
-            {% if request.endpoint == 'admin_home' %}
-              data-bs-toggle="tooltip"
-              data-bs-placement="bottom"
-              data-bs-custom-class="gp-tooltip gp-tooltip--sidebar"
-              title="Create and manage events"
-            {% endif %}>
-            Events
-          </a>
-
           <a class="btn btn-outline-light btn-sm"
             href="{{ url_for('admin_settings') }}"
             {% if request.endpoint == 'admin_home' %}

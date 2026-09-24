@@ -859,6 +859,10 @@ def login():
 @app.route("/admin")
 @admin_required
 def admin_home():
+    # Most of the old admin dashboard/CRUD pages are obsolete now that
+    # content is edited inline on the live pages; only Users and Settings
+    # remain in active use, so send visitors straight to Users.
+    return redirect(url_for("admin_users"))
     total_artists = Artist.query.count()
     total_events = Event.query.count()
 
@@ -873,12 +877,14 @@ def admin_home():
 @app.route("/admin/artists")
 @login_required
 def admin_artists():
+    return redirect(url_for("admin_users"))
     artists = Artist.query.order_by(Artist.display_name.asc()).all()
     return render_template("admin/artists.html", artists=artists)
 
 @app.route("/admin/artists/new", methods=["GET", "POST"])
 @login_required
 def admin_artists_new():
+    return redirect(url_for("admin_users"))
     form = ArtistForm()
     if form.validate_on_submit():
         artist = Artist(
@@ -894,6 +900,7 @@ def admin_artists_new():
 @app.route("/admin/artists/<int:artist_id>/edit", methods=["GET", "POST"])
 @login_required
 def admin_artists_edit(artist_id):
+    return redirect(url_for("admin_users"))
     artist = Artist.query.get_or_404(artist_id)
     form = ArtistForm(obj=artist)
 
@@ -909,6 +916,7 @@ def admin_artists_edit(artist_id):
 @app.route("/admin/artists/<int:artist_id>/delete", methods=["POST"])
 @login_required
 def admin_artists_delete(artist_id):
+    return redirect(url_for("admin_users"))
     artist = Artist.query.get_or_404(artist_id)
     db.session.delete(artist)
     db.session.commit()
@@ -925,12 +933,14 @@ def logout():
 @app.route("/admin/events")
 @login_required
 def admin_events():
+    return redirect(url_for("admin_users"))
     events = Event.query.order_by(Event.date.desc()).all()
     return render_template("admin/events.html", events=events)
 
 @app.route("/admin/events/new", methods=["GET", "POST"])
 @login_required
 def admin_events_new():
+    return redirect(url_for("admin_users"))
     form = EventForm()
     if form.validate_on_submit():
         event = Event(
@@ -947,6 +957,7 @@ def admin_events_new():
 @app.route("/admin/events/<int:event_id>/edit", methods=["GET", "POST"])
 @login_required
 def admin_events_edit(event_id):
+    return redirect(url_for("admin_users"))
     event = Event.query.get_or_404(event_id)
     form = EventForm(obj=event)
 
@@ -963,6 +974,7 @@ def admin_events_edit(event_id):
 @app.route("/admin/events/<int:event_id>/delete", methods=["POST"])
 @login_required
 def admin_events_delete(event_id):
+    return redirect(url_for("admin_users"))
     event = Event.query.get_or_404(event_id)
     db.session.delete(event)
     db.session.commit()
@@ -972,6 +984,7 @@ def admin_events_delete(event_id):
 @app.route("/admin/events/<int:event_id>/artists", methods=["GET", "POST"])
 @login_required
 def admin_event_artists(event_id):
+    return redirect(url_for("admin_users"))
     event = Event.query.get_or_404(event_id)
     artists = Artist.query.order_by(Artist.display_name.asc()).all()
 
@@ -991,6 +1004,7 @@ def admin_event_artists(event_id):
 @app.route("/admin/events/<int:event_id>/media", methods=["GET", "POST"])
 @login_required
 def admin_event_media(event_id):
+    return redirect(url_for("admin_users"))
     event = Event.query.get_or_404(event_id)
 
     form = MediaForm()
@@ -1021,6 +1035,7 @@ def admin_event_media(event_id):
 @app.route("/admin/media/<int:media_id>/delete", methods=["POST"])
 @login_required
 def admin_media_delete(media_id):
+    return redirect(url_for("admin_users"))
     item = Media.query.get_or_404(media_id)
     event_id = item.event_id
     db.session.delete(item)
