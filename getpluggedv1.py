@@ -13,7 +13,21 @@ from flask_wtf import CSRFProtect
 
 app = Flask(__name__)
 
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-change-me")
+# SECRET_KEY signs session cookies and CSRF tokens - anyone who knows it can
+# forge both. It must come from the environment in any real deployment;
+# the only fallback allowed is an obviously-fake key, and only when
+# FLASK_DEBUG opts into local development (see the __main__ block below).
+_secret_key = os.environ.get("SECRET_KEY")
+if not _secret_key:
+    if os.environ.get("FLASK_DEBUG", "0").lower() in ("1", "true"):
+        _secret_key = "dev-only-insecure-key-do-not-use-in-production"
+    else:
+        raise RuntimeError(
+            "SECRET_KEY environment variable is not set. Set it to a long "
+            "random value before running this app. For local development "
+            "only, set FLASK_DEBUG=1 instead to use an insecure dev key."
+        )
+app.config["SECRET_KEY"] = _secret_key
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///getplugged.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -1227,14 +1241,35 @@ def admin_users_delete(user_id):
     return redirect(url_for("admin_users"))
 
 def ensure_default_admin():
+    """First-run bootstrap: create the initial super_admin account if none
+    exists yet. Never fall back to a known password silently - the same
+    reasoning as SECRET_KEY above."""
     with app.app_context():
         u = User.query.filter_by(username="admin").first()
         if not u:
+            admin_password = os.environ.get("ADMIN_PASSWORD")
+            if not admin_password:
+                if os.environ.get("FLASK_DEBUG", "0").lower() in ("1", "true"):
+                    admin_password = "change-me-now"
+                else:
+                    raise RuntimeError(
+                        "No admin user exists yet and ADMIN_PASSWORD is not set. "
+                        "Set ADMIN_PASSWORD to create the first admin account. "
+                        "For local development only, set FLASK_DEBUG=1 instead."
+                    )
             u = User(username="admin", role="super_admin")
-            u.set_password(os.environ.get("ADMIN_PASSWORD", "change-me-now"))
+            u.set_password(admin_password)
             db.session.add(u)
             db.session.commit()
 
 if __name__ == '__main__':
     ensure_default_admin()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Debug mode (the interactive Werkzeug debugger) must never be on by
+    # default - it lets anyone who triggers an unhandled error run arbitrary
+    # code on the server. Same for binding to all interfaces: default to
+    # localhost-only unless explicitly opted into. Both are opt-in via env
+    # vars for local development.
+    debug_mode = os.environ.get("FLASK_DEBUG", "0").lower() in ("1", "true")
+    host = os.environ.get("HOST", "127.0.0.1")
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=debug_mode, host=host, port=port)
