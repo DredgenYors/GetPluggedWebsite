@@ -61,17 +61,21 @@
         <button type="button" class="gp-event-recap-add" id="gp-add-photo" data-event-id="{{ event.id }}">+ Add Photo</button>
         {% endif %}
       </div>
-      <div class="gp-event-recap-grid" id="gp-event-recap-grid"{% if not photos %} hidden{% endif %}>
-        {% for p in photos %}
-          <div class="gp-event-recap-item">
-            <a href="{{ site_image(p.url) }}" target="_blank" rel="noopener noreferrer">
-              <img src="{{ site_image(p.url) }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
-            </a>
-            {% if can_edit %}
-            <button type="button" class="gp-event-recap-remove" data-media-id="{{ p.id }}" title="Remove photo">&times;</button>
-            {% endif %}
-          </div>
-        {% endfor %}
+      <div class="gp-carousel" data-carousel data-carousel-min-loop="5">
+        <button type="button" class="gp-carousel-arrow gp-carousel-prev" data-carousel-prev aria-label="Previous photos">&lsaquo;</button>
+        <div class="gp-event-recap-grid gp-carousel-viewport" id="gp-event-recap-grid" data-carousel-track{% if not photos %} hidden{% endif %}>
+          {% for p in photos %}
+            <div class="gp-event-recap-item">
+              <a href="{{ site_image(p.url) }}" target="_blank" rel="noopener noreferrer">
+                <img src="{{ site_image(p.url) }}" alt="{{ p.caption if p.caption else event.title ~ ' photo ' ~ loop.index }}" loading="lazy">
+              </a>
+              {% if can_edit %}
+              <button type="button" class="gp-event-recap-remove" data-media-id="{{ p.id }}" title="Remove photo">&times;</button>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        <button type="button" class="gp-carousel-arrow gp-carousel-next" data-carousel-next aria-label="Next photos">&rsaquo;</button>
       </div>
       <p class="gp-empty-note" id="gp-event-recap-empty"{% if photos %} hidden{% endif %}>No photos added yet.</p>
     </div>

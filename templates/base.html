@@ -161,6 +161,8 @@
     });
     </script>
 
+    <script src="{{ url_for('static', filename='js/carousel.js') }}"></script>
+
     {% if current_user.is_authenticated and current_user.is_admin() %}
     <script src="{{ url_for('static', filename='js/inline-edit.js') }}"></script>
     {% endif %}

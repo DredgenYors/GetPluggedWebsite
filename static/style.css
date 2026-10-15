@@ -1613,6 +1613,14 @@ body > footer{
   .gp-carousel-arrow{ opacity: 1; }
 }
 
+/* No arrows (or fade) when there's nothing in the track to scroll to -
+   mirrors the [hidden] grid used for a zero-photos Recap section. */
+.gp-carousel:has([data-carousel-track][hidden]) .gp-carousel-arrow,
+.gp-carousel:has([data-carousel-track][hidden])::before,
+.gp-carousel:has([data-carousel-track][hidden])::after{
+  display: none;
+}
+
 .gp-gallery-card{
   position: relative;
   display: block;
@@ -2285,9 +2293,12 @@ body > footer{
   display: flex;
   gap: 0.75rem;
   overflow-x: auto;
-  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   padding-bottom: 0.5rem;
 }
+
+.gp-event-recap-grid::-webkit-scrollbar{ display: none; }
 
 .gp-event-recap-grid[hidden]{ display: none; }
 
@@ -2297,7 +2308,6 @@ body > footer{
   aspect-ratio: 1 / 1;
   overflow: hidden;
   background: var(--gp-muted-bg);
-  scroll-snap-align: start;
 }
 
 @media (min-width: 768px){

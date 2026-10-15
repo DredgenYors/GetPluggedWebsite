@@ -20,6 +20,11 @@
         overlay.hidden = false;
         overlay.scrollTop = 0;
         document.body.classList.add("gp-modal-open");
+        // The modal's markup is injected via innerHTML, so any <script> in
+        // it never runs and DOMContentLoaded already fired once for the
+        // outer page - carousels inside it (Recap Photos) need an explicit
+        // re-init call.
+        if (window.gpInitCarousels) window.gpInitCarousels(contentRoot);
       })
       .catch(() => {
         window.location.href = url.replace(/\/modal$/, "");

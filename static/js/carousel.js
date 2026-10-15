@@ -7,6 +7,9 @@
   }
 
   function initCarousel(root) {
+    if (root.dataset.carouselReady) return;
+    root.dataset.carouselReady = "1";
+
     const track = root.querySelector("[data-carousel-track]");
     const viewport = root.querySelector(".gp-carousel-viewport");
     const prevBtn = root.querySelector("[data-carousel-prev]");
@@ -14,29 +17,49 @@
     if (!track || !viewport) return;
 
     const minLoop = parseInt(root.dataset.carouselMinLoop || "5", 10);
-    const originalItems = Array.from(track.children);
 
-    // Only loop/auto-drift when there's enough content for it to feel like a
-    // loop rather than a jarring jump - otherwise just leave it as a plain,
-    // manually-scrollable row with no clones and no motion.
-    const looping = !REDUCE_MOTION && originalItems.length >= minLoop;
-    if (looping) {
-      originalItems.forEach((item) => {
-        const clone = item.cloneNode(true);
-        clone.setAttribute("aria-hidden", "true");
-        clone.setAttribute("tabindex", "-1");
-        clone.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
-        track.appendChild(clone);
-      });
+    let looping = false;
+    let cloneNodes = [];
+    let loopWidth = 0;
+    let wasEditMode = isEditMode();
+
+    function cloneOf(item) {
+      const clone = item.cloneNode(true);
+      clone.setAttribute("aria-hidden", "true");
+      clone.setAttribute("tabindex", "-1");
+      clone.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+      return clone;
     }
 
-    let paused = isEditMode();
-    let lastTime = null;
-    let loopWidth = 0;
+    // Real (non-clone) items currently in the track - always safe to read,
+    // since clones only ever exist outside Edit Mode (see buildClones/
+    // destroyClones below), and the add/remove-photo controls that mutate
+    // this list live are only usable while Edit Mode is on.
+    function realItems() {
+      return Array.from(track.children).filter((el) => !cloneNodes.includes(el));
+    }
+
+    function destroyClones() {
+      cloneNodes.forEach((el) => el.remove());
+      cloneNodes = [];
+      looping = false;
+    }
+
+    function buildClones() {
+      destroyClones();
+      const items = realItems();
+      if (REDUCE_MOTION || items.length < minLoop) return;
+      cloneNodes = items.map(cloneOf);
+      cloneNodes.forEach((clone) => track.appendChild(clone));
+      looping = true;
+    }
 
     function measure() {
       loopWidth = looping ? track.scrollWidth / 2 : 0;
     }
+
+    let paused = isEditMode();
+    let lastTime = null;
 
     function pause() {
       paused = true;
@@ -73,30 +96,47 @@
 
     function step(direction) {
       pause();
-      const card = track.querySelector(".gp-gallery-card");
-      const cardWidth = card ? card.getBoundingClientRect().width : 260;
+      const item = realItems()[0];
+      const itemWidth = item ? item.getBoundingClientRect().width : 260;
       const trackStyle = window.getComputedStyle(track);
       const gap = parseFloat(trackStyle.columnGap || trackStyle.gap || "12") || 12;
-      viewport.scrollBy({ left: direction * (cardWidth + gap), behavior: "smooth" });
+      viewport.scrollBy({ left: direction * (itemWidth + gap), behavior: "smooth" });
     }
 
     if (prevBtn) prevBtn.addEventListener("click", () => step(-1));
     if (nextBtn) nextBtn.addEventListener("click", () => step(1));
 
-    // Edit Mode can be toggled on this same page without a reload - stop
-    // auto-drift the moment it's on, rather than waiting for a hover.
+    // Edit Mode can be toggled on this same page without a reload. Entering
+    // it tears down any clones immediately, since the add/remove-photo
+    // controls splice the real item list directly and must never find a
+    // stale clone in their way. Leaving it rebuilds from whatever the real
+    // list looks like now (photos may have been added/removed meanwhile).
     const editModeObserver = new MutationObserver(() => {
-      if (isEditMode()) pause();
+      const nowEditMode = isEditMode();
+      if (nowEditMode === wasEditMode) return;
+      wasEditMode = nowEditMode;
+      if (nowEditMode) {
+        pause();
+        destroyClones();
+      } else {
+        buildClones();
+        resume();
+      }
+      measure();
     });
     editModeObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
     window.addEventListener("resize", measure);
 
+    if (!isEditMode()) buildClones();
     measure();
-    if (looping) requestAnimationFrame(tick);
+    requestAnimationFrame(tick);
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("[data-carousel]").forEach(initCarousel);
-  });
+  function initAll(root) {
+    (root || document).querySelectorAll("[data-carousel]").forEach(initCarousel);
+  }
+
+  window.gpInitCarousels = initAll;
+  document.addEventListener("DOMContentLoaded", () => initAll());
 })();
