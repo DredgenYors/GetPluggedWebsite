@@ -115,32 +115,38 @@
     </div>
 
     {% if gallery_preview or (current_user.is_authenticated and current_user.is_admin()) %}
-    <div class="gp-gallery-grid">
-      {% for item in gallery_preview %}
-        <a class="gp-gallery-card" href="{{ url_for('event_detail', event_id=item.event.id) }}" data-event-id="{{ item.event.id }}">
-          {% if item.cover_url %}
-            <img src="{{ item.cover_url }}" alt="{{ item.event.title }}" loading="lazy" style="object-position: {{ item.event.cover_focus_x }}% {{ item.event.cover_focus_y }}%;">
-          {% else %}
-            <div class="gp-gallery-card-placeholder"></div>
-          {% endif %}
-          <span class="gp-gallery-card-date">{{ item.event.date.strftime('%b %Y') }}</span>
-          <div class="gp-gallery-card-overlay">
-            <span class="gp-label-accent">Event</span>
-            <h3>{{ item.event.title }}</h3>
-            <div class="gp-gallery-card-hover">
-              {% if item.event.location %}<p>{{ item.event.location }}</p>{% endif %}
-              <span class="gp-gallery-card-hint">View recap <span class="gp-arrow">&#8599;</span></span>
-            </div>
-          </div>
-        </a>
-      {% endfor %}
-      {% if current_user.is_authenticated and current_user.is_admin() %}
-      <button type="button" class="gp-gallery-card gp-gallery-add" id="gp-add-event">
-        <span class="gp-gallery-add-icon">+</span>
-        <span>Add Event</span>
-      </button>
-      {% endif %}
+    <div class="gp-carousel" data-carousel data-carousel-min-loop="5">
+      <button type="button" class="gp-carousel-arrow gp-carousel-prev" data-carousel-prev aria-label="Previous events">&lsaquo;</button>
+      <div class="gp-carousel-viewport">
+        <div class="gp-carousel-track" data-carousel-track>
+          {% for item in gallery_preview %}
+            <a class="gp-gallery-card" href="{{ url_for('event_detail', event_id=item.event.id) }}" data-event-id="{{ item.event.id }}">
+              {% if item.cover_url %}
+                <img src="{{ item.cover_url }}" alt="{{ item.event.title }}" loading="lazy" style="object-position: {{ item.event.cover_focus_x }}% {{ item.event.cover_focus_y }}%;">
+              {% else %}
+                <div class="gp-gallery-card-placeholder"></div>
+              {% endif %}
+              <span class="gp-gallery-card-date">{{ item.event.date.strftime('%b %Y') }}</span>
+              <div class="gp-gallery-card-overlay">
+                <span class="gp-label-accent">Event</span>
+                <h3>{{ item.event.title }}</h3>
+                <div class="gp-gallery-card-hover">
+                  {% if item.event.location %}<p>{{ item.event.location }}</p>{% endif %}
+                  <span class="gp-gallery-card-hint">View recap <span class="gp-arrow">&#8599;</span></span>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      <button type="button" class="gp-carousel-arrow gp-carousel-next" data-carousel-next aria-label="Next events">&rsaquo;</button>
     </div>
+    {% if current_user.is_authenticated and current_user.is_admin() %}
+    <button type="button" class="gp-gallery-add" id="gp-add-event">
+      <span class="gp-gallery-add-icon">+</span>
+      <span>Add Event</span>
+    </button>
+    {% endif %}
     {% else %}
       <p class="gp-empty-note">No events yet &mdash; check back soon.</p>
     {% endif %}
@@ -302,6 +308,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/carousel.js') }}"></script>
 <script src="{{ url_for('static', filename='js/gallery-modal.js') }}"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {

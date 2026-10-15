@@ -436,9 +436,11 @@ def home():
     settings = get_settings()
     next_event = upcoming_events[0] if upcoming_events else None
 
-    # Small "Gallery" preview: most recent events, each with a cover image if available
+    # "Gallery" preview carousel: most recent events, each with a cover image
+    # if available. Capped at 10 rather than showing every event ever, so the
+    # homepage doesn't load unboundedly as the event history grows.
     gallery_preview = []
-    for ev in Event.query.order_by(Event.date.desc()).limit(4).all():
+    for ev in Event.query.order_by(Event.date.desc()).limit(10).all():
         gallery_preview.append({"event": ev, "cover_url": event_cover_url(ev)})
 
     # "Stay Plugged In" rows. The original Tickets-toggle-driven row (fixed,
