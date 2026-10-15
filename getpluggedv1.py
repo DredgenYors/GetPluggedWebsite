@@ -346,8 +346,6 @@ login_manager.init_app(app)
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
-EVENTS_CONFIRMED = False # Set to False if no confirmed events
-
 def admin_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -407,7 +405,7 @@ artists = [
 
 @app.context_processor
 def inject_globals():
-    return dict(events_confirmed=EVENTS_CONFIRMED, current_year=datetime.now().year)
+    return dict(current_year=datetime.now().year)
 
 @app.context_processor
 def inject_settings():
@@ -894,11 +892,7 @@ def admin_inline_edit_image_focus():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        print("LOGIN SUBMIT OK:", form.username.data)  # debug
         user = User.query.filter_by(username=form.username.data.strip()).first()
-        print("USER FOUND:", bool(user), "ROLE:", getattr(user, "role", None))  # debug
-        if user:
-            print("PW CHECK:", user.check_password(form.password.data))  # debug
 
         if user and user.check_password(form.password.data):
             # Only admin/super_admin can log in
@@ -913,8 +907,7 @@ def login():
         flash("Invalid username or password.", "danger")
     else:
         if request.method == "POST":
-            print("FORM ERRORS:", form.errors)  # debug
-            flash("Form invalid (see console).", "danger")
+            flash("Please check your username and password and try again.", "danger")
 
     return render_template("login.html", form=form)
 
@@ -1218,6 +1211,46 @@ def admin_users():
             current_user.set_password(new_pw)
             db.session.commit()
             flash("Password updated.", "success")
+            return redirect(url_for("admin_users"))
+
+        # -------------------------
+        # ACTION: RESET PASSWORD (super_admin ONLY, for someone ELSE)
+        # -------------------------
+        if action == "reset_password":
+            if not current_user.is_super_admin():
+                abort(403)
+
+            user_id_raw = (request.form.get("user_id") or "").strip()
+            new_pw = (request.form.get("new_password") or "").strip()
+            confirm_pw = (request.form.get("confirm_password") or "").strip()
+
+            if not user_id_raw.isdigit():
+                flash("Invalid user id.", "danger")
+                return redirect(url_for("admin_users"))
+
+            target_id = int(user_id_raw)
+
+            # Hard rule: use "change password" for your own account instead
+            if target_id == current_user.id:
+                flash("Use the change password option for your own account.", "danger")
+                return redirect(url_for("admin_users"))
+
+            if not new_pw or not confirm_pw:
+                flash("Please fill out both password fields.", "danger")
+                return redirect(url_for("admin_users"))
+
+            if new_pw != confirm_pw:
+                flash("New passwords do not match.", "danger")
+                return redirect(url_for("admin_users"))
+
+            if len(new_pw) < 8:
+                flash("New password must be at least 8 characters.", "danger")
+                return redirect(url_for("admin_users"))
+
+            target_user = User.query.get_or_404(target_id)
+            target_user.set_password(new_pw)
+            db.session.commit()
+            flash(f"Password reset for {target_user.username}.", "success")
             return redirect(url_for("admin_users"))
 
         flash("Unknown action.", "danger")
