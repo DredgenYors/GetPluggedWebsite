@@ -151,13 +151,26 @@
       // has a well-known quirk of clipping the *start* of content that
       // does overflow, which would break the normal scrolling case.
       const items = realItems();
-      trackOffset = 0;
+      let newTrackOffset = 0;
       if (!looping && items.length && slotWidth) {
         const realWidth = items.length * slotWidth - (slotWidth - itemWidth);
         const extra = viewport.clientWidth - realWidth;
-        if (extra > 0) trackOffset = extra / 2;
+        if (extra > 0) newTrackOffset = extra / 2;
       }
-      track.style.marginLeft = trackOffset ? `${trackOffset}px` : "";
+      // Rounded to a whole pixel, and only written when it actually
+      // changes - ResizeObserver is watching viewport, and setting a
+      // fractional-pixel margin here can perturb viewport's own computed
+      // clientWidth by a rounding hair, which re-fires the observer, which
+      // recomputes this again slightly differently, forever: an infinite
+      // feedback loop oscillating between two near-identical states (this
+      // is what was visible as the images "jittering"). Rounding collapses
+      // those near-identical values to the same integer, and skipping the
+      // write when nothing really changed stops it from ever starting.
+      newTrackOffset = Math.round(newTrackOffset);
+      if (newTrackOffset !== trackOffset) {
+        trackOffset = newTrackOffset;
+        track.style.marginLeft = trackOffset ? `${trackOffset}px` : "";
+      }
     }
 
     // Puts the middle real item (by index - the true center for an odd

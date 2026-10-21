@@ -1576,7 +1576,11 @@ body > footer{
   top: 0;
   bottom: 0;
   width: 3rem;
-  z-index: 2;
+  /* Below 2 - the event modal's sticky hero (.gp-modal-hero) uses
+     z-index:2, and these two were tying or beating it, so the fade (and
+     the arrows below) painted over the pinned hero image/title whenever
+     the Recap Photos carousel scrolled underneath it. */
+  z-index: 1;
   pointer-events: none;
 }
 
@@ -1594,7 +1598,9 @@ body > footer{
   position: absolute;
   top: 50%;
   translate: 0 -50%;
-  z-index: 3;
+  /* Still above the fade/carousel content (z-index:1) but below the
+     modal's sticky hero (z-index:2) - see the fade rule above. */
+  z-index: 1;
   width: 2.5rem;
   height: 2.5rem;
   display: flex;
