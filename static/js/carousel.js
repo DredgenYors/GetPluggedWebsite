@@ -36,6 +36,7 @@
     let wasEditMode = isEditMode();
     let itemWidth = 0;
     let slotWidth = 0;
+    let trackOffset = 0;
 
     function cloneOf(item) {
       const clone = item.cloneNode(true);
@@ -135,6 +136,28 @@
       if (loopWidth > 0) {
         viewport.scrollLeft = ((viewport.scrollLeft % loopWidth) + loopWidth) % loopWidth;
       }
+
+      // Centering normally works by scrolling, but that only has anything
+      // to work with when the content actually overflows the viewport. A
+      // handful of items (common for Recap Photos - plenty of events have
+      // fewer than minLoop) can be narrower than the viewport entirely, in
+      // which case there's no scrollable range at all: scrollLeft just
+      // gets clamped to 0 by the browser, leaving everything stuck against
+      // the left edge with a dead gap on the right, and nothing is ever
+      // actually off-center for the depth effect to react to. When that's
+      // the case, shift the track itself with a left margin instead, sized
+      // so the middle item's center still lands on the viewport's center -
+      // margin rather than CSS justify-content:center, because the latter
+      // has a well-known quirk of clipping the *start* of content that
+      // does overflow, which would break the normal scrolling case.
+      const items = realItems();
+      trackOffset = 0;
+      if (!looping && items.length && slotWidth) {
+        const realWidth = items.length * slotWidth - (slotWidth - itemWidth);
+        const extra = viewport.clientWidth - realWidth;
+        if (extra > 0) trackOffset = extra / 2;
+      }
+      track.style.marginLeft = trackOffset ? `${trackOffset}px` : "";
     }
 
     // Puts the middle real item (by index - the true center for an odd
@@ -147,7 +170,7 @@
       const items = realItems();
       if (!items.length || !slotWidth) return;
       const middleIndex = Math.floor(items.length / 2);
-      const itemCenter = middleIndex * slotWidth + itemWidth / 2;
+      const itemCenter = trackOffset + middleIndex * slotWidth + itemWidth / 2;
       viewport.scrollLeft = itemCenter - viewport.clientWidth / 2;
     }
 
@@ -163,7 +186,7 @@
       const children = track.children;
       for (let i = 0; i < children.length; i++) {
         const item = children[i];
-        const itemCenter = i * slotWidth + itemWidth / 2;
+        const itemCenter = trackOffset + i * slotWidth + itemWidth / 2;
         const rawSlots = (itemCenter - viewportCenter) / slotWidth;
         const slots = Math.max(-MAX_SLOTS, Math.min(MAX_SLOTS, rawSlots));
         const abs = Math.abs(slots);
