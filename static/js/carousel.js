@@ -2,6 +2,18 @@
   const PX_PER_SEC = 40;
   const REDUCE_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Coverflow-style depth effect: tuned per "slot" of distance from the
+  // viewport's center (1 slot = one item-width-plus-gap away), clamped at
+  // MAX_SLOTS so far-off items don't keep rotating/shrinking indefinitely.
+  const MAX_SLOTS = 3;
+  const ROTATE_DEG_PER_SLOT = 20;
+  const SCALE_PER_SLOT = 0.1;
+  const MIN_SCALE = 0.72;
+  const DEPTH_PX_PER_SLOT = 60;
+  const BRIGHTNESS_PER_SLOT = 0.08;
+  const MIN_BRIGHTNESS = 0.72;
+  const MAX_REPEATS = 8;
+
   function isEditMode() {
     return document.body.classList.contains("gp-edit-mode");
   }
@@ -22,6 +34,8 @@
     let cloneNodes = [];
     let loopWidth = 0;
     let wasEditMode = isEditMode();
+    let itemWidth = 0;
+    let slotWidth = 0;
 
     function cloneOf(item) {
       const clone = item.cloneNode(true);
@@ -49,58 +63,163 @@
       destroyClones();
       const items = realItems();
       if (REDUCE_MOTION || items.length < minLoop) return;
-      cloneNodes = items.map(cloneOf);
-      cloneNodes.forEach((clone) => track.appendChild(clone));
+
+      // Populate itemWidth/slotWidth from the current (clone-free) real
+      // items before using them below.
+      measure();
+      const realGroupWidth = items.length * slotWidth;
+      if (!realGroupWidth) return;
+
+      // One loop-group (the real items) must stay wider than the viewport,
+      // or the wraparound math breaks: the browser silently clamps
+      // scrollLeft at its own max before the wraparound check below ever
+      // gets a chance to fire, permanently pinning the carousel at
+      // max-scroll with nothing able to recover it on its own (this is
+      // exactly what "shifted right and stuck until reload" was - zooming
+      // changed the viewport width enough to cross this threshold). Repeat
+      // the real items enough times to keep a safe margin at the current
+      // viewport width - recomputed on every resize, so this stays safe
+      // across zoom/resize too.
+      const targetWidth = viewport.clientWidth * 1.5;
+      // Capped as a sanity backstop - an unexpectedly huge clientWidth
+      // reading (e.g. a resize event firing mid-transition, before layout
+      // has fully settled, so this read doesn't reflect the final size)
+      // should never be able to balloon this into hundreds of DOM nodes.
+      const repeats = Math.min(MAX_REPEATS, Math.max(1, Math.ceil(targetWidth / realGroupWidth)));
+
+      for (let r = 0; r < repeats; r++) {
+        items.forEach((item) => {
+          const clone = cloneOf(item);
+          cloneNodes.push(clone);
+          track.appendChild(clone);
+        });
+      }
       looping = true;
     }
 
     function measure() {
-      loopWidth = looping ? track.scrollWidth / 2 : 0;
+      // Cache item width/gap from actual rendered layout - measured here
+      // (init, resize, clone rebuild) rather than every frame, since all
+      // items share the same size and this avoids forcing a layout read
+      // 60 times a second just to position things in 3D space.
+      //
+      // offsetWidth, not getBoundingClientRect() - every item already has
+      // the coverflow transform applied by the time this runs (the tick
+      // loop is continuously running), and getBoundingClientRect() reports
+      // the visually rotated/scaled box, not the true CSS layout width.
+      // Reading that corrupted whichever width track.children[0] happened
+      // to have at that instant (usually scaled down, since index 0 is
+      // rarely centered) into itemWidth/slotWidth - which is what caused
+      // centering to land wrong by an inconsistent amount after a resize.
+      // offsetWidth always reflects the untransformed layout box.
+      const first = track.children[0];
+      if (first) {
+        itemWidth = first.offsetWidth;
+        const trackStyle = window.getComputedStyle(track);
+        const gap = parseFloat(trackStyle.columnGap || trackStyle.gap || "12") || 12;
+        slotWidth = itemWidth + gap;
+      }
+
+      // The wraparound distance is always exactly one real-items-group
+      // width, regardless of how many repeated clone groups exist in the
+      // track (those exist purely to keep enough content on screen - see
+      // buildClones above).
+      loopWidth = looping ? realItems().length * slotWidth : 0;
+
+      // Defensively re-normalize scrollLeft into a valid [0, loopWidth)
+      // range every time measurements are refreshed, regardless of what
+      // left it out of range (this is what fixes - and future-proofs
+      // against - scrollLeft getting silently clamped by the browser and
+      // stuck somewhere that never satisfies the tick loop's own
+      // wraparound check on its own).
+      if (loopWidth > 0) {
+        viewport.scrollLeft = ((viewport.scrollLeft % loopWidth) + loopWidth) % loopWidth;
+      }
     }
 
-    let paused = isEditMode();
+    // Puts the middle real item (by index - the true center for an odd
+    // count) directly in the viewport's center. Used on first render (so
+    // the carousel never opens with a gap straddling the center instead of
+    // an actual item) and after a resize/zoom, where snapping back to a
+    // clean centered state is preferable to wherever scrollLeft's old
+    // value happens to land under the new measurements.
+    function centerOnMiddleItem() {
+      const items = realItems();
+      if (!items.length || !slotWidth) return;
+      const middleIndex = Math.floor(items.length / 2);
+      const itemCenter = middleIndex * slotWidth + itemWidth / 2;
+      viewport.scrollLeft = itemCenter - viewport.clientWidth / 2;
+    }
+
+    // Coverflow depth pass: run every frame regardless of what moved
+    // scrollLeft (auto-drift, a manual drag, or an arrow's smooth-scroll),
+    // so there's one source of truth - the current scroll position - rather
+    // than separate depth logic per interaction type. Positions are
+    // computed from each item's index and the cached slotWidth, not from a
+    // live getBoundingClientRect() per item, to keep this cheap at 60fps.
+    function updateTransforms() {
+      if (!slotWidth) return;
+      const viewportCenter = viewport.scrollLeft + viewport.clientWidth / 2;
+      const children = track.children;
+      for (let i = 0; i < children.length; i++) {
+        const item = children[i];
+        const itemCenter = i * slotWidth + itemWidth / 2;
+        const rawSlots = (itemCenter - viewportCenter) / slotWidth;
+        const slots = Math.max(-MAX_SLOTS, Math.min(MAX_SLOTS, rawSlots));
+        const abs = Math.abs(slots);
+
+        const rotateY = -slots * ROTATE_DEG_PER_SLOT;
+        const scale = Math.max(MIN_SCALE, 1 - abs * SCALE_PER_SLOT);
+        const depth = -abs * DEPTH_PX_PER_SLOT;
+        const brightness = Math.max(MIN_BRIGHTNESS, 1 - abs * BRIGHTNESS_PER_SLOT);
+
+        item.style.transform =
+          `translateZ(${depth}px) rotateY(${rotateY}deg) scale(${scale})`;
+        item.style.filter = `brightness(${brightness})`;
+        item.style.zIndex = String(1000 - Math.round(abs * 100));
+      }
+    }
+
+    // Pause state is read live from the DOM every frame (:hover, :focus-
+    // within) rather than tracked as a flag toggled by mouseenter/leave/
+    // pointerdown/up listeners - that earlier approach could get stuck
+    // "paused" forever whenever a pair of events didn't fire in the exact
+    // order assumed (e.g. a drag that ends outside the element), which is
+    // exactly what caused the drift to randomly stop or stutter. :hover and
+    // :focus-within can't get stuck - they always reflect the real cursor/
+    // focus position, including for the whole duration of a manual drag.
     let lastTime = null;
-
-    function pause() {
-      paused = true;
-    }
-    function resume() {
-      if (!isEditMode()) paused = false;
-    }
+    let arrowPauseUntil = 0;
 
     function tick(time) {
       if (lastTime == null) lastTime = time;
-      const dt = (time - lastTime) / 1000;
+      // Cap dt so a long gap (tab backgrounded, rAF throttled) can't make
+      // the next frame jump forward a large distance all at once.
+      const dt = Math.min((time - lastTime) / 1000, 0.1);
       lastTime = time;
 
-      if (!paused && looping && document.visibilityState === "visible") {
+      const shouldDrift =
+        looping &&
+        time >= arrowPauseUntil &&
+        document.visibilityState === "visible" &&
+        !root.matches(":hover") &&
+        !root.matches(":focus-within");
+
+      if (shouldDrift) {
         viewport.scrollLeft += PX_PER_SEC * dt;
         if (loopWidth > 0 && viewport.scrollLeft >= loopWidth) {
           viewport.scrollLeft -= loopWidth;
         }
       }
+      updateTransforms();
       requestAnimationFrame(tick);
     }
 
-    root.addEventListener("mouseenter", pause);
-    root.addEventListener("mouseleave", resume);
-    root.addEventListener("focusin", pause);
-    root.addEventListener("focusout", (e) => {
-      if (!root.contains(e.relatedTarget)) resume();
-    });
-    // A user actively dragging/swiping the track shouldn't fight the
-    // auto-drift - pause for the duration of the gesture.
-    viewport.addEventListener("pointerdown", pause);
-    viewport.addEventListener("pointerup", resume);
-    viewport.addEventListener("pointercancel", resume);
-
     function step(direction) {
-      pause();
-      const item = realItems()[0];
-      const itemWidth = item ? item.getBoundingClientRect().width : 260;
-      const trackStyle = window.getComputedStyle(track);
-      const gap = parseFloat(trackStyle.columnGap || trackStyle.gap || "12") || 12;
-      viewport.scrollBy({ left: direction * (itemWidth + gap), behavior: "smooth" });
+      // Briefly hold off auto-drift so it doesn't fight the smooth-scroll
+      // animation below - self-expiring, so it can't get stuck either.
+      arrowPauseUntil = performance.now() + 500;
+      viewport.scrollBy({ left: direction * (slotWidth || 260), behavior: "smooth" });
     }
 
     if (prevBtn) prevBtn.addEventListener("click", () => step(-1));
@@ -116,20 +235,35 @@
       if (nowEditMode === wasEditMode) return;
       wasEditMode = nowEditMode;
       if (nowEditMode) {
-        pause();
         destroyClones();
       } else {
         buildClones();
-        resume();
       }
       measure();
     });
     editModeObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
-    window.addEventListener("resize", measure);
+    // The safe repeat count depends on the current viewport width, so any
+    // width change (including a browser zoom change) needs to rebuild the
+    // clone set, not just re-measure it. ResizeObserver rather than
+    // window's "resize" event: its callback fires only after layout has
+    // actually settled and hands back the element's real content-box size
+    // directly, and multiple size changes within one rendering frame are
+    // already coalesced into a single callback by the browser - no manual
+    // debounce/rAF-delay needed on top (that extra frame of indirection
+    // was itself still a chance for a value to be read before a sudden,
+    // large zoom jump had fully reflowed, which is what caused the
+    // recenter to consistently land wrong instead of just not happening).
+    const resizeObserver = new ResizeObserver(() => {
+      if (!isEditMode()) buildClones();
+      measure();
+      centerOnMiddleItem();
+    });
+    resizeObserver.observe(viewport);
 
     if (!isEditMode()) buildClones();
     measure();
+    centerOnMiddleItem();
     requestAnimationFrame(tick);
   }
 
