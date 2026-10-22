@@ -30,13 +30,22 @@
 
     const minLoop = parseInt(root.dataset.carouselMinLoop || "5", 10);
 
+    // The single source of truth for "is this a real, functioning
+    // carousel right now". Below minLoop items, nothing here applies at
+    // all - no transforms, no drift, no arrows - it's just a plain static
+    // row (exactly like Recap Photos looked before the coverflow effect
+    // existed). Once there's enough content to loop, the full treatment
+    // kicks in and behaves identically to the Gallery carousel. This
+    // split exists specifically so the few-items case can never run any
+    // of the JS-driven positioning that caused the earlier centering bugs
+    // and the jitter - there's no code path left that can misbehave,
+    // because there's no code running on it at all.
     let looping = false;
     let cloneNodes = [];
     let loopWidth = 0;
     let wasEditMode = isEditMode();
     let itemWidth = 0;
     let slotWidth = 0;
-    let trackOffset = 0;
 
     function cloneOf(item) {
       const clone = item.cloneNode(true);
@@ -54,14 +63,26 @@
       return Array.from(track.children).filter((el) => !cloneNodes.includes(el));
     }
 
-    function destroyClones() {
+    // Strips every trace of the carousel treatment back to a plain,
+    // untouched row - used both when there isn't enough content to loop,
+    // and as the first step whenever clones are being rebuilt.
+    function resetToStatic() {
       cloneNodes.forEach((el) => el.remove());
       cloneNodes = [];
       looping = false;
+      loopWidth = 0;
+      viewport.scrollLeft = 0;
+      track.style.marginLeft = "";
+      Array.from(track.children).forEach((item) => {
+        item.style.transform = "";
+        item.style.filter = "";
+        item.style.zIndex = "";
+      });
+      root.classList.remove("gp-carousel-active");
     }
 
     function buildClones() {
-      destroyClones();
+      resetToStatic();
       const items = realItems();
       if (REDUCE_MOTION || items.length < minLoop) return;
 
@@ -75,10 +96,8 @@
       // or the wraparound math breaks: the browser silently clamps
       // scrollLeft at its own max before the wraparound check below ever
       // gets a chance to fire, permanently pinning the carousel at
-      // max-scroll with nothing able to recover it on its own (this is
-      // exactly what "shifted right and stuck until reload" was - zooming
-      // changed the viewport width enough to cross this threshold). Repeat
-      // the real items enough times to keep a safe margin at the current
+      // max-scroll with nothing able to recover it on its own. Repeat the
+      // real items enough times to keep a safe margin at the current
       // viewport width - recomputed on every resize, so this stays safe
       // across zoom/resize too.
       const targetWidth = viewport.clientWidth * 1.5;
@@ -96,6 +115,7 @@
         });
       }
       looping = true;
+      root.classList.add("gp-carousel-active");
     }
 
     function measure() {
@@ -108,11 +128,6 @@
       // the coverflow transform applied by the time this runs (the tick
       // loop is continuously running), and getBoundingClientRect() reports
       // the visually rotated/scaled box, not the true CSS layout width.
-      // Reading that corrupted whichever width track.children[0] happened
-      // to have at that instant (usually scaled down, since index 0 is
-      // rarely centered) into itemWidth/slotWidth - which is what caused
-      // centering to land wrong by an inconsistent amount after a resize.
-      // offsetWidth always reflects the untransformed layout box.
       const first = track.children[0];
       if (first) {
         itemWidth = first.offsetWidth;
@@ -129,61 +144,21 @@
 
       // Defensively re-normalize scrollLeft into a valid [0, loopWidth)
       // range every time measurements are refreshed, regardless of what
-      // left it out of range (this is what fixes - and future-proofs
-      // against - scrollLeft getting silently clamped by the browser and
-      // stuck somewhere that never satisfies the tick loop's own
-      // wraparound check on its own).
+      // left it out of range.
       if (loopWidth > 0) {
         viewport.scrollLeft = ((viewport.scrollLeft % loopWidth) + loopWidth) % loopWidth;
-      }
-
-      // Centering normally works by scrolling, but that only has anything
-      // to work with when the content actually overflows the viewport. A
-      // handful of items (common for Recap Photos - plenty of events have
-      // fewer than minLoop) can be narrower than the viewport entirely, in
-      // which case there's no scrollable range at all: scrollLeft just
-      // gets clamped to 0 by the browser, leaving everything stuck against
-      // the left edge with a dead gap on the right, and nothing is ever
-      // actually off-center for the depth effect to react to. When that's
-      // the case, shift the track itself with a left margin instead, sized
-      // so the middle item's center still lands on the viewport's center -
-      // margin rather than CSS justify-content:center, because the latter
-      // has a well-known quirk of clipping the *start* of content that
-      // does overflow, which would break the normal scrolling case.
-      const items = realItems();
-      let newTrackOffset = 0;
-      if (!looping && items.length && slotWidth) {
-        const realWidth = items.length * slotWidth - (slotWidth - itemWidth);
-        const extra = viewport.clientWidth - realWidth;
-        if (extra > 0) newTrackOffset = extra / 2;
-      }
-      // Rounded to a whole pixel, and only written when it actually
-      // changes - ResizeObserver is watching viewport, and setting a
-      // fractional-pixel margin here can perturb viewport's own computed
-      // clientWidth by a rounding hair, which re-fires the observer, which
-      // recomputes this again slightly differently, forever: an infinite
-      // feedback loop oscillating between two near-identical states (this
-      // is what was visible as the images "jittering"). Rounding collapses
-      // those near-identical values to the same integer, and skipping the
-      // write when nothing really changed stops it from ever starting.
-      newTrackOffset = Math.round(newTrackOffset);
-      if (newTrackOffset !== trackOffset) {
-        trackOffset = newTrackOffset;
-        track.style.marginLeft = trackOffset ? `${trackOffset}px` : "";
       }
     }
 
     // Puts the middle real item (by index - the true center for an odd
-    // count) directly in the viewport's center. Used on first render (so
-    // the carousel never opens with a gap straddling the center instead of
-    // an actual item) and after a resize/zoom, where snapping back to a
-    // clean centered state is preferable to wherever scrollLeft's old
-    // value happens to land under the new measurements.
+    // count) directly in the viewport's center. Only meaningful once
+    // looping (there's nothing to scroll to otherwise).
     function centerOnMiddleItem() {
+      if (!looping) return;
       const items = realItems();
       if (!items.length || !slotWidth) return;
       const middleIndex = Math.floor(items.length / 2);
-      const itemCenter = trackOffset + middleIndex * slotWidth + itemWidth / 2;
+      const itemCenter = middleIndex * slotWidth + itemWidth / 2;
       viewport.scrollLeft = itemCenter - viewport.clientWidth / 2;
     }
 
@@ -193,13 +168,14 @@
     // than separate depth logic per interaction type. Positions are
     // computed from each item's index and the cached slotWidth, not from a
     // live getBoundingClientRect() per item, to keep this cheap at 60fps.
+    // Only ever called while looping.
     function updateTransforms() {
       if (!slotWidth) return;
       const viewportCenter = viewport.scrollLeft + viewport.clientWidth / 2;
       const children = track.children;
       for (let i = 0; i < children.length; i++) {
         const item = children[i];
-        const itemCenter = trackOffset + i * slotWidth + itemWidth / 2;
+        const itemCenter = i * slotWidth + itemWidth / 2;
         const rawSlots = (itemCenter - viewportCenter) / slotWidth;
         const slots = Math.max(-MAX_SLOTS, Math.min(MAX_SLOTS, rawSlots));
         const abs = Math.abs(slots);
@@ -220,14 +196,19 @@
     // within) rather than tracked as a flag toggled by mouseenter/leave/
     // pointerdown/up listeners - that earlier approach could get stuck
     // "paused" forever whenever a pair of events didn't fire in the exact
-    // order assumed (e.g. a drag that ends outside the element), which is
-    // exactly what caused the drift to randomly stop or stutter. :hover and
-    // :focus-within can't get stuck - they always reflect the real cursor/
-    // focus position, including for the whole duration of a manual drag.
+    // order assumed (e.g. a drag that ends outside the element). :hover
+    // and :focus-within can't get stuck - they always reflect the real
+    // cursor/focus position, including for the whole duration of a drag.
     let lastTime = null;
     let arrowPauseUntil = 0;
 
     function tick(time) {
+      if (!looping) {
+        lastTime = null;
+        requestAnimationFrame(tick);
+        return;
+      }
+
       if (lastTime == null) lastTime = time;
       // Cap dt so a long gap (tab backgrounded, rAF throttled) can't make
       // the next frame jump forward a large distance all at once.
@@ -235,7 +216,6 @@
       lastTime = time;
 
       const shouldDrift =
-        looping &&
         time >= arrowPauseUntil &&
         document.visibilityState === "visible" &&
         !root.matches(":hover") &&
@@ -252,6 +232,7 @@
     }
 
     function step(direction) {
+      if (!looping) return;
       // Briefly hold off auto-drift so it doesn't fight the smooth-scroll
       // animation below - self-expiring, so it can't get stuck either.
       arrowPauseUntil = performance.now() + 500;
@@ -265,13 +246,15 @@
     // it tears down any clones immediately, since the add/remove-photo
     // controls splice the real item list directly and must never find a
     // stale clone in their way. Leaving it rebuilds from whatever the real
-    // list looks like now (photos may have been added/removed meanwhile).
+    // list looks like now (photos may have been added/removed meanwhile) -
+    // which is also the point where a handful of photos that just crossed
+    // the minLoop threshold turns into a real carousel, or vice versa.
     const editModeObserver = new MutationObserver(() => {
       const nowEditMode = isEditMode();
       if (nowEditMode === wasEditMode) return;
       wasEditMode = nowEditMode;
       if (nowEditMode) {
-        destroyClones();
+        resetToStatic();
       } else {
         buildClones();
       }
@@ -285,11 +268,7 @@
     // window's "resize" event: its callback fires only after layout has
     // actually settled and hands back the element's real content-box size
     // directly, and multiple size changes within one rendering frame are
-    // already coalesced into a single callback by the browser - no manual
-    // debounce/rAF-delay needed on top (that extra frame of indirection
-    // was itself still a chance for a value to be read before a sudden,
-    // large zoom jump had fully reflowed, which is what caused the
-    // recenter to consistently land wrong instead of just not happening).
+    // already coalesced into a single callback by the browser.
     const resizeObserver = new ResizeObserver(() => {
       if (!isEditMode()) buildClones();
       measure();

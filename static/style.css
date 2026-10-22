@@ -1594,6 +1594,15 @@ body > footer{
   background: linear-gradient(to left, var(--gp-cream), transparent);
 }
 
+/* Below minLoop items, carousel.js never adds gp-carousel-active - the
+   row stays a plain, untouched static list (no drift, no depth effect),
+   so the fade/arrow chrome that implies "there's more to scroll through"
+   shouldn't show either. */
+.gp-carousel:not(.gp-carousel-active)::before,
+.gp-carousel:not(.gp-carousel-active)::after{
+  display: none;
+}
+
 .gp-carousel-arrow{
   position: absolute;
   top: 50%;
@@ -1618,6 +1627,10 @@ body > footer{
 
 .gp-carousel-prev{ left: -0.5rem; }
 .gp-carousel-next{ right: -0.5rem; }
+
+.gp-carousel:not(.gp-carousel-active) .gp-carousel-arrow{
+  display: none;
+}
 
 .gp-carousel:hover .gp-carousel-arrow,
 .gp-carousel:focus-within .gp-carousel-arrow{
