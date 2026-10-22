@@ -1415,6 +1415,19 @@ body > footer{
   align-items: flex-end;
   padding-bottom: 5rem;
   padding-top: 7rem;
+}
+
+/* Same reasoning as .gp-section::after - a plain border-bottom here spans
+   the hero's full edge-to-edge width, drawing the divider across the top
+   of the side-margin images instead of stopping at the content column. */
+.gp-hero::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 1280px;
+  margin: 0 auto;
   border-bottom: 1px solid var(--gp-border-warm);
 }
 
