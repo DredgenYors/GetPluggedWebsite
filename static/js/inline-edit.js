@@ -638,6 +638,18 @@
     if (btn) btn.textContent = on ? "Exit Edit Mode" : "Edit Page";
     const banner = document.getElementById("gp-edit-banner");
     if (banner) banner.classList.toggle("show", on);
+
+    // Below the nav's 1500px breakpoint, "Edit Page" lives inside the
+    // collapsible hamburger menu - clicking it isn't a real navigation, so
+    // Bootstrap's own collapse-on-link-click behavior never kicks in, and
+    // the menu is left open on top of the whole page (nothing underneath
+    // it is clickable) until the admin notices and closes it manually.
+    // Close it explicitly here so entering/exiting Edit Mode this way
+    // doesn't leave the page unusable.
+    const navLinks = document.getElementById("gpNavLinks");
+    if (navLinks && window.bootstrap && window.bootstrap.Collapse) {
+      window.bootstrap.Collapse.getOrCreateInstance(navLinks, { toggle: false }).hide();
+    }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
