@@ -938,6 +938,39 @@ body > footer{
   will-change: transform, opacity;
 }
 
+/* Decorative side-margin images - fill the blank gutter outside the
+   centered content column on wide viewports instead of leaving it empty.
+   Fixed (not scrolling with the page) so each side stays a single tall
+   rail of imagery behind the content the whole time, like a picture-frame
+   border. Hidden below the min-width breakpoint, where there isn't enough
+   real margin for them not to collide with the centered content. */
+.gp-margin-deco{
+  display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.gp-margin-deco img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gp-margin-deco-left{ left: 0; }
+.gp-margin-deco-right{ right: 0; }
+
+/* .gp-section-inner tops out at 1280px + 3rem of padding; this leaves a
+   comfortable gap between the rail and the content on both sides rather
+   than them touching edge-to-edge. */
+@media (min-width: 1700px){
+  .gp-margin-deco{ display: block; }
+}
+
 /* ==========================================================================
    BRAND REDESIGN — global layout, nav, footer, and home page sections
    ========================================================================== */

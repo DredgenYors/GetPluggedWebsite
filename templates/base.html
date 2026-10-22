@@ -16,6 +16,18 @@
 <body>
     <div class="gp-bg-top" aria-hidden="true"></div>
     <div class="gp-bg-noise" aria-hidden="true"></div>
+
+    <!-- Decorative side-margin images - only shown once the viewport is
+         wide enough to have real margin outside the centered content to
+         put them in (see the min-width media query in style.css). Test
+         placeholders for now, swappable later the same way other site
+         chrome images are. -->
+    <div class="gp-margin-deco gp-margin-deco-left" aria-hidden="true">
+        <img src="{{ url_for('static', filename='margin-deco-left.jpg') }}" alt="">
+    </div>
+    <div class="gp-margin-deco gp-margin-deco-right" aria-hidden="true">
+        <img src="{{ url_for('static', filename='margin-deco-right.jpg') }}" alt="">
+    </div>
     {% block intro_overlay %}{% endblock %}
 
     {% if current_user.is_authenticated and current_user.is_admin() %}
