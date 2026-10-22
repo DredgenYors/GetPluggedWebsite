@@ -751,6 +751,98 @@
       }
     }
 
+    // Disables (and relabels) a margin rail's Add button once it's at the
+    // server-enforced limit, so the control itself reflects the cap instead
+    // of only finding out by having a click rejected.
+    function updateMarginAddState(rail) {
+      const addBtn = rail.querySelector(".gp-margin-deco-add");
+      if (!addBtn) return;
+      const limit = parseInt(rail.dataset.marginLimit || "6", 10);
+      const count = rail.querySelectorAll(".gp-margin-deco-tile").length;
+      const atLimit = count >= limit;
+      addBtn.disabled = atLimit;
+      addBtn.title = atLimit ? `Limit of ${limit} images reached` : "Add image";
+    }
+
+    async function addMarginImage(button) {
+      const side = button.dataset.side;
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/png,image/jpeg,image/gif,image/webp";
+      fileInput.style.display = "none";
+      document.body.appendChild(fileInput);
+
+      fileInput.addEventListener("change", async () => {
+        const file = fileInput.files[0];
+        fileInput.remove();
+        if (!file) return;
+
+        button.classList.add("gp-edit-saving");
+        const fd = new FormData();
+        fd.append("file", file);
+        let result;
+        try {
+          const res = await fetch(`/admin/margin-images/${side}/inline-add-photo`, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken },
+            body: fd,
+          });
+          result = await res.json();
+        } catch (err) {
+          result = { ok: false, error: "Network error." };
+        }
+        button.classList.remove("gp-edit-saving");
+
+        if (result.ok) {
+          const rail = button.closest(".gp-margin-deco");
+          const tile = document.createElement("div");
+          tile.className = "gp-margin-deco-tile";
+          tile.dataset.imageId = result.media_id;
+          tile.innerHTML =
+            `<img src="${result.url}" alt="" aria-hidden="true">` +
+            `<button type="button" class="gp-margin-deco-remove" data-image-id="${result.media_id}" title="Remove image">&times;</button>`;
+          rail.insertBefore(tile, button);
+          if (window.gpLayoutMarginDeco) window.gpLayoutMarginDeco();
+          updateMarginAddState(rail);
+          showToast("Image added");
+        } else {
+          showToast(result.error || "Couldn't upload", true);
+        }
+      });
+
+      fileInput.click();
+    }
+
+    async function removeMarginImage(button) {
+      if (!window.confirm("Remove this image?")) return;
+
+      button.classList.add("gp-edit-saving");
+      let result;
+      try {
+        const res = await fetch(`/admin/margin-images/${button.dataset.imageId}/inline-delete`, {
+          method: "POST",
+          headers: { "X-CSRFToken": csrfToken },
+        });
+        result = await res.json();
+      } catch (err) {
+        result = { ok: false, error: "Network error." };
+      }
+
+      if (result.ok) {
+        const tile = button.closest(".gp-margin-deco-tile");
+        const rail = tile ? tile.closest(".gp-margin-deco") : null;
+        if (tile) tile.remove();
+        if (window.gpLayoutMarginDeco) window.gpLayoutMarginDeco();
+        if (rail) updateMarginAddState(rail);
+        showToast("Image removed");
+      } else {
+        button.classList.remove("gp-edit-saving");
+        showToast(result.error || "Couldn't remove image", true);
+      }
+    }
+
+    document.querySelectorAll(".gp-margin-deco").forEach(updateMarginAddState);
+
     document.body.addEventListener("change", async (e) => {
       const toggle = e.target.closest(".gp-row-link-toggle");
       if (!toggle) return;
@@ -803,6 +895,20 @@
       if (removePhotoBtn) {
         e.preventDefault();
         removeEventPhoto(removePhotoBtn);
+        return;
+      }
+
+      const addMarginBtn = e.target.closest(".gp-margin-deco-add");
+      if (addMarginBtn) {
+        e.preventDefault();
+        if (!addMarginBtn.disabled) addMarginImage(addMarginBtn);
+        return;
+      }
+
+      const removeMarginBtn = e.target.closest(".gp-margin-deco-remove");
+      if (removeMarginBtn) {
+        e.preventDefault();
+        removeMarginImage(removeMarginBtn);
         return;
       }
 

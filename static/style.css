@@ -968,24 +968,21 @@ body > footer{
   pointer-events: none;
 }
 
-/* Collage: 4 tiles stacked down the rail, each slightly overlapping the
-   one before it. The overlapping tile has a top-edge mask fading from
-   transparent to opaque over that overlap zone, so the image beneath
-   shows through and the two blend into each other instead of meeting at
-   a hard seam - a simple CSS-only way to get a "blended collage" look
-   with no image editing. Percentages are positions within the rail
-   itself (which has a definite height via top:0/bottom:0), not the tile. */
+/* Collage: however many tiles the admin has added, stacked down the rail,
+   each slightly overlapping the one before it. The overlapping tile has a
+   top-edge mask fading from transparent to opaque over that overlap zone,
+   so the image beneath shows through and the two blend into each other
+   instead of meeting at a hard seam - a simple CSS-only way to get a
+   "blended collage" look with no image editing. top/height/mask are set
+   per-tile as inline styles by static/js/margin-deco.js, which recomputes
+   them from however many tiles actually exist (and re-runs live whenever
+   an admin adds or removes one) rather than fixed CSS for a fixed count. */
 .gp-margin-deco-tile{
   position: absolute;
   left: 0;
   right: 0;
   overflow: hidden;
 }
-
-.gp-margin-deco-tile:nth-child(1){ top: 0%;  height: 30%; }
-.gp-margin-deco-tile:nth-child(2){ top: 24%; height: 30%; }
-.gp-margin-deco-tile:nth-child(3){ top: 48%; height: 30%; }
-.gp-margin-deco-tile:nth-child(4){ top: 72%; height: 28%; }
 
 .gp-margin-deco-tile img{
   width: 100%;
@@ -994,16 +991,66 @@ body > footer{
   display: block;
 }
 
-/* Every tile after the first fades in over its own top ~20% (which lines
-   up with the 6%-of-rail overlap above) so it blends into the tile
-   beneath rather than cutting across it. */
-.gp-margin-deco-tile:not(:nth-child(1)) img{
-  mask-image: linear-gradient(to bottom, transparent, black 20%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%);
-}
-
 .gp-margin-deco-left{ left: 0; }
 .gp-margin-deco-right{ right: 0; }
+
+/* Edit Mode controls - normally the rail is pointer-events:none (purely
+   decorative), but admins need to actually click the add/remove buttons
+   while editing. */
+body.gp-edit-mode .gp-margin-deco{ pointer-events: auto; }
+
+.gp-margin-deco-remove{
+  display: none;
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  z-index: 10;
+  width: 1.6rem;
+  height: 1.6rem;
+  align-items: center;
+  justify-content: center;
+  background: rgba(38,35,33,0.75);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.gp-margin-deco-remove:hover{ background: #b3261e; }
+
+.gp-edit-mode .gp-margin-deco-remove{ display: flex; }
+
+.gp-margin-deco-add{
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 11;
+  height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  background: rgba(38,35,33,0.75);
+  color: #fff;
+  border: none;
+  font-family: 'Space Mono', monospace;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.gp-margin-deco-add:hover{ background: var(--gp-green); }
+
+.gp-margin-deco-add:disabled{
+  cursor: not-allowed;
+  background: rgba(38,35,33,0.4);
+}
+
+.gp-edit-mode .gp-margin-deco-add{ display: flex; }
 
 /* ==========================================================================
    BRAND REDESIGN — global layout, nav, footer, and home page sections

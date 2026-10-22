@@ -20,21 +20,35 @@
     <!-- Decorative side-margin collages - only show up once the viewport
          has real margin outside the centered content to put them in (see
          the clamp()-based width in style.css, which collapses to 0 when
-         there isn't room). Each side is a few overlapping photos that
-         fade into one another rather than one solid image. Test
-         placeholders for now, swappable later the same way other site
-         chrome images are. -->
-    <div class="gp-margin-deco gp-margin-deco-left" aria-hidden="true">
-        <div class="gp-margin-deco-tile"><img src="{{ url_for('static', filename='margin-deco-left-1.jpg') }}" alt=""></div>
-        <div class="gp-margin-deco-tile"><img src="{{ url_for('static', filename='margin-deco-left-2.jpg') }}" alt=""></div>
-        <div class="gp-margin-deco-tile"><img src="{{ url_for('static', filename='margin-deco-left-3.jpg') }}" alt=""></div>
-        <div class="gp-margin-deco-tile"><img src="{{ url_for('static', filename='margin-deco-left-4.jpg') }}" alt=""></div>
+         there isn't room). Each side is however many photos the admin has
+         added, stacked and blended together (static/js/margin-deco.js
+         computes the overlap/fade layout live from the current count). -->
+    {% set can_edit = current_user.is_authenticated and current_user.is_admin() %}
+    <div class="gp-margin-deco gp-margin-deco-left" data-margin-side="left" data-margin-limit="{{ margin_image_limit }}">
+        {% for img in margin_images_left %}
+        <div class="gp-margin-deco-tile" data-image-id="{{ img.id }}">
+            <img src="{{ site_image(img.url) }}" alt="" aria-hidden="true">
+            {% if can_edit %}
+            <button type="button" class="gp-margin-deco-remove" data-image-id="{{ img.id }}" title="Remove image">&times;</button>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% if can_edit %}
+        <button type="button" class="gp-margin-deco-add" data-side="left" title="Add image">+</button>
+        {% endif %}
     </div>
-    <div class="gp-margin-deco gp-margin-deco-right" aria-hidden="true">
-        <div class="gp-margin-deco-tile"><img src="{{ url_for('static', filename='margin-deco-right-1.jpg') }}" alt=""></div>
-        <div class="gp-margin-deco-tile"><img src="{{ url_for('static', filename='margin-deco-right-2.jpg') }}" alt=""></div>
-        <div class="gp-margin-deco-tile"><img src="{{ url_for('static', filename='margin-deco-right-3.jpg') }}" alt=""></div>
-        <div class="gp-margin-deco-tile"><img src="{{ url_for('static', filename='margin-deco-right-4.jpg') }}" alt=""></div>
+    <div class="gp-margin-deco gp-margin-deco-right" data-margin-side="right" data-margin-limit="{{ margin_image_limit }}">
+        {% for img in margin_images_right %}
+        <div class="gp-margin-deco-tile" data-image-id="{{ img.id }}">
+            <img src="{{ site_image(img.url) }}" alt="" aria-hidden="true">
+            {% if can_edit %}
+            <button type="button" class="gp-margin-deco-remove" data-image-id="{{ img.id }}" title="Remove image">&times;</button>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% if can_edit %}
+        <button type="button" class="gp-margin-deco-add" data-side="right" title="Add image">+</button>
+        {% endif %}
     </div>
     {% block intro_overlay %}{% endblock %}
 
@@ -188,6 +202,7 @@
 
     <script src="{{ url_for('static', filename='js/carousel.js') }}"></script>
     <script src="{{ url_for('static', filename='js/photo-lightbox.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/margin-deco.js') }}"></script>
 
     {% if current_user.is_authenticated and current_user.is_admin() %}
     <script src="{{ url_for('static', filename='js/inline-edit.js') }}"></script>

@@ -36,6 +36,10 @@ app.config["UPLOAD_FOLDER"] = os.path.join(app.static_folder, "uploads")
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024  # 8 MB request cap
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 
+# Keeps each side-margin collage (see MarginImage) from growing so tall or
+# numerous that each tile shrinks to an unusable sliver.
+MAX_MARGIN_IMAGES_PER_SIDE = 6
+
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 csrf = CSRFProtect(app)
@@ -324,6 +328,17 @@ class StayPluggedRow(db.Model):
     status = db.Column(db.String(100), default="Coming Soon", nullable=False)
     links_to_tickets = db.Column(db.Boolean, default=False, nullable=False)
 
+class MarginImage(db.Model):
+    """One photo in a side-margin collage (see .gp-margin-deco in
+    style.css) - the decorative imagery filling the blank gutter outside
+    the centered content column on wide screens. Admin-managed independent
+    of any Event, since these are site-wide chrome shown on every page
+    rather than content tied to a specific gallery entry."""
+    id = db.Column(db.Integer, primary_key=True)
+    # "left" or "right"
+    side = db.Column(db.String(10), nullable=False)
+    url = db.Column(db.String(300), nullable=False)
+
 def get_settings() -> SiteSettings:
     settings = SiteSettings.query.first()
     if not settings:
@@ -410,6 +425,17 @@ def inject_globals():
 @app.context_processor
 def inject_settings():
     return {"site_settings": get_settings()}
+
+@app.context_processor
+def inject_margin_images():
+    """Global site chrome (see .gp-margin-deco in base.html) - available on
+    every page render the same way site_settings is, rather than only on
+    specific views."""
+    return {
+        "margin_images_left": MarginImage.query.filter_by(side="left").order_by(MarginImage.id.asc()).all(),
+        "margin_images_right": MarginImage.query.filter_by(side="right").order_by(MarginImage.id.asc()).all(),
+        "margin_image_limit": MAX_MARGIN_IMAGES_PER_SIDE,
+    }
 
 @app.template_global()
 def site_image(value, fallback=None):
@@ -594,6 +620,42 @@ def admin_inline_add_event_photo(event_id):
     db.session.commit()
 
     return jsonify({"ok": True, "url": site_image(path), "media_id": media.id})
+
+@app.route("/admin/margin-images/<side>/inline-add-photo", methods=["POST"])
+@admin_required
+def admin_inline_add_margin_image(side):
+    """Add a photo to a side-margin collage, straight from the page it
+    appears on (see .gp-margin-deco in base.html)."""
+    if side not in ("left", "right"):
+        return jsonify({"ok": False, "error": "Invalid side."}), 400
+
+    count = MarginImage.query.filter_by(side=side).count()
+    if count >= MAX_MARGIN_IMAGES_PER_SIDE:
+        return jsonify({"ok": False, "error": f"Limit of {MAX_MARGIN_IMAGES_PER_SIDE} images reached for this side."}), 400
+
+    file_storage = request.files.get("file")
+    path = save_uploaded_image(file_storage, "margin_deco")
+    if not path:
+        return jsonify({"ok": False, "error": "Please choose an image file (png, jpg, gif, or webp)."}), 400
+
+    image = MarginImage(side=side, url=path)
+    db.session.add(image)
+    db.session.commit()
+
+    return jsonify({"ok": True, "url": site_image(path), "media_id": image.id})
+
+@app.route("/admin/margin-images/<int:image_id>/inline-delete", methods=["POST"])
+@admin_required
+def admin_inline_delete_margin_image(image_id):
+    """Remove a single photo from a side-margin collage."""
+    image = MarginImage.query.get(image_id)
+    if not image:
+        return jsonify({"ok": False, "error": "Not found."}), 404
+
+    delete_uploaded_file(image.url)
+    db.session.delete(image)
+    db.session.commit()
+    return jsonify({"ok": True})
 
 @app.route("/admin/media/<int:media_id>/inline-delete", methods=["POST"])
 @admin_required
