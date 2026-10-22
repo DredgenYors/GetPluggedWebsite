@@ -215,10 +215,15 @@
       const dt = Math.min((time - lastTime) / 1000, 0.1);
       lastTime = time;
 
+      // Hover-pause is scoped to the viewport (the photos themselves),
+      // not the whole root - the prev/next arrows are also descendants of
+      // root, so checking root:hover here would mean the cursor merely
+      // resting on an arrow after a click holds the pause indefinitely,
+      // defeating the self-expiring arrowPauseUntil timer below.
       const shouldDrift =
         time >= arrowPauseUntil &&
         document.visibilityState === "visible" &&
-        !root.matches(":hover") &&
+        !viewport.matches(":hover") &&
         !root.matches(":focus-within");
 
       if (shouldDrift) {

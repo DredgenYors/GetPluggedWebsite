@@ -124,6 +124,11 @@
         </div>
     </footer>
 
+    <div id="gp-photo-lightbox" class="gp-photo-lightbox" hidden>
+        <button type="button" class="gp-photo-lightbox-close" aria-label="Close">&times;</button>
+        <img id="gp-photo-lightbox-img" src="" alt="">
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
@@ -162,6 +167,7 @@
     </script>
 
     <script src="{{ url_for('static', filename='js/carousel.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/photo-lightbox.js') }}"></script>
 
     {% if current_user.is_authenticated and current_user.is_admin() %}
     <script src="{{ url_for('static', filename='js/inline-edit.js') }}"></script>

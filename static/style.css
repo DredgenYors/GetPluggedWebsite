@@ -2441,6 +2441,53 @@ body > footer{
 .gp-footer-links a:hover{ color: var(--gp-green); }
 
 /* ==========================================================================
+   PHOTO LIGHTBOX (click a recap photo to view it full-size in place)
+   ========================================================================== */
+
+.gp-photo-lightbox{
+  position: fixed;
+  inset: 0;
+  /* Above the gallery/event modal (z-index:2000) - a recap photo can be
+     clicked while already viewing an event inside that modal. */
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(38,35,33,0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.gp-photo-lightbox[hidden]{ display: none; }
+
+body.gp-photo-lightbox-open{ overflow: hidden; }
+
+#gp-photo-lightbox-img{
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: gpModalFadeUp 0.25s ease;
+}
+
+.gp-photo-lightbox-close{
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.gp-photo-lightbox-close:hover{ color: var(--gp-green); }
+
+/* ==========================================================================
    GALLERY MODAL (click an experience to preview it without leaving the page)
    ========================================================================== */
 
