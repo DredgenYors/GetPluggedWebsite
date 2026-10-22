@@ -812,11 +812,56 @@
           tile.dataset.imageId = result.media_id;
           tile.innerHTML =
             `<img src="${result.url}" alt="" aria-hidden="true">` +
+            `<button type="button" class="gp-margin-deco-edit" data-image-id="${result.media_id}" title="Change image">Edit</button>` +
             `<button type="button" class="gp-margin-deco-remove" data-image-id="${result.media_id}" title="Remove image">&times;</button>`;
           rail.insertBefore(tile, button);
           if (window.gpLayoutMarginDeco) window.gpLayoutMarginDeco();
           updateMarginAddState(rail);
           showToast("Image added");
+        } else {
+          showToast(result.error || "Couldn't upload", true);
+        }
+      });
+
+      fileInput.click();
+    }
+
+    // Replaces one tile's photo in place - same spot in the collage,
+    // unlike add (appends a new tile) or remove (deletes one).
+    async function editMarginImage(button) {
+      const imageId = button.dataset.imageId;
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/png,image/jpeg,image/gif,image/webp";
+      fileInput.style.display = "none";
+      document.body.appendChild(fileInput);
+
+      fileInput.addEventListener("change", async () => {
+        const file = fileInput.files[0];
+        fileInput.remove();
+        if (!file) return;
+
+        button.classList.add("gp-edit-saving");
+        const fd = new FormData();
+        fd.append("file", file);
+        let result;
+        try {
+          const res = await fetch(`/admin/margin-images/${imageId}/inline-edit`, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken },
+            body: fd,
+          });
+          result = await res.json();
+        } catch (err) {
+          result = { ok: false, error: "Network error." };
+        }
+        button.classList.remove("gp-edit-saving");
+
+        if (result.ok) {
+          const tile = button.closest(".gp-margin-deco-tile");
+          const img = tile ? tile.querySelector("img") : null;
+          if (img) img.src = result.url;
+          showToast("Image updated");
         } else {
           showToast(result.error || "Couldn't upload", true);
         }
@@ -914,6 +959,13 @@
       if (addMarginBtn) {
         e.preventDefault();
         if (!addMarginBtn.disabled) addMarginImage(addMarginBtn);
+        return;
+      }
+
+      const editMarginBtn = e.target.closest(".gp-margin-deco-edit");
+      if (editMarginBtn) {
+        e.preventDefault();
+        editMarginImage(editMarginBtn);
         return;
       }
 

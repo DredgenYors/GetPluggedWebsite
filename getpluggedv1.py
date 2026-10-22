@@ -644,6 +644,24 @@ def admin_inline_add_margin_image(side):
 
     return jsonify({"ok": True, "url": site_image(path), "media_id": image.id})
 
+@app.route("/admin/margin-images/<int:image_id>/inline-edit", methods=["POST"])
+@admin_required
+def admin_inline_edit_margin_image(image_id):
+    """Replace a single side-margin photo in place, keeping its spot in the
+    collage (as opposed to add/delete, which change how many there are)."""
+    image = MarginImage.query.get_or_404(image_id)
+
+    file_storage = request.files.get("file")
+    path = save_uploaded_image(file_storage, "margin_deco")
+    if not path:
+        return jsonify({"ok": False, "error": "Please choose an image file (png, jpg, gif, or webp)."}), 400
+
+    delete_uploaded_file(image.url)
+    image.url = path
+    db.session.commit()
+
+    return jsonify({"ok": True, "url": site_image(path)})
+
 @app.route("/admin/margin-images/<int:image_id>/inline-delete", methods=["POST"])
 @admin_required
 def admin_inline_delete_margin_image(image_id):

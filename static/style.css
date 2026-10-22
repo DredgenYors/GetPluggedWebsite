@@ -1023,6 +1023,36 @@ body.gp-edit-mode .gp-margin-deco{ pointer-events: auto; }
 
 .gp-edit-mode .gp-margin-deco-remove{ display: flex; }
 
+/* Replaces this one tile's photo in place (same spot in the collage) -
+   distinct from the remove "x" (deletes it, shrinking the column) and the
+   add "+" (appends a new one). Centered over the image itself since that's
+   the thing it acts on. */
+.gp-margin-deco-edit{
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  padding: 0.4rem 1rem;
+  background: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.gp-margin-deco-edit:hover{
+  background: #fff;
+  color: var(--gp-charcoal);
+}
+
+.gp-edit-mode .gp-margin-deco-edit{ display: block; }
+
 .gp-margin-deco-add{
   display: none;
   position: absolute;

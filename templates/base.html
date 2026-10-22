@@ -29,6 +29,7 @@
         <div class="gp-margin-deco-tile" data-image-id="{{ img.id }}">
             <img src="{{ site_image(img.url) }}" alt="" aria-hidden="true">
             {% if can_edit %}
+            <button type="button" class="gp-margin-deco-edit" data-image-id="{{ img.id }}" title="Change image">Edit</button>
             <button type="button" class="gp-margin-deco-remove" data-image-id="{{ img.id }}" title="Remove image">&times;</button>
             {% endif %}
         </div>
@@ -42,6 +43,7 @@
         <div class="gp-margin-deco-tile" data-image-id="{{ img.id }}">
             <img src="{{ site_image(img.url) }}" alt="" aria-hidden="true">
             {% if can_edit %}
+            <button type="button" class="gp-margin-deco-edit" data-image-id="{{ img.id }}" title="Change image">Edit</button>
             <button type="button" class="gp-margin-deco-remove" data-image-id="{{ img.id }}" title="Remove image">&times;</button>
             {% endif %}
         </div>
