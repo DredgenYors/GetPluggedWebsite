@@ -244,8 +244,14 @@
       viewport.scrollBy({ left: direction * (slotWidth || 260), behavior: "smooth" });
     }
 
-    if (prevBtn) prevBtn.addEventListener("click", () => step(-1));
-    if (nextBtn) nextBtn.addEventListener("click", () => step(1));
+    // Clicking a button leaves it focused, which would otherwise hold
+    // root:focus-within true indefinitely - the same kind of stuck pause
+    // the hover check above has to guard against, but via focus instead of
+    // hover. Blurring right after the click lets the arrow's own 500ms
+    // timed pause (set inside step()) be what resumes drift, rather than
+    // waiting on focus to move elsewhere (e.g. a click outside the carousel).
+    if (prevBtn) prevBtn.addEventListener("click", () => { step(-1); prevBtn.blur(); });
+    if (nextBtn) nextBtn.addEventListener("click", () => { step(1); nextBtn.blur(); });
 
     // Edit Mode can be toggled on this same page without a reload. Entering
     // it tears down any clones immediately, since the add/remove-photo
