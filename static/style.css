@@ -949,7 +949,14 @@ body > footer{
   position: fixed;
   top: 0;
   bottom: 0;
-  width: 200px;
+  /* Fill nearly the whole gutter outside the centered content (which
+     tops out at 1280px, border-box, so that's the number to measure
+     the remaining margin against) rather than a fixed width that left
+     most of the margin blank regardless of how much room there was.
+     The 16px is just a small breathing gap so the image doesn't butt
+     directly against the content; capped so it doesn't balloon into an
+     oversized strip on ultra-wide monitors. */
+  width: clamp(0px, calc((100vw - 1280px) / 2 - 16px), 420px);
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
@@ -964,10 +971,11 @@ body > footer{
 .gp-margin-deco-left{ left: 0; }
 .gp-margin-deco-right{ right: 0; }
 
-/* .gp-section-inner tops out at 1280px + 3rem of padding; this leaves a
-   comfortable gap between the rail and the content on both sides rather
-   than them touching edge-to-edge. */
-@media (min-width: 1700px){
+/* Lowered from 1700px - that was excluding plenty of ordinary laptop/
+   desktop screens at 100% zoom that do have workable margin once the
+   rail's width is fluid (above) instead of a fixed 200px. Below this,
+   there isn't enough room for a rail without crowding the content. */
+@media (min-width: 1400px){
   .gp-margin-deco{ display: block; }
 }
 
