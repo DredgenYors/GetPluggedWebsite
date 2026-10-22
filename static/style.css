@@ -939,13 +939,19 @@ body > footer{
 }
 
 /* Decorative side-margin images - fill the blank gutter outside the
-   centered content column on wide viewports instead of leaving it empty.
-   Fixed (not scrolling with the page) so each side stays a single tall
-   rail of imagery behind the content the whole time, like a picture-frame
-   border. Hidden below the min-width breakpoint, where there isn't enough
-   real margin for them not to collide with the centered content. */
+   centered content column instead of leaving it empty. Fixed (not
+   scrolling with the page) so each side stays a single tall rail of
+   imagery behind the content the whole time, like a picture-frame
+   border.
+
+   No min-width media query - picking a fixed breakpoint meant guessing
+   at real-world screen sizes (1366px-wide laptops at 100% zoom were
+   being excluded by a 1400px cutoff that seemed reasonable in testing
+   but wasn't). Instead the width itself is the on/off switch: clamp()'s
+   0px floor collapses it to nothing the instant there isn't genuine
+   margin to put it in, so it shows on literally any screen/zoom level
+   the moment there's room, with no cutoff to re-tune later. */
 .gp-margin-deco{
-  display: none;
   position: fixed;
   top: 0;
   bottom: 0;
@@ -953,10 +959,10 @@ body > footer{
      tops out at 1280px, border-box, so that's the number to measure
      the remaining margin against) rather than a fixed width that left
      most of the margin blank regardless of how much room there was.
-     The 16px is just a small breathing gap so the image doesn't butt
+     The 8px is just a small breathing gap so the image doesn't butt
      directly against the content; capped so it doesn't balloon into an
      oversized strip on ultra-wide monitors. */
-  width: clamp(0px, calc((100vw - 1280px) / 2 - 16px), 420px);
+  width: clamp(0px, calc((100vw - 1280px) / 2 - 8px), 420px);
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
@@ -970,14 +976,6 @@ body > footer{
 
 .gp-margin-deco-left{ left: 0; }
 .gp-margin-deco-right{ right: 0; }
-
-/* Lowered from 1700px - that was excluding plenty of ordinary laptop/
-   desktop screens at 100% zoom that do have workable margin once the
-   rail's width is fluid (above) instead of a fixed 200px. Below this,
-   there isn't enough room for a rail without crowding the content. */
-@media (min-width: 1400px){
-  .gp-margin-deco{ display: block; }
-}
 
 /* ==========================================================================
    BRAND REDESIGN — global layout, nav, footer, and home page sections
