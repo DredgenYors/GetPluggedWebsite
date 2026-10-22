@@ -1167,8 +1167,25 @@ body > footer{
   position: relative;
   z-index: 1;
   padding: 5.5rem 0;
-  border-bottom: 1px solid var(--gp-border-warm);
   scroll-margin-top: 96px; /* keep section heading clear of the fixed nav on anchor jumps */
+}
+
+/* A plain border-bottom here would span the section's full edge-to-edge
+   width, which - now that the side margins can have decorative images in
+   them (see .gp-margin-deco) - drew the divider line across the top of
+   those images instead of stopping at the actual content. Capping this to
+   the same max-width as .gp-section-inner, and centering it the same way,
+   keeps the line scoped to the content column exactly like everything
+   else in the section. */
+.gp-section::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 1280px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--gp-border-warm);
 }
 
 .gp-section-tint{
