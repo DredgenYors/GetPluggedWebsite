@@ -1220,11 +1220,29 @@ body > footer{
   background: var(--gp-surface);
 }
 
-.gp-section-grid{
+/* Same reasoning as .gp-section::after: a background-image directly on
+   .gp-section-grid would paint across the section's full edge-to-edge
+   width, showing the dot grid on top of the side-margin images instead
+   of stopping at the content column. Scoped to a ::before capped at the
+   same 1280px/centered box as .gp-section-inner. z-index:-1 (inside
+   .gp-section's own stacking context, which it already establishes via
+   position:relative + z-index:1) keeps it behind the section's actual
+   content rather than painting over it - positioned descendants would
+   otherwise paint above static in-flow content like .gp-section-inner. */
+.gp-section-grid::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 1280px;
+  margin: 0 auto;
   background-image:
     linear-gradient(to right, rgba(38,35,33,0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(38,35,33,0.05) 1px, transparent 1px);
   background-size: 48px 48px;
+  z-index: -1;
 }
 
 .gp-section-inner{
