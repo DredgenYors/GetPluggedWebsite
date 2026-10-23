@@ -857,6 +857,20 @@ html.js .gp-anim-init{
   transform: translateY(16px);
 }
 
+/* The eyebrow rule lines (Mission, Services, Gallery, Stay Plugged In,
+   Our Story, Contact) draw themselves in via scaleX, set by GSAP rather
+   than the opacity/translateY above - needs its own pre-hide rule so it
+   doesn't sit at full width from first paint until the JS that collapses
+   it actually runs (which, now that it's tied to the hero's own
+   entrance, can be several seconds into a first visit - see
+   initScrollReveals in home.html). Without this, the line would flash
+   at full width, then collapse, then redraw - the exact thing this is
+   for. */
+html.js .gp-rule.gp-anim-init{
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
 /* Clip-reveal wrapper, generic version of .gp-hero-title-wrap below -
    reused by any section heading that gets the same line-reveal treatment
    as the hero title (Services, Our Story, Contact). Multi-line headings

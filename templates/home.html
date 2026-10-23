@@ -41,7 +41,7 @@
   <div class="gp-section-inner gp-mission-grid">
     <div class="gp-mission-label">
       <span class="gp-eyebrow gp-anim-init" data-editable data-field="mission_eyebrow" data-type="text">{{ site_settings.mission_eyebrow }}</span>
-      <div class="gp-rule"></div>
+      <div class="gp-rule gp-anim-init"></div>
     </div>
     <div>
       <p class="gp-mission-statement gp-anim-init" data-editable data-field="mission_statement" data-type="textarea">
@@ -58,7 +58,7 @@
     <div class="gp-section-head">
       <div>
         <span class="gp-eyebrow gp-anim-init" data-editable data-field="services_eyebrow" data-type="text">{{ site_settings.services_eyebrow }}</span>
-        <div class="gp-rule"></div>
+        <div class="gp-rule gp-anim-init"></div>
         <div class="gp-reveal-title-wrap">
           <h2 class="gp-section-title" data-editable data-field="services_heading" data-type="text">{{ site_settings.services_heading }}</h2>
         </div>
@@ -112,7 +112,7 @@
     <div class="gp-section-head">
       <div>
         <span class="gp-eyebrow gp-anim-init" data-editable data-field="gallery_eyebrow" data-type="text">{{ site_settings.gallery_eyebrow }}</span>
-        <div class="gp-rule"></div>
+        <div class="gp-rule gp-anim-init"></div>
         <h2 class="gp-section-title gp-anim-init" data-editable data-field="gallery_heading" data-type="text">{{ site_settings.gallery_heading }}</h2>
       </div>
       <p class="gp-section-lede gp-anim-init" data-editable data-field="gallery_note" data-type="text">{{ site_settings.gallery_note }}</p>
@@ -163,7 +163,7 @@
     <div class="gp-section-head">
       <div>
         <span class="gp-eyebrow gp-anim-init" data-editable data-field="stay_plugged_eyebrow" data-type="text">{{ site_settings.stay_plugged_eyebrow }}</span>
-        <div class="gp-rule"></div>
+        <div class="gp-rule gp-anim-init"></div>
         <h2 class="gp-section-title gp-anim-init" data-editable data-field="stay_plugged_heading" data-type="text">{{ site_settings.stay_plugged_heading }}</h2>
       </div>
       <p class="gp-section-lede gp-anim-init" data-editable data-field="stay_plugged_lede" data-type="text">{{ site_settings.stay_plugged_lede }}</p>
@@ -238,7 +238,7 @@
 <section id="our-story" class="gp-section">
   <div class="gp-section-inner gp-story-inner">
     <span class="gp-eyebrow gp-anim-init" data-editable data-field="our_story_eyebrow" data-type="text">{{ site_settings.our_story_eyebrow }}</span>
-    <div class="gp-rule"></div>
+    <div class="gp-rule gp-anim-init"></div>
     <div class="gp-reveal-title-wrap">
       <h2 class="gp-story-title">
         <span data-editable data-type="text" data-field="story_heading_prefix">{{ site_settings.story_heading_prefix }}</span><br>
@@ -285,7 +285,7 @@
 <section id="contact" class="gp-section gp-section-grid">
   <div class="gp-section-inner">
     <span class="gp-eyebrow gp-anim-init" data-editable data-field="contact_eyebrow" data-type="text">{{ site_settings.contact_eyebrow }}</span>
-    <div class="gp-rule"></div>
+    <div class="gp-rule gp-anim-init"></div>
     <div class="gp-reveal-title-wrap">
       <h2 class="gp-contact-title">
         <span data-editable data-field="contact_heading_line1" data-type="text">{{ site_settings.contact_heading_line1 }}</span><br>
@@ -481,7 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const statement = section.querySelector(".gp-mission-statement");
       const link = section.querySelector(".gp-textlink");
 
-      clearInit(eyebrow, statement, link);
+      clearInit(eyebrow, rule, statement, link);
 
       const tl = gsap.timeline();
       revealEyebrowRule(tl, eyebrow, rule);
@@ -510,7 +510,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const image = section.querySelector(".gp-services-image");
       const cards = gsap.utils.toArray(section.querySelectorAll(".gp-service"));
 
-      clearInit(eyebrow, image, ...cards);
+      clearInit(eyebrow, rule, image, ...cards);
 
       const tl = gsap.timeline();
       revealEyebrowRule(tl, eyebrow, rule);
@@ -538,7 +538,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const lede = section.querySelector(".gp-section-lede");
       const carousel = section.querySelector(".gp-carousel");
 
-      clearInit(eyebrow, title, lede, carousel);
+      clearInit(eyebrow, rule, title, lede, carousel);
 
       const tl = gsap.timeline();
       revealEyebrowRule(tl, eyebrow, rule);
@@ -566,7 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const rows = gsap.utils.toArray(section.querySelectorAll(".gp-next-row:not(.gp-next-row-add)"));
       const footLink = section.querySelector(".gp-section-foot .gp-textlink");
 
-      clearInit(eyebrow, title, lede, ...rows, footLink);
+      clearInit(eyebrow, rule, title, lede, ...rows, footLink);
 
       const tl = gsap.timeline();
       revealEyebrowRule(tl, eyebrow, rule);
@@ -598,7 +598,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const stats = gsap.utils.toArray(section.querySelectorAll(".gp-story-stats > div"));
       const founders = gsap.utils.toArray(section.querySelectorAll(".gp-founder"));
 
-      clearInit(eyebrow, ...paragraphs, ...stats, ...founders);
+      clearInit(eyebrow, rule, ...paragraphs, ...stats, ...founders);
 
       const tl = gsap.timeline();
       revealEyebrowRule(tl, eyebrow, rule);
@@ -641,7 +641,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const lede = section.querySelector(".gp-contact-lede");
       const ctas = gsap.utils.toArray(section.querySelectorAll(".gp-contact-ctas > a"));
 
-      clearInit(eyebrow, lede, ...ctas);
+      clearInit(eyebrow, rule, lede, ...ctas);
 
       const tl = gsap.timeline();
       revealEyebrowRule(tl, eyebrow, rule);
