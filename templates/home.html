@@ -39,15 +39,15 @@
 <!-- ===== MISSION ===== -->
 <section id="mission" class="gp-section">
   <div class="gp-section-inner gp-mission-grid">
-    <div class="gp-mission-label">
+    <div class="gp-mission-label gp-anim-init">
       <span class="gp-eyebrow" data-editable data-field="mission_eyebrow" data-type="text">{{ site_settings.mission_eyebrow }}</span>
       <div class="gp-rule"></div>
     </div>
     <div>
-      <p class="gp-mission-statement" data-editable data-field="mission_statement" data-type="textarea">
+      <p class="gp-mission-statement gp-anim-init" data-editable data-field="mission_statement" data-type="textarea">
         {{ site_settings.mission_statement }}
       </p>
-      <a class="gp-textlink" href="#our-story">Our Story <span class="gp-arrow">&#8599;</span></a>
+      <a class="gp-textlink gp-anim-init" href="#our-story">Our Story <span class="gp-arrow">&#8599;</span></a>
     </div>
   </div>
 </section>
@@ -57,10 +57,12 @@
   <div class="gp-section-inner">
     <div class="gp-section-head">
       <div>
-        <span class="gp-eyebrow" data-editable data-field="services_eyebrow" data-type="text">{{ site_settings.services_eyebrow }}</span>
-        <h2 class="gp-section-title" data-editable data-field="services_heading" data-type="text">{{ site_settings.services_heading }}</h2>
+        <span class="gp-eyebrow gp-anim-init" data-editable data-field="services_eyebrow" data-type="text">{{ site_settings.services_eyebrow }}</span>
+        <div class="gp-reveal-title-wrap">
+          <h2 class="gp-section-title" data-editable data-field="services_heading" data-type="text">{{ site_settings.services_heading }}</h2>
+        </div>
       </div>
-      <div class="gp-services-image" data-editable-image data-field="services_image" role="img" aria-label="Placeholder image">
+      <div class="gp-services-image gp-anim-init" data-editable-image data-field="services_image" role="img" aria-label="Placeholder image">
         {% if site_settings.services_image %}
           <img src="{{ site_image(site_settings.services_image) }}" alt="">
         {% else %}
@@ -71,28 +73,28 @@
     </div>
 
     <div class="gp-services-grid">
-      <div class="gp-service">
+      <div class="gp-service gp-anim-init">
         <span class="gp-service-num">01</span>
         <div>
           <h3 data-editable data-field="service1_title" data-type="text">{{ site_settings.service1_title }}</h3>
           <p data-editable data-field="service1_body" data-type="textarea">{{ site_settings.service1_body }}</p>
         </div>
       </div>
-      <div class="gp-service">
+      <div class="gp-service gp-anim-init">
         <span class="gp-service-num">02</span>
         <div>
           <h3 data-editable data-field="service2_title" data-type="text">{{ site_settings.service2_title }}</h3>
           <p data-editable data-field="service2_body" data-type="textarea">{{ site_settings.service2_body }}</p>
         </div>
       </div>
-      <div class="gp-service">
+      <div class="gp-service gp-anim-init">
         <span class="gp-service-num">03</span>
         <div>
           <h3 data-editable data-field="service3_title" data-type="text">{{ site_settings.service3_title }}</h3>
           <p data-editable data-field="service3_body" data-type="textarea">{{ site_settings.service3_body }}</p>
         </div>
       </div>
-      <div class="gp-service">
+      <div class="gp-service gp-anim-init">
         <span class="gp-service-num">04</span>
         <div>
           <h3 data-editable data-field="service4_title" data-type="text">{{ site_settings.service4_title }}</h3>
@@ -108,14 +110,14 @@
   <div class="gp-section-inner">
     <div class="gp-section-head">
       <div>
-        <span class="gp-eyebrow" data-editable data-field="gallery_eyebrow" data-type="text">{{ site_settings.gallery_eyebrow }}</span>
-        <h2 class="gp-section-title" data-editable data-field="gallery_heading" data-type="text">{{ site_settings.gallery_heading }}</h2>
+        <span class="gp-eyebrow gp-anim-init" data-editable data-field="gallery_eyebrow" data-type="text">{{ site_settings.gallery_eyebrow }}</span>
+        <h2 class="gp-section-title gp-anim-init" data-editable data-field="gallery_heading" data-type="text">{{ site_settings.gallery_heading }}</h2>
       </div>
-      <p class="gp-section-lede" data-editable data-field="gallery_note" data-type="text">{{ site_settings.gallery_note }}</p>
+      <p class="gp-section-lede gp-anim-init" data-editable data-field="gallery_note" data-type="text">{{ site_settings.gallery_note }}</p>
     </div>
 
     {% if gallery_preview or (current_user.is_authenticated and current_user.is_admin()) %}
-    <div class="gp-carousel" data-carousel data-carousel-min-loop="5">
+    <div class="gp-carousel gp-anim-init" data-carousel data-carousel-min-loop="5">
       <button type="button" class="gp-carousel-arrow gp-carousel-prev" data-carousel-prev aria-label="Previous events">&lsaquo;</button>
       <div class="gp-carousel-viewport">
         <div class="gp-carousel-track" data-carousel-track>
@@ -158,15 +160,15 @@
   <div class="gp-section-inner">
     <div class="gp-section-head">
       <div>
-        <span class="gp-eyebrow" data-editable data-field="stay_plugged_eyebrow" data-type="text">{{ site_settings.stay_plugged_eyebrow }}</span>
-        <h2 class="gp-section-title" data-editable data-field="stay_plugged_heading" data-type="text">{{ site_settings.stay_plugged_heading }}</h2>
+        <span class="gp-eyebrow gp-anim-init" data-editable data-field="stay_plugged_eyebrow" data-type="text">{{ site_settings.stay_plugged_eyebrow }}</span>
+        <h2 class="gp-section-title gp-anim-init" data-editable data-field="stay_plugged_heading" data-type="text">{{ site_settings.stay_plugged_heading }}</h2>
       </div>
-      <p class="gp-section-lede" data-editable data-field="stay_plugged_lede" data-type="text">{{ site_settings.stay_plugged_lede }}</p>
+      <p class="gp-section-lede gp-anim-init" data-editable data-field="stay_plugged_lede" data-type="text">{{ site_settings.stay_plugged_lede }}</p>
     </div>
 
     <div class="gp-next-rows">
       {% for row in stay_plugged_rows %}
-        <div class="gp-next-row">
+        <div class="gp-next-row gp-anim-init">
           <span class="gp-next-row-num">{{ "%02d"|format(loop.index) }}</span>
           <div class="gp-next-row-body">
             {% if row.removable %}
@@ -209,7 +211,7 @@
       {% endfor %}
 
       {% if not stay_plugged_rows %}
-        <div class="gp-next-row">
+        <div class="gp-next-row gp-anim-init">
           <div class="gp-next-row-body">
             <span class="gp-label-accent">Announcement</span>
             <h3 class="gp-next-row-title">{{ site_settings.coming_soon_title or "More on the way" }}</h3>
@@ -224,7 +226,7 @@
     </div>
 
     <div class="gp-section-foot">
-      <a class="gp-textlink" href="#contact"><span data-editable data-field="stay_plugged_footer_text" data-type="text">{{ site_settings.stay_plugged_footer_text }}</span> <span class="gp-arrow">&#8599;</span></a>
+      <a class="gp-textlink gp-anim-init" href="#contact"><span data-editable data-field="stay_plugged_footer_text" data-type="text">{{ site_settings.stay_plugged_footer_text }}</span> <span class="gp-arrow">&#8599;</span></a>
     </div>
   </div>
 </section>
@@ -232,27 +234,29 @@
 <!-- ===== OUR STORY ===== -->
 <section id="our-story" class="gp-section">
   <div class="gp-section-inner gp-story-inner">
-    <span class="gp-eyebrow gp-eyebrow-accent" data-editable data-field="our_story_eyebrow" data-type="text">{{ site_settings.our_story_eyebrow }}</span>
-    <h2 class="gp-story-title">
-      <span data-editable data-type="text" data-field="story_heading_prefix">{{ site_settings.story_heading_prefix }}</span><br>
-      <span class="gp-story-accent" data-editable data-type="text" data-field="story_heading_accent">{{ site_settings.story_heading_accent }}</span><br>
-      <span data-editable data-type="text" data-field="story_heading_suffix">{{ site_settings.story_heading_suffix }}</span>
-    </h2>
+    <span class="gp-eyebrow gp-eyebrow-accent gp-anim-init" data-editable data-field="our_story_eyebrow" data-type="text">{{ site_settings.our_story_eyebrow }}</span>
+    <div class="gp-reveal-title-wrap">
+      <h2 class="gp-story-title">
+        <span data-editable data-type="text" data-field="story_heading_prefix">{{ site_settings.story_heading_prefix }}</span><br>
+        <span class="gp-story-accent" data-editable data-type="text" data-field="story_heading_accent">{{ site_settings.story_heading_accent }}</span><br>
+        <span data-editable data-type="text" data-field="story_heading_suffix">{{ site_settings.story_heading_suffix }}</span>
+      </h2>
+    </div>
 
     <div class="gp-story-paragraphs">
       {% for para in (site_settings.what_is_body or "").split('\n\n') %}
-        {% if para.strip() %}<p>{{ para.strip() }}</p>{% endif %}
+        {% if para.strip() %}<p class="gp-anim-init">{{ para.strip() }}</p>{% endif %}
       {% endfor %}
     </div>
 
     <div class="gp-story-stats">
-      <div><div class="gp-story-stat-value" data-editable data-field="stat1_value" data-type="text">{{ site_settings.stat1_value }}</div><div class="gp-story-stat-label" data-editable data-field="stat1_label" data-type="text">{{ site_settings.stat1_label }}</div></div>
-      <div><div class="gp-story-stat-value" data-editable data-field="stat2_value" data-type="text">{{ site_settings.stat2_value }}</div><div class="gp-story-stat-label" data-editable data-field="stat2_label" data-type="text">{{ site_settings.stat2_label }}</div></div>
-      <div><div class="gp-story-stat-value" data-editable data-field="stat3_value" data-type="text">{{ site_settings.stat3_value }}</div><div class="gp-story-stat-label" data-editable data-field="stat3_label" data-type="text">{{ site_settings.stat3_label }}</div></div>
+      <div class="gp-anim-init"><div class="gp-story-stat-value" data-editable data-field="stat1_value" data-type="text">{{ site_settings.stat1_value }}</div><div class="gp-story-stat-label" data-editable data-field="stat1_label" data-type="text">{{ site_settings.stat1_label }}</div></div>
+      <div class="gp-anim-init"><div class="gp-story-stat-value" data-editable data-field="stat2_value" data-type="text">{{ site_settings.stat2_value }}</div><div class="gp-story-stat-label" data-editable data-field="stat2_label" data-type="text">{{ site_settings.stat2_label }}</div></div>
+      <div class="gp-anim-init"><div class="gp-story-stat-value" data-editable data-field="stat3_value" data-type="text">{{ site_settings.stat3_value }}</div><div class="gp-story-stat-label" data-editable data-field="stat3_label" data-type="text">{{ site_settings.stat3_label }}</div></div>
     </div>
 
     <div class="gp-founders">
-      <div class="gp-founder">
+      <div class="gp-founder gp-anim-init">
         <div class="gp-founder-avatar" data-editable-image data-field="founder1_image">
           {% if site_settings.founder1_image %}
             <img src="{{ site_image(site_settings.founder1_image) }}" alt="{{ site_settings.founder1_name }}">
@@ -261,7 +265,7 @@
         <h6 class="gp-founder-name" data-editable data-field="founder1_name" data-type="text">{{ site_settings.founder1_name or "Founder 1" }}</h6>
       </div>
 
-      <div class="gp-founder">
+      <div class="gp-founder gp-anim-init">
         <div class="gp-founder-avatar" data-editable-image data-field="founder2_image">
           {% if site_settings.founder2_image %}
             <img src="{{ site_image(site_settings.founder2_image) }}" alt="{{ site_settings.founder2_name }}">
@@ -276,23 +280,25 @@
 <!-- ===== CONTACT ===== -->
 <section id="contact" class="gp-section gp-section-grid">
   <div class="gp-section-inner">
-    <span class="gp-eyebrow gp-eyebrow-accent" data-editable data-field="contact_eyebrow" data-type="text">{{ site_settings.contact_eyebrow }}</span>
-    <h2 class="gp-contact-title">
-      <span data-editable data-field="contact_heading_line1" data-type="text">{{ site_settings.contact_heading_line1 }}</span><br>
-      <span class="gp-accent-text" data-editable data-field="contact_heading_line2" data-type="text">{{ site_settings.contact_heading_line2 }}</span>
-    </h2>
-    <p class="gp-contact-lede" data-editable data-field="contact_lede" data-type="textarea">
+    <span class="gp-eyebrow gp-eyebrow-accent gp-anim-init" data-editable data-field="contact_eyebrow" data-type="text">{{ site_settings.contact_eyebrow }}</span>
+    <div class="gp-reveal-title-wrap">
+      <h2 class="gp-contact-title">
+        <span data-editable data-field="contact_heading_line1" data-type="text">{{ site_settings.contact_heading_line1 }}</span><br>
+        <span class="gp-accent-text" data-editable data-field="contact_heading_line2" data-type="text">{{ site_settings.contact_heading_line2 }}</span>
+      </h2>
+    </div>
+    <p class="gp-contact-lede gp-anim-init" data-editable data-field="contact_lede" data-type="textarea">
       {{ site_settings.contact_lede }}
     </p>
 
     <div class="gp-contact-ctas">
       {% if site_settings.email %}
-      <a class="gp-btn gp-btn-solid" href="mailto:{{ site_settings.email }}">
+      <a class="gp-btn gp-btn-solid gp-anim-init" href="mailto:{{ site_settings.email }}">
         <span data-editable data-field="contact_cta_email_label" data-type="text">{{ site_settings.contact_cta_email_label }}</span> <span class="gp-arrow">&#8599;</span>
       </a>
       {% endif %}
       {% if site_settings.instagram_url %}
-      <a class="gp-btn gp-btn-ghost" href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer">
+      <a class="gp-btn gp-btn-ghost gp-anim-init" href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer">
         <span data-editable data-field="contact_cta_follow_label" data-type="text">{{ site_settings.contact_cta_follow_label }}</span>
       </a>
       {% endif %}
@@ -390,6 +396,229 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     return tl;
+  }
+
+  // ---- SCROLL-REVEALS: Mission through Contact (everything below the
+  // hero) - set up unconditionally here, independent of the intro/hero
+  // sequence below (which has several early returns depending on whether
+  // the intro has already played this session). Each section plays once,
+  // the first time it scrolls into view, matching how the hero itself
+  // only ever plays once rather than replaying on every scroll past.
+  const REDUCE_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function clearInit(...els) {
+    els.forEach(el => el && el.classList.remove("gp-anim-init"));
+  }
+
+  if (REDUCE_MOTION || typeof ScrollTrigger === "undefined") {
+    // Respect the reduced-motion preference (or a failed ScrollTrigger
+    // load) by just showing everything in place, with no motion, rather
+    // than leaving it hidden with nothing left to ever reveal it.
+    document.querySelectorAll(".gp-anim-init").forEach(el => el.classList.remove("gp-anim-init"));
+  } else {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // setup (if given) runs immediately, synchronously - for the handful
+    // of elements (a clip-reveal title's yPercent, the Mission rule's
+    // scaleX) that need their hidden starting state in place well before
+    // the section is anywhere near the viewport, not only the instant it
+    // scrolls into view.
+    function revealOnce(section, setup, build) {
+      if (!section) return;
+      if (setup) setup();
+      ScrollTrigger.create({ trigger: section, start: "top 80%", once: true, onEnter: build });
+    }
+
+    function setupMission() {
+      const rule = document.querySelector("#mission .gp-rule");
+      if (rule) gsap.set(rule, { scaleX: 0, transformOrigin: "left center" });
+    }
+
+    function playMission() {
+      const section = document.getElementById("mission");
+      if (!section) return;
+      const label = section.querySelector(".gp-mission-label");
+      const rule = section.querySelector(".gp-rule");
+      const statement = section.querySelector(".gp-mission-statement");
+      const link = section.querySelector(".gp-textlink");
+
+      clearInit(label, statement, link);
+
+      const tl = gsap.timeline();
+      if (label) tl.fromTo(label, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" });
+      if (rule) tl.to(rule, { scaleX: 1, duration: 0.5, ease: "power2.out" }, "-=0.25");
+      if (statement) {
+        tl.fromTo(statement,
+          { opacity: 0, y: 14, filter: "blur(4px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power2.out" },
+          "-=0.15"
+        );
+      }
+      if (link) tl.fromTo(link, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "-=0.25");
+    }
+
+    function setupServices() {
+      const title = document.querySelector("#services .gp-reveal-title-wrap .gp-section-title");
+      if (title) gsap.set(title, { yPercent: 120 });
+    }
+
+    function playServices() {
+      const section = document.getElementById("services");
+      if (!section) return;
+      const eyebrow = section.querySelector(".gp-section-head .gp-eyebrow");
+      const title = section.querySelector(".gp-reveal-title-wrap .gp-section-title");
+      const image = section.querySelector(".gp-services-image");
+      const cards = gsap.utils.toArray(section.querySelectorAll(".gp-service"));
+
+      clearInit(eyebrow, image, ...cards);
+
+      const tl = gsap.timeline();
+      if (eyebrow) tl.fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
+      if (title) tl.to(title, { yPercent: 0, duration: 0.7, ease: "power3.out" }, "-=0.25");
+      if (image) tl.fromTo(image, { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out" }, "-=0.45");
+      if (cards.length) {
+        tl.fromTo(cards,
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", stagger: 0.1 },
+          "-=0.3"
+        );
+      }
+    }
+
+    function playGalleryPreview() {
+      const section = document.getElementById("gallery-preview");
+      if (!section) return;
+      const eyebrow = section.querySelector(".gp-section-head .gp-eyebrow");
+      const title = section.querySelector(".gp-section-head .gp-section-title");
+      const lede = section.querySelector(".gp-section-lede");
+      const carousel = section.querySelector(".gp-carousel");
+
+      clearInit(eyebrow, title, lede, carousel);
+
+      const tl = gsap.timeline();
+      if (eyebrow) tl.fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
+      if (title) tl.fromTo(title, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.3");
+      if (lede) tl.fromTo(lede, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "-=0.3");
+      // The carousel drives its own continuous transforms once it starts
+      // looping (see carousel.js's tick()) - animating transform/opacity
+      // on individual cards here would fight that every frame, so the
+      // whole block gets one simple entrance instead of a per-card
+      // stagger.
+      if (carousel) tl.fromTo(carousel, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, "-=0.25");
+    }
+
+    function playStayPluggedIn() {
+      const section = document.getElementById("stay-plugged-in");
+      if (!section) return;
+      const eyebrow = section.querySelector(".gp-section-head .gp-eyebrow");
+      const title = section.querySelector(".gp-section-head .gp-section-title");
+      const lede = section.querySelector(".gp-section-lede");
+      const rows = gsap.utils.toArray(section.querySelectorAll(".gp-next-row:not(.gp-next-row-add)"));
+      const footLink = section.querySelector(".gp-section-foot .gp-textlink");
+
+      clearInit(eyebrow, title, lede, ...rows, footLink);
+
+      const tl = gsap.timeline();
+      if (eyebrow) tl.fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
+      if (title) tl.fromTo(title, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.3");
+      if (lede) tl.fromTo(lede, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "-=0.3");
+      if (rows.length) {
+        tl.fromTo(rows,
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.55, ease: "power2.out", stagger: 0.08 },
+          "-=0.2"
+        );
+      }
+      if (footLink) tl.fromTo(footLink, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "-=0.1");
+    }
+
+    function setupOurStory() {
+      const title = document.querySelector("#our-story .gp-reveal-title-wrap .gp-story-title");
+      if (title) gsap.set(title, { yPercent: 120 });
+    }
+
+    function playOurStory() {
+      const section = document.getElementById("our-story");
+      if (!section) return;
+      const eyebrow = section.querySelector(".gp-eyebrow");
+      const title = section.querySelector(".gp-reveal-title-wrap .gp-story-title");
+      const paragraphs = gsap.utils.toArray(section.querySelectorAll(".gp-story-paragraphs p"));
+      const stats = gsap.utils.toArray(section.querySelectorAll(".gp-story-stats > div"));
+      const founders = gsap.utils.toArray(section.querySelectorAll(".gp-founder"));
+
+      clearInit(eyebrow, ...paragraphs, ...stats, ...founders);
+
+      const tl = gsap.timeline();
+      if (eyebrow) tl.fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
+      if (title) tl.to(title, { yPercent: 0, duration: 0.7, ease: "power3.out" }, "-=0.25");
+      if (paragraphs.length) {
+        tl.fromTo(paragraphs,
+          { opacity: 0, y: 14, filter: "blur(4px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power2.out", stagger: 0.1 },
+          "-=0.3"
+        );
+      }
+      if (stats.length) {
+        tl.fromTo(stats,
+          { opacity: 0, scale: 0.85 },
+          { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out", stagger: 0.1 },
+          "-=0.25"
+        );
+      }
+      if (founders.length) {
+        tl.fromTo(founders,
+          { opacity: 0, y: 14, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power2.out", stagger: 0.1 },
+          "-=0.2"
+        );
+      }
+    }
+
+    function setupContact() {
+      const title = document.querySelector("#contact .gp-reveal-title-wrap .gp-contact-title");
+      if (title) gsap.set(title, { yPercent: 120 });
+    }
+
+    function playContact() {
+      const section = document.getElementById("contact");
+      if (!section) return;
+      const eyebrow = section.querySelector(".gp-eyebrow");
+      const title = section.querySelector(".gp-reveal-title-wrap .gp-contact-title");
+      const lede = section.querySelector(".gp-contact-lede");
+      const ctas = gsap.utils.toArray(section.querySelectorAll(".gp-contact-ctas > a"));
+
+      clearInit(eyebrow, lede, ...ctas);
+
+      const tl = gsap.timeline();
+      if (eyebrow) tl.fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
+      if (title) tl.to(title, { yPercent: 0, duration: 0.7, ease: "power3.out" }, "-=0.25");
+      if (lede) {
+        tl.fromTo(lede,
+          { opacity: 0, y: 12, filter: "blur(4px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "power2.out" },
+          "-=0.3"
+        );
+      }
+      if (ctas.length) {
+        tl.fromTo(ctas,
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", stagger: 0.1 },
+          "-=0.2"
+        );
+      }
+    }
+
+    revealOnce(document.getElementById("mission"), setupMission, playMission);
+    revealOnce(document.getElementById("services"), setupServices, playServices);
+    revealOnce(document.getElementById("gallery-preview"), null, playGalleryPreview);
+    revealOnce(document.getElementById("stay-plugged-in"), null, playStayPluggedIn);
+    revealOnce(document.getElementById("our-story"), setupOurStory, playOurStory);
+    revealOnce(document.getElementById("contact"), setupContact, playContact);
+
+    // Late-loading images (gallery cards, services photo, founder
+    // avatars) can shift section positions after ScrollTrigger first
+    // measured them - recalibrate once everything has actually loaded.
+    window.addEventListener("load", () => ScrollTrigger.refresh());
   }
 
   function runEntrance() {

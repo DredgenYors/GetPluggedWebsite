@@ -842,6 +842,31 @@ html.js .gp-nav-item.gp-anim-init {
   transform: translateY(-14px);
 }
 
+/* Generic scroll-reveal pre-hide, reused by the home page sections below
+   the hero (Mission, Services, Gallery, Stay Plugged In, Our Story,
+   Contact - see the scroll-triggered reveals in home.html's scripts
+   block). Same FOUC-prevention convention as the hero/nav rules above:
+   only hidden when JS actually runs, so a no-JS visit sees every section
+   in place immediately rather than stuck invisible. Kept as one shared,
+   neutral distance (rather than a bespoke value per element) since these
+   are meant to read as one consistent, restrained motion language site-
+   wide - matching the hero's own restraint - not a different animation
+   personality per section. */
+html.js .gp-anim-init{
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+/* Clip-reveal wrapper, generic version of .gp-hero-title-wrap below -
+   reused by any section heading that gets the same line-reveal treatment
+   as the hero title (Services, Our Story, Contact). Multi-line headings
+   (Our Story, Contact) are revealed as a single block rather than
+   line-by-line - simpler, and still restrained. */
+.gp-reveal-title-wrap{
+  overflow: hidden;
+  display: block;
+}
+
 /* Clip reveal wrapper */
 .gp-hero-title-wrap{
   overflow: hidden;
