@@ -4,7 +4,36 @@
   if (!csrfToken) return;
 
   const EDIT_KEY = "gp_edit_mode";
-  const isEditMode = () => sessionStorage.getItem(EDIT_KEY) === "1";
+
+  // sessionStorage can be silently blocked (strict browser privacy
+  // settings, some extensions) without throwing - reads/writes just
+  // quietly no-op. Wrapped so that degrades gracefully (edit mode just
+  // won't be remembered across a reload) instead of throwing.
+  function readStoredEditMode() {
+    try {
+      return sessionStorage.getItem(EDIT_KEY) === "1";
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function writeStoredEditMode(on) {
+    try {
+      sessionStorage.setItem(EDIT_KEY, on ? "1" : "0");
+    } catch (err) {
+      // Ignored - see readStoredEditMode above.
+    }
+  }
+
+  // The authoritative "is edit mode on right now" check, used to gate
+  // every delegated click handler below - reads the live DOM state (set
+  // by setEditMode, further down) rather than sessionStorage directly.
+  // If storage were blocked, every one of those handlers would silently
+  // think edit mode was never on - even with the banner/controls visibly
+  // showing, since their visibility is driven by this same body class -
+  // making every click on Edit/x/+ (and every other inline-edit control)
+  // a silent no-op with no console error to point at the cause.
+  const isEditMode = () => document.body.classList.contains("gp-edit-mode");
 
   function showToast(message, isError) {
     let toast = document.getElementById("gp-edit-toast");
@@ -632,7 +661,7 @@
   }
 
   function setEditMode(on) {
-    sessionStorage.setItem(EDIT_KEY, on ? "1" : "0");
+    writeStoredEditMode(on);
     document.body.classList.toggle("gp-edit-mode", on);
     const btn = document.getElementById("gp-edit-toggle");
     if (btn) btn.textContent = on ? "Exit Edit Mode" : "Edit Page";
@@ -653,7 +682,10 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    setEditMode(isEditMode());
+    // Restore from storage (best-effort - see readStoredEditMode) on a
+    // fresh page load, before the body class exists at all. isEditMode()
+    // itself reads that body class, not storage, so it can't be used here.
+    setEditMode(readStoredEditMode());
 
     const toggleBtn = document.getElementById("gp-edit-toggle");
     if (toggleBtn) {
