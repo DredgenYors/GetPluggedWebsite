@@ -953,7 +953,16 @@ body > footer{
    the moment there's room, with no cutoff to re-tune later. */
 .gp-margin-deco{
   position: fixed;
-  top: 0;
+  /* Starts below the fixed nav (84px), not the very top of the viewport -
+     that sliver was always hidden behind the opaque nav anyway (it sits
+     at z-index:1000), so starting the rail there instead of wasting tile
+     height on an unreachable area costs nothing visually. It also keeps
+     any tile's controls from ever landing underneath the nav. Edit Mode
+     pushes the nav down further (see body.gp-edit-mode .gp-nav) to make
+     room for the banner above it - the rail needs the same adjustment,
+     below, or the top tile's controls would end up trapped under the
+     banner instead. */
+  top: 84px;
   bottom: 0;
   /* Fill nearly the whole gutter outside the centered content (which
      tops out at 1280px, border-box, so that's the number to measure
@@ -963,9 +972,26 @@ body > footer{
      directly against the content; capped so it doesn't balloon into an
      oversized strip on ultra-wide monitors. */
   width: clamp(0px, calc((100vw - 1280px) / 2 - 8px), 420px);
-  z-index: 0;
+  /* Above .gp-section/.gp-hero (z-index:1) - those are full viewport-
+     width boxes (only their own .gp-section-inner is narrower), so
+     wherever one overlaps the margin gutter, it was sitting in front of
+     the rail and silently swallowing every hover/click meant for the
+     image controls, despite pointer-events:auto being correctly applied
+     to the rail itself in Edit Mode - a child's z-index only competes
+     within its own parent's stacking context, so no z-index set on the
+     Edit/x/+ buttons themselves could ever out-rank an ancestor-level
+     sibling like a section. Still well below the nav/banner (1000+),
+     modals (2000+), and lightbox (3000), which should stay on top of it. */
+  z-index: 2;
   overflow: hidden;
   pointer-events: none;
+}
+
+body.gp-edit-mode .gp-margin-deco{
+  top: 118px; /* nav's own edit-mode top (34px) + its height (84px) */
+  /* Normally pointer-events:none (purely decorative), but admins need to
+     actually reach the Edit/x/+ controls while editing. */
+  pointer-events: auto;
 }
 
 /* Collage: however many tiles the admin has added, stacked down the rail,
@@ -993,11 +1019,6 @@ body > footer{
 
 .gp-margin-deco-left{ left: 0; }
 .gp-margin-deco-right{ right: 0; }
-
-/* Edit Mode controls - normally the rail is pointer-events:none (purely
-   decorative), but admins need to actually click the add/remove buttons
-   while editing. */
-body.gp-edit-mode .gp-margin-deco{ pointer-events: auto; }
 
 .gp-margin-deco-remove{
   display: none;
