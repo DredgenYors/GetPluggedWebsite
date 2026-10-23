@@ -39,8 +39,8 @@
 <!-- ===== MISSION ===== -->
 <section id="mission" class="gp-section">
   <div class="gp-section-inner gp-mission-grid">
-    <div class="gp-mission-label gp-anim-init">
-      <span class="gp-eyebrow" data-editable data-field="mission_eyebrow" data-type="text">{{ site_settings.mission_eyebrow }}</span>
+    <div class="gp-mission-label">
+      <span class="gp-eyebrow gp-anim-init" data-editable data-field="mission_eyebrow" data-type="text">{{ site_settings.mission_eyebrow }}</span>
       <div class="gp-rule"></div>
     </div>
     <div>
@@ -58,6 +58,7 @@
     <div class="gp-section-head">
       <div>
         <span class="gp-eyebrow gp-anim-init" data-editable data-field="services_eyebrow" data-type="text">{{ site_settings.services_eyebrow }}</span>
+        <div class="gp-rule"></div>
         <div class="gp-reveal-title-wrap">
           <h2 class="gp-section-title" data-editable data-field="services_heading" data-type="text">{{ site_settings.services_heading }}</h2>
         </div>
@@ -111,6 +112,7 @@
     <div class="gp-section-head">
       <div>
         <span class="gp-eyebrow gp-anim-init" data-editable data-field="gallery_eyebrow" data-type="text">{{ site_settings.gallery_eyebrow }}</span>
+        <div class="gp-rule"></div>
         <h2 class="gp-section-title gp-anim-init" data-editable data-field="gallery_heading" data-type="text">{{ site_settings.gallery_heading }}</h2>
       </div>
       <p class="gp-section-lede gp-anim-init" data-editable data-field="gallery_note" data-type="text">{{ site_settings.gallery_note }}</p>
@@ -161,6 +163,7 @@
     <div class="gp-section-head">
       <div>
         <span class="gp-eyebrow gp-anim-init" data-editable data-field="stay_plugged_eyebrow" data-type="text">{{ site_settings.stay_plugged_eyebrow }}</span>
+        <div class="gp-rule"></div>
         <h2 class="gp-section-title gp-anim-init" data-editable data-field="stay_plugged_heading" data-type="text">{{ site_settings.stay_plugged_heading }}</h2>
       </div>
       <p class="gp-section-lede gp-anim-init" data-editable data-field="stay_plugged_lede" data-type="text">{{ site_settings.stay_plugged_lede }}</p>
@@ -234,7 +237,8 @@
 <!-- ===== OUR STORY ===== -->
 <section id="our-story" class="gp-section">
   <div class="gp-section-inner gp-story-inner">
-    <span class="gp-eyebrow gp-eyebrow-accent gp-anim-init" data-editable data-field="our_story_eyebrow" data-type="text">{{ site_settings.our_story_eyebrow }}</span>
+    <span class="gp-eyebrow gp-anim-init" data-editable data-field="our_story_eyebrow" data-type="text">{{ site_settings.our_story_eyebrow }}</span>
+    <div class="gp-rule"></div>
     <div class="gp-reveal-title-wrap">
       <h2 class="gp-story-title">
         <span data-editable data-type="text" data-field="story_heading_prefix">{{ site_settings.story_heading_prefix }}</span><br>
@@ -280,7 +284,8 @@
 <!-- ===== CONTACT ===== -->
 <section id="contact" class="gp-section gp-section-grid">
   <div class="gp-section-inner">
-    <span class="gp-eyebrow gp-eyebrow-accent gp-anim-init" data-editable data-field="contact_eyebrow" data-type="text">{{ site_settings.contact_eyebrow }}</span>
+    <span class="gp-eyebrow gp-anim-init" data-editable data-field="contact_eyebrow" data-type="text">{{ site_settings.contact_eyebrow }}</span>
+    <div class="gp-rule"></div>
     <div class="gp-reveal-title-wrap">
       <h2 class="gp-contact-title">
         <span data-editable data-field="contact_heading_line1" data-type="text">{{ site_settings.contact_heading_line1 }}</span><br>
@@ -399,27 +404,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---- SCROLL-REVEALS: Mission through Contact (everything below the
-  // hero) - set up unconditionally here, independent of the intro/hero
-  // sequence below (which has several early returns depending on whether
-  // the intro has already played this session). Each section plays once,
-  // the first time it scrolls into view, matching how the hero itself
-  // only ever plays once rather than replaying on every scroll past.
-  const REDUCE_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // hero). Called from inside runEntrance() below (once nav/hero actually
+  // start), not unconditionally up here - Mission in particular is close
+  // enough to the top of the page that its ScrollTrigger condition is
+  // often already met at page load, so setting these up before the intro
+  // overlay/hero sequence finishes let it fully reveal itself while
+  // hidden behind the overlay - popping in already-finished the instant
+  // the overlay cleared, well before the hero's own entrance had even
+  // started. Setting these up at the same moment the hero starts instead
+  // means anything already in view reveals itself alongside the hero,
+  // not ahead of it.
+  //
+  // Each section plays once, the first time it scrolls into view,
+  // matching how the hero itself only ever plays once rather than
+  // replaying on every scroll past.
+  function initScrollReveals() {
+    const REDUCE_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  function clearInit(...els) {
-    els.forEach(el => el && el.classList.remove("gp-anim-init"));
-  }
+    function clearInit(...els) {
+      els.forEach(el => el && el.classList.remove("gp-anim-init"));
+    }
 
-  if (REDUCE_MOTION || typeof ScrollTrigger === "undefined") {
-    // Respect the reduced-motion preference (or a failed ScrollTrigger
-    // load) by just showing everything in place, with no motion, rather
-    // than leaving it hidden with nothing left to ever reveal it.
-    document.querySelectorAll(".gp-anim-init").forEach(el => el.classList.remove("gp-anim-init"));
-  } else {
+    if (REDUCE_MOTION || typeof ScrollTrigger === "undefined") {
+      // Respect the reduced-motion preference (or a failed ScrollTrigger
+      // load) by just showing everything in place, with no motion,
+      // rather than leaving it hidden with nothing left to reveal it.
+      document.querySelectorAll(".gp-anim-init").forEach(el => el.classList.remove("gp-anim-init"));
+      return;
+    }
+
     gsap.registerPlugin(ScrollTrigger);
 
     // setup (if given) runs immediately, synchronously - for the handful
-    // of elements (a clip-reveal title's yPercent, the Mission rule's
+    // of elements (a clip-reveal title's yPercent, an eyebrow rule's
     // scaleX) that need their hidden starting state in place well before
     // the section is anywhere near the viewport, not only the instant it
     // scrolls into view.
@@ -429,35 +446,57 @@ document.addEventListener("DOMContentLoaded", () => {
       ScrollTrigger.create({ trigger: section, start: "top 80%", once: true, onEnter: build });
     }
 
-    function setupMission() {
-      const rule = document.querySelector("#mission .gp-rule");
+    function setupRule(selector) {
+      const rule = document.querySelector(selector);
       if (rule) gsap.set(rule, { scaleX: 0, transformOrigin: "left center" });
+    }
+
+    // Every section's eyebrow+rule gets this same treatment - the
+    // eyebrow slides in from the left while its line draws itself in
+    // alongside it - so the six read as one consistent, clearly-
+    // noticeable "beat" rather than each section doing its own slightly
+    // different (and in a couple of cases barely-there) variant of it.
+    function revealEyebrowRule(tl, eyebrow, rule, position) {
+      if (eyebrow) {
+        tl.fromTo(eyebrow,
+          { opacity: 0, x: -16 },
+          { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" },
+          position
+        );
+      }
+      if (rule) {
+        tl.to(rule, { scaleX: 1, duration: 0.5, ease: "power2.out" }, eyebrow ? "-=0.3" : position);
+      }
+    }
+
+    function setupMission() {
+      setupRule("#mission .gp-rule");
     }
 
     function playMission() {
       const section = document.getElementById("mission");
       if (!section) return;
-      const label = section.querySelector(".gp-mission-label");
+      const eyebrow = section.querySelector(".gp-eyebrow");
       const rule = section.querySelector(".gp-rule");
       const statement = section.querySelector(".gp-mission-statement");
       const link = section.querySelector(".gp-textlink");
 
-      clearInit(label, statement, link);
+      clearInit(eyebrow, statement, link);
 
       const tl = gsap.timeline();
-      if (label) tl.fromTo(label, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" });
-      if (rule) tl.to(rule, { scaleX: 1, duration: 0.5, ease: "power2.out" }, "-=0.25");
+      revealEyebrowRule(tl, eyebrow, rule);
       if (statement) {
         tl.fromTo(statement,
           { opacity: 0, y: 14, filter: "blur(4px)" },
           { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power2.out" },
-          "-=0.15"
+          "-=0.2"
         );
       }
       if (link) tl.fromTo(link, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "-=0.25");
     }
 
     function setupServices() {
+      setupRule("#services .gp-rule");
       const title = document.querySelector("#services .gp-reveal-title-wrap .gp-section-title");
       if (title) gsap.set(title, { yPercent: 120 });
     }
@@ -466,6 +505,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const section = document.getElementById("services");
       if (!section) return;
       const eyebrow = section.querySelector(".gp-section-head .gp-eyebrow");
+      const rule = section.querySelector(".gp-section-head .gp-rule");
       const title = section.querySelector(".gp-reveal-title-wrap .gp-section-title");
       const image = section.querySelector(".gp-services-image");
       const cards = gsap.utils.toArray(section.querySelectorAll(".gp-service"));
@@ -473,8 +513,8 @@ document.addEventListener("DOMContentLoaded", () => {
       clearInit(eyebrow, image, ...cards);
 
       const tl = gsap.timeline();
-      if (eyebrow) tl.fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
-      if (title) tl.to(title, { yPercent: 0, duration: 0.7, ease: "power3.out" }, "-=0.25");
+      revealEyebrowRule(tl, eyebrow, rule);
+      if (title) tl.to(title, { yPercent: 0, duration: 0.7, ease: "power3.out" }, "-=0.2");
       if (image) tl.fromTo(image, { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out" }, "-=0.45");
       if (cards.length) {
         tl.fromTo(cards,
@@ -485,10 +525,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    function setupGalleryPreview() {
+      setupRule("#gallery-preview .gp-rule");
+    }
+
     function playGalleryPreview() {
       const section = document.getElementById("gallery-preview");
       if (!section) return;
       const eyebrow = section.querySelector(".gp-section-head .gp-eyebrow");
+      const rule = section.querySelector(".gp-section-head .gp-rule");
       const title = section.querySelector(".gp-section-head .gp-section-title");
       const lede = section.querySelector(".gp-section-lede");
       const carousel = section.querySelector(".gp-carousel");
@@ -496,8 +541,8 @@ document.addEventListener("DOMContentLoaded", () => {
       clearInit(eyebrow, title, lede, carousel);
 
       const tl = gsap.timeline();
-      if (eyebrow) tl.fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
-      if (title) tl.fromTo(title, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.3");
+      revealEyebrowRule(tl, eyebrow, rule);
+      if (title) tl.fromTo(title, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.2");
       if (lede) tl.fromTo(lede, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "-=0.3");
       // The carousel drives its own continuous transforms once it starts
       // looping (see carousel.js's tick()) - animating transform/opacity
@@ -507,10 +552,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (carousel) tl.fromTo(carousel, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, "-=0.25");
     }
 
+    function setupStayPluggedIn() {
+      setupRule("#stay-plugged-in .gp-rule");
+    }
+
     function playStayPluggedIn() {
       const section = document.getElementById("stay-plugged-in");
       if (!section) return;
       const eyebrow = section.querySelector(".gp-section-head .gp-eyebrow");
+      const rule = section.querySelector(".gp-section-head .gp-rule");
       const title = section.querySelector(".gp-section-head .gp-section-title");
       const lede = section.querySelector(".gp-section-lede");
       const rows = gsap.utils.toArray(section.querySelectorAll(".gp-next-row:not(.gp-next-row-add)"));
@@ -519,8 +569,8 @@ document.addEventListener("DOMContentLoaded", () => {
       clearInit(eyebrow, title, lede, ...rows, footLink);
 
       const tl = gsap.timeline();
-      if (eyebrow) tl.fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
-      if (title) tl.fromTo(title, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.3");
+      revealEyebrowRule(tl, eyebrow, rule);
+      if (title) tl.fromTo(title, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.2");
       if (lede) tl.fromTo(lede, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "-=0.3");
       if (rows.length) {
         tl.fromTo(rows,
@@ -533,6 +583,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function setupOurStory() {
+      setupRule("#our-story .gp-rule");
       const title = document.querySelector("#our-story .gp-reveal-title-wrap .gp-story-title");
       if (title) gsap.set(title, { yPercent: 120 });
     }
@@ -541,6 +592,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const section = document.getElementById("our-story");
       if (!section) return;
       const eyebrow = section.querySelector(".gp-eyebrow");
+      const rule = section.querySelector(".gp-rule");
       const title = section.querySelector(".gp-reveal-title-wrap .gp-story-title");
       const paragraphs = gsap.utils.toArray(section.querySelectorAll(".gp-story-paragraphs p"));
       const stats = gsap.utils.toArray(section.querySelectorAll(".gp-story-stats > div"));
@@ -549,8 +601,8 @@ document.addEventListener("DOMContentLoaded", () => {
       clearInit(eyebrow, ...paragraphs, ...stats, ...founders);
 
       const tl = gsap.timeline();
-      if (eyebrow) tl.fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
-      if (title) tl.to(title, { yPercent: 0, duration: 0.7, ease: "power3.out" }, "-=0.25");
+      revealEyebrowRule(tl, eyebrow, rule);
+      if (title) tl.to(title, { yPercent: 0, duration: 0.7, ease: "power3.out" }, "-=0.2");
       if (paragraphs.length) {
         tl.fromTo(paragraphs,
           { opacity: 0, y: 14, filter: "blur(4px)" },
@@ -575,6 +627,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function setupContact() {
+      setupRule("#contact .gp-rule");
       const title = document.querySelector("#contact .gp-reveal-title-wrap .gp-contact-title");
       if (title) gsap.set(title, { yPercent: 120 });
     }
@@ -583,6 +636,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const section = document.getElementById("contact");
       if (!section) return;
       const eyebrow = section.querySelector(".gp-eyebrow");
+      const rule = section.querySelector(".gp-rule");
       const title = section.querySelector(".gp-reveal-title-wrap .gp-contact-title");
       const lede = section.querySelector(".gp-contact-lede");
       const ctas = gsap.utils.toArray(section.querySelectorAll(".gp-contact-ctas > a"));
@@ -590,8 +644,8 @@ document.addEventListener("DOMContentLoaded", () => {
       clearInit(eyebrow, lede, ...ctas);
 
       const tl = gsap.timeline();
-      if (eyebrow) tl.fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
-      if (title) tl.to(title, { yPercent: 0, duration: 0.7, ease: "power3.out" }, "-=0.25");
+      revealEyebrowRule(tl, eyebrow, rule);
+      if (title) tl.to(title, { yPercent: 0, duration: 0.7, ease: "power3.out" }, "-=0.2");
       if (lede) {
         tl.fromTo(lede,
           { opacity: 0, y: 12, filter: "blur(4px)" },
@@ -610,8 +664,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     revealOnce(document.getElementById("mission"), setupMission, playMission);
     revealOnce(document.getElementById("services"), setupServices, playServices);
-    revealOnce(document.getElementById("gallery-preview"), null, playGalleryPreview);
-    revealOnce(document.getElementById("stay-plugged-in"), null, playStayPluggedIn);
+    revealOnce(document.getElementById("gallery-preview"), setupGalleryPreview, playGalleryPreview);
+    revealOnce(document.getElementById("stay-plugged-in"), setupStayPluggedIn, playStayPluggedIn);
     revealOnce(document.getElementById("our-story"), setupOurStory, playOurStory);
     revealOnce(document.getElementById("contact"), setupContact, playContact);
 
@@ -626,6 +680,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const startHero = () => {
       playHero();
+      // Same moment as the hero, not before it - see initScrollReveals's
+      // own comment for why.
+      initScrollReveals();
     };
 
     if (navTl) navTl.eventCallback("onComplete", startHero);
