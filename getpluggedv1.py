@@ -335,13 +335,10 @@ class StayPluggedRow(db.Model):
 
     # ---- Ticketing (Square Checkout Links - see TicketOrder below) ----
     tickets_enabled = db.Column(db.Boolean, default=False, nullable=False)
-    # Free-text display price (e.g. "$25" or "$20 adv / $25 door") - the
-    # real price lives in Square's own Checkout Link, this is only what's
-    # shown to the customer before they click through to pay.
-    ticket_price = db.Column(db.String(50), default="", nullable=False)
     # A Checkout Link created in Square's own dashboard for this row's
-    # event. Opened in a new tab from the ticket order page - nothing here
-    # talks to Square's API directly.
+    # event (pricing lives there, not here - nothing in this app talks to
+    # Square's API directly). Admin-only, edited on the ticket order page
+    # itself (row_tickets.html) rather than here on the home page.
     square_checkout_url = db.Column(db.String(500), default="", nullable=False)
 
 class TicketOrder(db.Model):
@@ -530,8 +527,6 @@ def home():
             "date_text": row.date_text,
             "status": row.status,
             "tickets_enabled": row.tickets_enabled,
-            "ticket_price": row.ticket_price,
-            "square_checkout_url": row.square_checkout_url,
         })
 
     return render_template(
@@ -931,7 +926,7 @@ def admin_inline_delete_stay_plugged_row():
 # StayPluggedRow fields editable in place: max length for each.
 STAY_PLUGGED_ROW_FIELDS = {
     "label": 100, "title": 200, "detail": 300, "date_text": 100, "status": 100,
-    "ticket_price": 50, "square_checkout_url": 500,
+    "square_checkout_url": 500,
 }
 
 @app.route("/admin/inline-edit-stay-plugged-row", methods=["POST"])

@@ -2174,13 +2174,6 @@ body.gp-edit-mode .gp-margin-deco{
   margin-top: 0.75rem;
 }
 
-.gp-next-row-ticket-field{
-  font-family: 'Space Mono', monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.02em;
-  color: var(--gp-muted-text);
-}
-
 .gp-next-row-add{
   display: none;
   width: 100%;
@@ -2563,6 +2556,12 @@ body.gp-edit-mode .gp-margin-deco{
   line-height: 1.6;
   max-width: 45ch;
   margin: 0 0 1.5rem;
+}
+
+.gp-ticket-admin-panel{
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--gp-border-warm);
 }
 
 .gp-event-recap-head{

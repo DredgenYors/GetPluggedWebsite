@@ -186,8 +186,6 @@
                 <input type="checkbox" class="gp-ticket-toggle" data-row-id="{{ row.id }}" {% if row.tickets_enabled %}checked{% endif %}>
                 Ticket Sales Enabled
               </label>
-              <span class="gp-next-row-ticket-field" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="ticket_price" data-allow-empty="true" data-empty-placeholder="Add a price">{{ row.ticket_price or "Add a price" }}</span>
-              <span class="gp-next-row-ticket-field" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="square_checkout_url" data-allow-empty="true" data-empty-placeholder="Add a Square Checkout Link">{{ row.square_checkout_url or "Add a Square Checkout Link" }}</span>
               {% if row.tickets_enabled %}
               <a class="gp-textlink" href="{{ url_for('admin_row_ticket_diagnostics', row_id=row.id) }}">View Ticket Diagnostics</a>
               {% endif %}
@@ -203,7 +201,7 @@
             {% if row.removable %}
             <div class="gp-next-row-date" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="date_text" data-allow-empty="true" data-empty-placeholder="Add date">{{ row.date_text or "Add date" }}</div>
             {% if row.tickets_enabled %}
-            <a class="gp-next-row-badge gp-next-row-badge-link" href="{{ url_for('row_tickets', row_id=row.id) }}" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="status">{{ row.status }}</a>
+            <a class="gp-next-row-badge gp-next-row-badge-link" href="{{ url_for('row_tickets', row_id=row.id) }}">Get Tickets</a>
             {% else %}
             <span class="gp-next-row-badge" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="status">{{ row.status }}</span>
             {% endif %}
