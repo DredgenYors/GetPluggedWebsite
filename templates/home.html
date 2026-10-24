@@ -186,9 +186,6 @@
                 <input type="checkbox" class="gp-ticket-toggle" data-row-id="{{ row.id }}" {% if row.tickets_enabled %}checked{% endif %}>
                 Ticket Sales Enabled
               </label>
-              {% if row.tickets_enabled %}
-              <a class="gp-textlink" href="{{ url_for('admin_row_ticket_diagnostics', row_id=row.id) }}">View Ticket Diagnostics</a>
-              {% endif %}
             </div>
             {% endif %}
             {% else %}
