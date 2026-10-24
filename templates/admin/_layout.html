@@ -33,6 +33,17 @@
             </a>
           {% endif %}
 
+          <a class="gp-btn gp-btn-outline"
+            href="{{ url_for('admin_ticket_diagnostics_index') }}"
+            {% if request.endpoint == 'admin_home' %}
+              data-bs-toggle="tooltip"
+              data-bs-placement="bottom"
+              data-bs-custom-class="gp-tooltip gp-tooltip--sidebar"
+              title="View ticket orders for any event"
+            {% endif %}>
+            Diagnostics
+          </a>
+
           <a class="gp-btn gp-btn-ghost" href="{{ url_for('logout') }}">Logout</a>
         </div>
       </div>

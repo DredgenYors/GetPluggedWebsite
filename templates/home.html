@@ -174,7 +174,6 @@
         <div class="gp-next-row gp-anim-init">
           <span class="gp-next-row-num">{{ "%02d"|format(loop.index) }}</span>
           <div class="gp-next-row-body">
-            {% if row.removable %}
             <span class="gp-label-accent" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="label">{{ row.label }}</span>
             <h3 class="gp-next-row-title" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="title">{{ row.title }}</h3>
             {% if row.detail or can_edit %}
@@ -188,14 +187,8 @@
               </label>
             </div>
             {% endif %}
-            {% else %}
-            <span class="gp-label-accent">{{ row.label }}</span>
-            <h3 class="gp-next-row-title">{{ row.title }}</h3>
-            {% if row.detail %}<p class="gp-next-row-detail">{{ row.detail }}</p>{% endif %}
-            {% endif %}
           </div>
           <div class="gp-next-row-meta">
-            {% if row.removable %}
             <div class="gp-next-row-date" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="date_text" data-allow-empty="true" data-empty-placeholder="Add date">{{ row.date_text or "Add date" }}</div>
             {% if row.tickets_enabled %}
             <a class="gp-next-row-badge gp-next-row-badge-link" href="{{ url_for('row_tickets', row_id=row.id) }}">Get Tickets</a>
@@ -204,14 +197,6 @@
             {% endif %}
             {% if can_edit %}
             <button type="button" class="gp-next-row-remove" data-row-id="{{ row.id }}" title="Remove row">&times;</button>
-            {% endif %}
-            {% else %}
-            {% if row.date_text %}<div class="gp-next-row-date">{{ row.date_text }}</div>{% endif %}
-            {% if row.status_href %}
-            <a class="gp-next-row-badge gp-next-row-badge-link" href="{{ row.status_href }}">{{ row.status }}</a>
-            {% else %}
-            <span class="gp-next-row-badge">{{ row.status }}</span>
-            {% endif %}
             {% endif %}
           </div>
         </div>

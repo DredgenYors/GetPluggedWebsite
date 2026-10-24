@@ -415,14 +415,6 @@ def super_admin_required(f):
         return f(*args, **kwargs)
     return wrapper
 
-upcoming_events = [
-    {
-        'title': 'THE OUTLET VOL. 2',
-        'date': 'OCT 18, 2025',
-        'location': 'Kulture Gallery - Bloomfield, NJ',
-    },
-]
-
 artists = [
             {'name': 'Barti', 'social_media': {'instagram': '@chaevscarti'}},
             {'name': 'Brandin Tyrik', 'social_media': {'instagram': '@brandintyrik'}},
@@ -491,9 +483,6 @@ def event_cover_url(event):
 @app.route('/')
 def home():
     """Home page route"""
-    settings = get_settings()
-    next_event = upcoming_events[0] if upcoming_events else None
-
     # "Gallery" preview carousel: most recent events, each with a cover image
     # if available. Capped at 10 rather than showing every event ever, so the
     # homepage doesn't load unboundedly as the event history grows.
@@ -501,25 +490,11 @@ def home():
     for ev in Event.query.order_by(Event.date.desc()).limit(10).all():
         gallery_preview.append({"event": ev, "cover_url": event_cover_url(ev)})
 
-    # "Stay Plugged In" rows. The original Tickets-toggle-driven row (fixed,
-    # not admin-removable for now) comes first when confirmed, followed by
-    # any rows added via Edit Mode (removable). When there's neither, the
-    # section falls back to the Settings-configured coming-soon message.
+    # "Stay Plugged In" rows - every row lives in StayPluggedRow now (see its
+    # class docstring), each with full ticketing capability built in.
     stay_plugged_rows = []
-    if settings.events_confirmed and next_event:
-        stay_plugged_rows.append({
-            "removable": False,
-            "label": "Upcoming Event",
-            "title": next_event["title"],
-            "detail": next_event["location"],
-            "date_text": next_event["date"],
-            "status": "Get Tickets" if settings.ticket_url else "More Info Soon",
-            "status_href": url_for("tickets") if settings.ticket_url else None,
-        })
-
     for row in StayPluggedRow.query.order_by(StayPluggedRow.id.asc()).all():
         stay_plugged_rows.append({
-            "removable": True,
             "id": row.id,
             "label": row.label,
             "title": row.title,
@@ -877,6 +852,16 @@ def admin_toggle_row_tickets(row_id):
     row.tickets_enabled = not row.tickets_enabled
     db.session.commit()
     return jsonify({"ok": True, "redirect": url_for("home") + "#stay-plugged-in"})
+
+@app.route("/admin/ticket-diagnostics")
+@admin_required
+def admin_ticket_diagnostics_index():
+    """Pick-an-event landing page for Diagnostics in the sidebar - lists
+    every "What's Next" row so an admin can jump to its order table
+    (admin_row_ticket_diagnostics below), which already tells them plainly
+    when a row has no orders yet rather than erroring or looking broken."""
+    rows = StayPluggedRow.query.order_by(StayPluggedRow.id.asc()).all()
+    return render_template("admin/ticket_diagnostics_index.html", rows=rows)
 
 @app.route("/admin/stay-plugged-rows/<int:row_id>/tickets")
 @admin_required

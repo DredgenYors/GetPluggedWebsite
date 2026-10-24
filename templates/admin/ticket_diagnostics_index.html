@@ -1,0 +1,50 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Ticket Diagnostics{% endblock %}
+
+{% block admin_content %}
+<div class="gp-admin-content">
+  <span class="gp-eyebrow">ADMIN</span>
+  <div class="gp-rule"></div>
+  <h2 class="gp-auth-title mb-0" style="font-size: 2rem; margin-top: 0.6rem;">Ticket Diagnostics</h2>
+  <p class="small mt-2" style="color: var(--gp-muted-text);">
+    Choose an event below to view everyone who's submitted ticket info for it.
+  </p>
+
+  {% if rows %}
+  <div class="gp-admin-table-wrap mt-3">
+    <table class="gp-admin-table">
+      <thead>
+        <tr>
+          <th>Event</th>
+          <th>Date</th>
+          <th>Tickets</th>
+          <th>Orders</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>{{ row.title }}</td>
+          <td>{{ row.date_text or "—" }}</td>
+          <td>
+            {% if row.tickets_enabled %}
+              <span class="gp-pill gp-pill-accent">Enabled</span>
+            {% else %}
+              <span class="gp-pill">Off</span>
+            {% endif %}
+          </td>
+          <td>{{ row.ticket_orders|length }}</td>
+          <td class="text-end">
+            <a class="gp-textlink" href="{{ url_for('admin_row_ticket_diagnostics', row_id=row.id) }}">View &rsaquo;</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="gp-empty-note mt-3">No events yet &mdash; add a row in the What's Next section first.</p>
+  {% endif %}
+</div>
+{% endblock %}
