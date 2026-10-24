@@ -139,6 +139,19 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Bootstrap modals must be a direct child of <body>, not nested inside
+         .gp-main - that element has position:relative;z-index:1 (see
+         "body > nav, body > main, body > footer" below), which traps any
+         z-index set on a descendant inside that same bounded stacking
+         context. Bootstrap's own modal JS always appends .modal-backdrop
+         straight to <body>, so a modal left nested in .gp-main renders its
+         whole dialog UNDER that backdrop - visible, but every click on it
+         (Cancel, Confirm, anything) actually lands on the backdrop instead
+         and just dismisses the modal. Giving modals their own block here
+         keeps them real siblings of the backdrop so z-index works as
+         Bootstrap expects. -->
+    {% block modals %}{% endblock %}
+
     <!-- Footer -->
     <footer class="gp-footer">
         <div class="gp-footer-inner">

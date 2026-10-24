@@ -3158,3 +3158,212 @@ body.gp-modal-open{ overflow: hidden; }
 body.gp-edit-mode .gp-nav{
   top: 34px;
 }
+
+/* ==========================================================================
+   ADMIN BACKEND REDESIGN — brings the classic Bootstrap-dark admin area
+   (sidebar + user/ticket/settings pages under admin/_layout.html) in line
+   with the cream/charcoal/green site redesign. Scoped to .gp-admin-main /
+   .gp-admin-sidebar so it only touches the backend area, not the public
+   Bootstrap usage elsewhere (e.g. the Add User form's .row g-2 columns).
+   ========================================================================== */
+
+/* .gp-admin-main used to be a flex:1 item capped at max-width:1200px with
+   no auto margins, so once the viewport was wider than sidebar+main
+   combined it just sat flush against the sidebar with a dead gap on the
+   right - reading as "cut off on the left" next to the rest of the site's
+   centered, symmetric-margin layout. Wrapping sidebar+main in a shell with
+   its own max-width and auto margins re-centers the whole admin area the
+   same way .gp-section-inner centers everything else.
+
+   1280px - not something wider like 1440px - specifically to match
+   .gp-section-inner's own max-width: the margin-deco rails' width (see
+   .gp-margin-deco in the side-margin-images section above) is calculated
+   against that same 1280px figure, so matching it here is what keeps the
+   rails landing in the actual freed-up gutter instead of overlapping into
+   a wider admin shell. */
+.gp-admin-shell{
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.gp-admin-main{
+  margin: 0 auto;
+}
+
+/* ---- Sidebar ---- */
+.gp-admin-sidebar-card{
+  background: var(--gp-panel-bg);
+  border: var(--gp-border);
+  padding: 1.5rem;
+}
+
+.gp-admin-sidebar-label{
+  display: block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gp-muted-text);
+  margin-bottom: 1.25rem;
+}
+
+.gp-admin-sidebar-nav{
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.gp-admin-sidebar-nav .gp-btn{
+  width: 100%;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+}
+
+/* ---- Buttons (small/danger variants used in the backend area) ---- */
+.gp-btn-sm{
+  padding: 0.5rem 1rem;
+  font-size: 0.65rem;
+}
+
+.gp-btn-danger{
+  background: #b3261e;
+  color: #fff;
+}
+
+.gp-btn-danger:hover{
+  background: #8f1e17;
+  color: #fff;
+}
+
+/* ---- Flash alerts (reuses the login page's .gp-auth-alert look) ---- */
+.gp-admin-main .gp-auth-alert{
+  max-width: none;
+}
+
+/* ---- Delete confirmation modal ---- */
+.gp-admin-modal{
+  background: var(--gp-panel-bg);
+  color: var(--gp-charcoal);
+  border: var(--gp-border);
+  border-radius: 0;
+}
+
+.gp-admin-modal .modal-header,
+.gp-admin-modal .modal-footer{
+  border-color: var(--gp-border-warm);
+}
+
+.gp-admin-modal .modal-title{
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.gp-admin-modal .text-warning{
+  color: #9a6b00 !important;
+}
+
+/* ---- Generic admin card/input (used by Settings, User Access, etc.) ---- */
+.gp-admin-card{
+  background: var(--gp-panel-bg);
+  border: var(--gp-border);
+  padding: 1.25rem;
+  border-radius: 0;
+}
+
+.gp-admin-input,
+.gp-admin-select{
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--gp-border-warm);
+  background: #fff;
+  color: var(--gp-charcoal);
+  border-radius: 0;
+}
+
+.gp-admin-input:focus,
+.gp-admin-select:focus{
+  outline: none;
+  border-color: var(--gp-green);
+  box-shadow: none;
+}
+
+.gp-admin-input::placeholder{
+  color: var(--gp-muted-text);
+}
+
+/* ---- Pills (role labels, "You" marker, ticket status) ---- */
+.gp-pill{
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--gp-border-warm);
+  color: var(--gp-muted-text);
+}
+
+.gp-pill-accent{ border-color: var(--gp-green); color: var(--gp-green); }
+
+/* ---- Admin list item (User Access rows) ---- */
+.gp-admin-list-item{
+  background: var(--gp-panel-bg);
+  border: var(--gp-border);
+  border-radius: 0;
+}
+
+.gp-admin-list-item.gp-admin-list-item-flagged{
+  border-color: var(--gp-green);
+}
+
+/* ---- Admin data table (Ticket Orders, etc.) ---- */
+.gp-admin-table-wrap{
+  overflow-x: auto;
+  border: var(--gp-border);
+}
+
+.gp-admin-table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.gp-admin-table th{
+  font-family: 'Space Mono', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--gp-muted-text);
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--gp-border-warm);
+  background: var(--gp-surface);
+}
+
+.gp-admin-table td{
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--gp-border-warm);
+  color: var(--gp-charcoal);
+  vertical-align: middle;
+}
+
+.gp-admin-table tbody tr:last-child td{ border-bottom: none; }
+.gp-admin-table tbody tr:hover{ background: var(--gp-surface); }
+
+.gp-admin-table a{ color: var(--gp-charcoal); }
+.gp-admin-table a:hover{ color: var(--gp-green); }
+
+/* ---- Callout (the Square-payment-isn't-verified-automatically note) ---- */
+.gp-admin-callout{
+  border: 1px solid var(--gp-border-warm);
+  border-left: 3px solid #9a6b00;
+  padding: 0.85rem 1rem;
+  color: var(--gp-muted-text);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 1rem 0 1.5rem;
+  max-width: 65ch;
+}

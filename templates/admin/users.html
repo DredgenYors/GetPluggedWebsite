@@ -12,22 +12,26 @@
 <div class="gp-admin-content">
   {% set is_super = (current_user.is_authenticated and current_user.is_super_admin()) %}
   {% set open_add = (request.args.get('add') == '1') %}
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">User Access</h2>
+  <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+      <span class="gp-eyebrow">ADMIN</span>
+      <div class="gp-rule"></div>
+      <h2 class="gp-auth-title mb-0" style="font-size: 2rem; margin-top: 0.6rem;">User Access</h2>
+    </div>
 
     {% if is_super %}
-      <button class="btn btn-success" type="button" id="gpToggleAddUserBtn">
-        +Add User
+      <button class="gp-btn gp-btn-outline" type="button" id="gpToggleAddUserBtn">
+        + Add User
       </button>
     {% endif %}
   </div>
-  
+
   {% if is_super %}
-    <div id="gpAddUserPanel" class="card shadow-sm p-3 mb-3 bg-dark text-light border gp-bordered {% if not open_add %}d-none{% endif %}">
+    <div id="gpAddUserPanel" class="gp-admin-card mb-3 {% if not open_add %}d-none{% endif %}">
       <div class="d-flex justify-content-between align-items-center">
         <div>
           <div class="fw-bold">Add New User</div>
-          <div class="text-muted small">Create login credentials and assign a role.</div>
+          <div class="small" style="color: var(--gp-muted-text);">Create login credentials and assign a role.</div>
         </div>
       </div>
 
@@ -37,27 +41,27 @@
 
         <div class="row g-2">
           <div class="col-md-4">
-            <label class="form-label small text-muted mb-1">Username</label>
-            <input class="form-control bg-dark text-light border-secondary"
+            <label class="form-label small mb-1" style="color: var(--gp-muted-text);">Username</label>
+            <input class="form-control gp-admin-input"
                   type="text" name="username" required>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label small text-muted mb-1">Temporary Password</label>
-            <input class="form-control bg-dark text-light border-secondary"
+            <label class="form-label small mb-1" style="color: var(--gp-muted-text);">Temporary Password</label>
+            <input class="form-control gp-admin-input"
                   type="password" name="password"  required>
           </div>
 
           <div class="col-md-3">
-            <label class="form-label small text-muted mb-1">Role</label>
-            <select class="form-select bg-dark text-light border-secondary" name="role" required>
+            <label class="form-label small mb-1" style="color: var(--gp-muted-text);">Role</label>
+            <select class="form-select gp-admin-select" name="role" required>
               <option value="admin">Admin</option>
               <option value="super_admin">Super Admin</option>
             </select>
           </div>
 
           <div class="col-md-2 d-flex align-items-end">
-            <button class="btn btn-success" type="submit">Add</button>
+            <button class="gp-btn gp-btn-solid" type="submit">Add</button>
           </div>
         </div>
       </form>
@@ -69,23 +73,21 @@
       {% set is_me = (current_user.is_authenticated and u.id == current_user.id) %}
       {% set can_edit = (is_super and not is_me) %}
 
-      <div class="card gp-admin-list-item mb-2 shadow-sm p-3 d-flex justify-content-between align-items-center flex-row
-                  {% if is_me %}border border-warning{% endif %}">
+      <div class="gp-admin-list-item mb-2 p-3 d-flex justify-content-between align-items-center flex-row
+                  {% if is_me %}gp-admin-list-item-flagged{% endif %}">
 
         <!-- Left -->
         <div class="me-3">
           <div class="fw-bold d-flex align-items-center gap-2 flex-wrap">
-            <span class="{% if is_me %}text-warning{% else %}text-light{% endif %}">
-              {{ u.username }}
-            </span>
+            <span>{{ u.username }}</span>
 
             {% if is_me %}
-              <span class="badge rounded-pill text-bg-warning">★ You</span>
+              <span class="gp-pill gp-pill-accent">&#9733; You</span>
             {% endif %}
           </div>
 
-          <div class="text-muted small">
-            Current role: <span class="text-light-emphasis">{{ role_labels.get(u.role, u.role) }}</span>
+          <div class="small" style="color: var(--gp-muted-text);">
+            Current role: <span style="color: var(--gp-charcoal);">{{ role_labels.get(u.role, u.role) }}</span>
           </div>
         </div>
 
@@ -99,19 +101,19 @@
               <input type="hidden" name="action" value="update_role">
               <input type="hidden" name="user_id" value="{{ u.id }}">
 
-              <select class="form-select form-select-sm bg-dark text-light border-secondary"
+              <select class="form-select gp-admin-select"
                       name="role" style="min-width: 170px;">
                 <option value="user" {% if u.role=='user' %}selected{% endif %}>User</option>
                 <option value="admin" {% if u.role=='admin' %}selected{% endif %}>Admin</option>
                 <option value="super_admin" {% if u.role=='super_admin' %}selected{% endif %}>Super Admin</option>
               </select>
 
-              <button class="btn btn-success btn-sm" type="submit">Update</button>
+              <button class="gp-btn gp-btn-outline gp-btn-sm" type="submit">Update</button>
             </form>
 
             <!-- Toggle + hidden password reset form (for THIS user) -->
             <button type="button"
-                    class="btn btn-sm btn-outline-light gp-toggle-password">
+                    class="gp-btn gp-btn-ghost gp-btn-sm gp-toggle-password">
               Reset Password
             </button>
 
@@ -121,13 +123,13 @@
                 <input type="hidden" name="action" value="reset_password">
                 <input type="hidden" name="user_id" value="{{ u.id }}">
 
-                <input class="form-control form-control-sm bg-dark text-light border-secondary"
+                <input class="form-control gp-admin-input"
                       type="password" name="new_password" placeholder="New" required style="width:140px;">
 
-                <input class="form-control form-control-sm bg-dark text-light border-secondary"
+                <input class="form-control gp-admin-input"
                       type="password" name="confirm_password" placeholder="Confirm" required style="width:140px;">
 
-                <button class="btn btn-outline-success btn-sm" type="submit">Save</button>
+                <button class="gp-btn gp-btn-outline gp-btn-sm" type="submit">Save</button>
               </form>
             </div>
 
@@ -138,13 +140,13 @@
                   data-item-type="user"
                   data-item-name="{{ u.username }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+              <button class="gp-btn gp-btn-danger gp-btn-sm" type="submit">Delete</button>
             </form>
 
           {% elif is_me %}
             <!-- Admin/Super Admin: toggle their OWN password change -->
             <button type="button"
-                    class="btn btn-sm btn-outline-light gp-toggle-password">
+                    class="gp-btn gp-btn-ghost gp-btn-sm gp-toggle-password">
               Change Password
             </button>
 
@@ -154,16 +156,16 @@
                 <input type="hidden" name="action" value="change_password">
                 <input type="hidden" name="user_id" value="{{ u.id }}">
 
-                <input class="form-control form-control-sm bg-dark text-light border-secondary"
+                <input class="form-control gp-admin-input"
                       type="password" name="current_password" placeholder="Current" required style="width:140px;">
 
-                <input class="form-control form-control-sm bg-dark text-light border-secondary"
+                <input class="form-control gp-admin-input"
                       type="password" name="new_password" placeholder="New" required style="width:140px;">
 
-                <input class="form-control form-control-sm bg-dark text-light border-secondary"
+                <input class="form-control gp-admin-input"
                       type="password" name="confirm_password" placeholder="Confirm" required style="width:140px;">
 
-                <button class="btn btn-outline-success btn-sm" type="submit">Save</button>
+                <button class="gp-btn gp-btn-outline gp-btn-sm" type="submit">Save</button>
               </form>
             </div>
 
@@ -176,10 +178,10 @@
       </div>
     {% endfor %}
   {% else %}
-    <p class="text-muted">No users found.</p>
+    <p class="gp-empty-note">No users found.</p>
   {% endif %}
 
-  <p class="text-muted small mt-2 mb-0">
+  <p class="small mt-2 mb-0" style="color: var(--gp-muted-text);">
     Only Super Admins can change roles, and Super Admins cannot change their own role. Admins can change their own password, and access all other site settings.
   </p>
 </div>
