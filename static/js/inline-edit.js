@@ -933,28 +933,51 @@
     document.querySelectorAll(".gp-margin-deco").forEach(updateMarginAddState);
 
     document.body.addEventListener("change", async (e) => {
-      const toggle = e.target.closest(".gp-row-link-toggle");
-      if (!toggle) return;
-
-      toggle.disabled = true;
-      try {
-        const res = await fetch("/admin/inline-toggle-stay-plugged-row-link", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
-          body: JSON.stringify({ row_id: toggle.dataset.rowId }),
-        });
-        const result = await res.json();
-        if (result.ok && result.redirect) {
-          goTo(result.redirect);
-          return;
+      const rowToggle = e.target.closest(".gp-row-link-toggle");
+      if (rowToggle) {
+        rowToggle.disabled = true;
+        try {
+          const res = await fetch("/admin/inline-toggle-stay-plugged-row-link", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+            body: JSON.stringify({ row_id: rowToggle.dataset.rowId }),
+          });
+          const result = await res.json();
+          if (result.ok && result.redirect) {
+            goTo(result.redirect);
+            return;
+          }
+          rowToggle.checked = !rowToggle.checked;
+          showToast(result.error || "Couldn't update", true);
+        } catch (err) {
+          rowToggle.checked = !rowToggle.checked;
+          showToast("Network error", true);
         }
-        toggle.checked = !toggle.checked;
-        showToast(result.error || "Couldn't update", true);
-      } catch (err) {
-        toggle.checked = !toggle.checked;
-        showToast("Network error", true);
+        rowToggle.disabled = false;
+        return;
       }
-      toggle.disabled = false;
+
+      const ticketToggle = e.target.closest(".gp-ticket-toggle");
+      if (ticketToggle) {
+        ticketToggle.disabled = true;
+        try {
+          const res = await fetch(`/admin/events/${ticketToggle.dataset.eventId}/toggle-tickets`, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken },
+          });
+          const result = await res.json();
+          if (result.ok && result.redirect) {
+            goTo(result.redirect);
+            return;
+          }
+          ticketToggle.checked = !ticketToggle.checked;
+          showToast(result.error || "Couldn't update", true);
+        } catch (err) {
+          ticketToggle.checked = !ticketToggle.checked;
+          showToast("Network error", true);
+        }
+        ticketToggle.disabled = false;
+      }
     });
 
     document.body.addEventListener("click", (e) => {

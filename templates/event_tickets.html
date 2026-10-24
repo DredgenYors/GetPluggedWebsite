@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Tickets - {{ event.title }} - Get Plugged NJ{% endblock %}
+
+{% block content %}
+<section class="gp-section gp-auth-section">
+  <div class="gp-section-inner gp-auth-inner">
+    {% if can_edit %}
+    <a class="gp-textlink" href="{{ url_for('admin_event_ticket_diagnostics', event_id=event.id) }}" style="display:block; margin-bottom: 1.5rem;">View Ticket Diagnostics</a>
+    {% endif %}
+
+    <span class="gp-eyebrow">TICKETS</span>
+    <div class="gp-rule"></div>
+    <h1 class="gp-auth-title">{{ event.title }}</h1>
+    <p class="gp-event-meta-value" style="margin-bottom: 2rem;">
+      {{ event.date.strftime('%b %d, %Y') }}{% if event.location %} &middot; {{ event.location }}{% endif %}{% if event.ticket_price %} &middot; {{ event.ticket_price }}{% endif %}
+    </p>
+
+    {% if not event.tickets_enabled %}
+      <p class="gp-empty-note">Ticket sales aren't open for this event yet. Check back soon.</p>
+    {% else %}
+      <input type="hidden" id="gp-ticket-csrf" value="{{ csrf_token() }}">
+      <input type="hidden" id="gp-ticket-event-id" value="{{ event.id }}">
+
+      <!-- Stage 1: customer info -->
+      <form id="gp-ticket-form" class="gp-auth-form gp-ticket-stage">
+        <div class="gp-auth-field">
+          <label class="gp-auth-label" for="gp-ticket-name">Full Name</label>
+          <input class="gp-auth-input" type="text" id="gp-ticket-name" name="name" required maxlength="200" autocomplete="name">
+        </div>
+        <div class="gp-auth-field">
+          <label class="gp-auth-label" for="gp-ticket-email">Email</label>
+          <input class="gp-auth-input" type="email" id="gp-ticket-email" name="email" required maxlength="200" autocomplete="email">
+        </div>
+        <div class="gp-auth-field">
+          <label class="gp-auth-label" for="gp-ticket-phone">Phone (optional)</label>
+          <input class="gp-auth-input" type="tel" id="gp-ticket-phone" name="phone" maxlength="50" autocomplete="tel">
+        </div>
+        <div class="gp-auth-field">
+          <label class="gp-auth-label" for="gp-ticket-quantity">Number of Tickets</label>
+          <input class="gp-auth-input" type="number" id="gp-ticket-quantity" name="quantity" value="1" min="1" max="20" required>
+        </div>
+        <div class="gp-auth-error" id="gp-ticket-form-error" hidden></div>
+        <button type="submit" class="gp-btn gp-btn-solid gp-auth-submit" id="gp-ticket-submit-btn">
+          Continue to Payment <span class="gp-arrow">&#8599;</span>
+        </button>
+      </form>
+
+      <!-- Stage 2: hand off to Square -->
+      <div class="gp-ticket-stage" id="gp-ticket-payment-stage" hidden>
+        <p class="gp-ticket-note">Thanks! Click below to securely complete your payment with Square &mdash; it'll open in a new tab, so keep this page open too.</p>
+        <a class="gp-btn gp-btn-solid" id="gp-ticket-pay-btn" href="#" target="_blank" rel="noopener noreferrer">
+          Pay with Square <span class="gp-arrow">&#8599;</span>
+        </a>
+      </div>
+
+      <!-- Stage 3: thank you -->
+      <div class="gp-ticket-stage" id="gp-ticket-thanks-stage" hidden>
+        <p class="gp-ticket-note">If you haven't finished paying yet, complete it in the Square tab that opened. Once your payment goes through, check your email for your receipt and any further details about the event.</p>
+        <a class="gp-textlink" href="{{ url_for('event_detail', event_id=event.id) }}">
+          <span class="gp-chevron">&lsaquo;</span> Back to {{ event.title }}
+        </a>
+      </div>
+    {% endif %}
+
+    <div class="gp-event-footer" style="margin-top: 3rem;">
+      <a class="gp-textlink" href="{{ url_for('event_detail', event_id=event.id) }}">
+        <span class="gp-chevron">&lsaquo;</span> Back to Event
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/tickets.js') }}"></script>
+{% endblock %}

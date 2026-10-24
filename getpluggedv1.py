@@ -299,6 +299,17 @@ class Event(db.Model):
     cover_focus_x = db.Column(db.Float, default=50.0, nullable=False)
     cover_focus_y = db.Column(db.Float, default=50.0, nullable=False)
 
+    # ---- Ticketing (Square Checkout Links - see TicketOrder below) ----
+    tickets_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    # Free-text display price (e.g. "$25" or "$20 adv / $25 door") - the
+    # real price lives in Square's own Checkout Link, this is only what's
+    # shown to the customer before they click through to pay.
+    ticket_price = db.Column(db.String(50), default="", nullable=False)
+    # A Checkout Link created in Square's own dashboard for this event.
+    # Opened in a new tab from the ticket order page - nothing here talks
+    # to Square's API directly.
+    square_checkout_url = db.Column(db.String(500), default="", nullable=False)
+
     artists = db.relationship("Artist", secondary=event_artists, backref="events")
     media_items = db.relationship("Media", backref="event", cascade="all, delete-orphan")
 
@@ -327,6 +338,25 @@ class StayPluggedRow(db.Model):
     date_text = db.Column(db.String(100), default="", nullable=False)
     status = db.Column(db.String(100), default="Coming Soon", nullable=False)
     links_to_tickets = db.Column(db.Boolean, default=False, nullable=False)
+
+class TicketOrder(db.Model):
+    """One customer's ticket request for an event (see Event.tickets_enabled
+    above). Payment itself happens on Square's own hosted Checkout Link, not
+    in this app, so "status" here is self-reported by the customer clicking
+    through to pay - not a verified payment state. Admins reconcile against
+    Square's own dashboard and mark orders paid manually (see
+    /admin/ticket-orders/<id>/mark-paid)."""
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(200), nullable=False)
+    phone = db.Column(db.String(50), default="", nullable=False)
+    quantity = db.Column(db.Integer, default=1, nullable=False)
+    # "pending" or "paid"
+    status = db.Column(db.String(20), default="pending", nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    event = db.relationship("Event", backref=db.backref("ticket_orders", cascade="all, delete-orphan"))
 
 class MarginImage(db.Model):
     """One photo in a side-margin collage (see .gp-margin-deco in
@@ -578,6 +608,60 @@ def event_detail_modal(event_id):
 def tickets():
     return render_template("tickets.html")
 
+# How many tickets a single order can request - a sanity cap, not a real
+# inventory/capacity system (there isn't one here; Square's own Checkout
+# Link handles actual availability if the admin sets a limit there).
+MAX_TICKET_QUANTITY = 20
+
+@app.route("/events/<int:event_id>/tickets")
+def event_tickets(event_id):
+    """Customer-facing ticket order page: submit info, then pay on Square
+    in a new tab. See TicketOrder for why payment status is self-reported
+    rather than verified here."""
+    event = Event.query.get_or_404(event_id)
+    can_edit = current_user.is_authenticated and current_user.is_admin()
+    if not event.tickets_enabled and not can_edit:
+        abort(404)
+    return render_template("event_tickets.html", event=event, can_edit=can_edit)
+
+@app.route("/events/<int:event_id>/ticket-orders", methods=["POST"])
+def create_ticket_order(event_id):
+    """Submit a customer's ticket request - the form step before Square."""
+    event = Event.query.get_or_404(event_id)
+    if not event.tickets_enabled:
+        return jsonify({"ok": False, "error": "Tickets aren't available for this event."}), 400
+    if not event.square_checkout_url:
+        return jsonify({"ok": False, "error": "Ticket payment isn't set up for this event yet. Please check back soon."}), 400
+
+    data = request.get_json(silent=True) or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip()
+    phone = (data.get("phone") or "").strip()
+
+    if not name:
+        return jsonify({"ok": False, "error": "Please enter your name."}), 400
+    if len(name) > 200:
+        return jsonify({"ok": False, "error": "Name is too long."}), 400
+    if not email or "@" not in email or "." not in email.split("@")[-1]:
+        return jsonify({"ok": False, "error": "Please enter a valid email."}), 400
+    if len(email) > 200:
+        return jsonify({"ok": False, "error": "Email is too long."}), 400
+    if len(phone) > 50:
+        return jsonify({"ok": False, "error": "Phone number is too long."}), 400
+
+    try:
+        quantity = int(data.get("quantity"))
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "Please enter a valid number of tickets."}), 400
+    if not (1 <= quantity <= MAX_TICKET_QUANTITY):
+        return jsonify({"ok": False, "error": f"Quantity must be between 1 and {MAX_TICKET_QUANTITY}."}), 400
+
+    order = TicketOrder(event_id=event.id, name=name, email=email, phone=phone, quantity=quantity)
+    db.session.add(order)
+    db.session.commit()
+
+    return jsonify({"ok": True, "order_id": order.id, "square_checkout_url": event.square_checkout_url})
+
 @app.route("/admin/inline-add-event", methods=["POST"])
 @admin_required
 def admin_inline_add_event():
@@ -739,7 +823,10 @@ def admin_inline_edit_event_cover_focus(event_id):
     return jsonify({"ok": True, "x": event.cover_focus_x, "y": event.cover_focus_y})
 
 # Event fields editable in place on /gallery/<id>: max length (strings) or "date".
-EVENT_INLINE_FIELDS = {"title": 200, "location": 200, "description": 4000, "date": "date"}
+EVENT_INLINE_FIELDS = {
+    "title": 200, "location": 200, "description": 4000, "date": "date",
+    "ticket_price": 50, "square_checkout_url": 500,
+}
 
 @app.route("/admin/inline-edit-event", methods=["POST"])
 @admin_required
@@ -771,6 +858,8 @@ def admin_inline_edit_event():
     else:
         if field == "title" and not value:
             return jsonify({"ok": False, "error": "Title can't be empty."}), 400
+        if field == "square_checkout_url" and value and not value.startswith(("http://", "https://")):
+            return jsonify({"ok": False, "error": "Enter a full URL (starting with https://)."}), 400
         max_len = EVENT_INLINE_FIELDS[field]
         if len(value) > max_len:
             return jsonify({"ok": False, "error": f"Too long (max {max_len} characters)."}), 400
@@ -782,6 +871,38 @@ def admin_inline_edit_event():
 
     db.session.commit()
     return jsonify({"ok": True, "value": display_value, "raw_value": value})
+
+@app.route("/admin/events/<int:event_id>/toggle-tickets", methods=["POST"])
+@admin_required
+def admin_toggle_event_tickets(event_id):
+    """Turn ticket sales on/off for an event, from its own page."""
+    event = Event.query.get_or_404(event_id)
+    event.tickets_enabled = not event.tickets_enabled
+    db.session.commit()
+    return jsonify({"ok": True, "redirect": url_for("event_detail", event_id=event.id)})
+
+@app.route("/admin/events/<int:event_id>/tickets")
+@admin_required
+def admin_event_ticket_diagnostics(event_id):
+    """Table of every ticket order submitted for this event, for the admin
+    to reconcile against Square's own dashboard and fulfill."""
+    event = Event.query.get_or_404(event_id)
+    orders = TicketOrder.query.filter_by(event_id=event.id).order_by(TicketOrder.created_at.desc()).all()
+    return render_template("admin/ticket_diagnostics.html", event=event, orders=orders)
+
+@app.route("/admin/ticket-orders/<int:order_id>/mark-paid", methods=["POST"])
+@admin_required
+def admin_mark_ticket_order_paid(order_id):
+    """Flip one order between pending/paid - a manual record of the admin's
+    own reconciliation against Square, not a verified payment state. A
+    plain form POST + redirect, matching the rest of the admin area
+    (users.html etc.) rather than the public site's AJAX inline-edit
+    conventions."""
+    order = TicketOrder.query.get_or_404(order_id)
+    order.status = "pending" if order.status == "paid" else "paid"
+    db.session.commit()
+    flash(f"Order marked {order.status}.", "success")
+    return redirect(url_for("admin_event_ticket_diagnostics", event_id=order.event_id))
 
 @app.route("/admin/inline-add-stay-plugged-row", methods=["POST"])
 @admin_required

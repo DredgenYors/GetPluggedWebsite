@@ -2541,6 +2541,43 @@ body.gp-edit-mode .gp-margin-deco{
 
 .gp-event-recap{ margin-bottom: 3rem; }
 
+/* ---- Event tickets (see event_detail.html / event_tickets.html) ---- */
+.gp-event-tickets{ margin-bottom: 3rem; }
+
+.gp-ticket-toggle-label{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gp-muted-text);
+  cursor: pointer;
+}
+
+.gp-event-ticket-admin-fields{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.gp-ticket-note{
+  color: var(--gp-charcoal);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 45ch;
+  margin: 0 0 1.5rem;
+}
+
+.gp-event-ticket-ctas{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+}
+
 .gp-event-recap-head{
   display: flex;
   align-items: center;
