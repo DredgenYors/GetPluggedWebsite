@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 
-{% block title %}Tickets - {{ event.title }} - Get Plugged NJ{% endblock %}
+{% block title %}Tickets - {{ row.title }} - Get Plugged NJ{% endblock %}
 
 {% block content %}
 <section class="gp-section gp-auth-section">
   <div class="gp-section-inner gp-auth-inner">
     {% if can_edit %}
-    <a class="gp-textlink" href="{{ url_for('admin_event_ticket_diagnostics', event_id=event.id) }}" style="display:block; margin-bottom: 1.5rem;">View Ticket Diagnostics</a>
+    <a class="gp-textlink" href="{{ url_for('admin_row_ticket_diagnostics', row_id=row.id) }}" style="display:block; margin-bottom: 1.5rem;">View Ticket Diagnostics</a>
     {% endif %}
 
     <span class="gp-eyebrow">TICKETS</span>
     <div class="gp-rule"></div>
-    <h1 class="gp-auth-title">{{ event.title }}</h1>
+    <h1 class="gp-auth-title">{{ row.title }}</h1>
     <p class="gp-event-meta-value" style="margin-bottom: 2rem;">
-      {{ event.date.strftime('%b %d, %Y') }}{% if event.location %} &middot; {{ event.location }}{% endif %}{% if event.ticket_price %} &middot; {{ event.ticket_price }}{% endif %}
+      {{ row.date_text }}{% if row.detail %} &middot; {{ row.detail }}{% endif %}{% if row.ticket_price %} &middot; {{ row.ticket_price }}{% endif %}
     </p>
 
-    {% if not event.tickets_enabled %}
+    {% if not row.tickets_enabled %}
       <p class="gp-empty-note">Ticket sales aren't open for this event yet. Check back soon.</p>
     {% else %}
       <input type="hidden" id="gp-ticket-csrf" value="{{ csrf_token() }}">
-      <input type="hidden" id="gp-ticket-event-id" value="{{ event.id }}">
+      <input type="hidden" id="gp-ticket-row-id" value="{{ row.id }}">
 
       <!-- Stage 1: customer info -->
       <form id="gp-ticket-form" class="gp-auth-form gp-ticket-stage">
@@ -57,15 +57,15 @@
       <!-- Stage 3: thank you -->
       <div class="gp-ticket-stage" id="gp-ticket-thanks-stage" hidden>
         <p class="gp-ticket-note">If you haven't finished paying yet, complete it in the Square tab that opened. Once your payment goes through, check your email for your receipt and any further details about the event.</p>
-        <a class="gp-textlink" href="{{ url_for('event_detail', event_id=event.id) }}">
-          <span class="gp-chevron">&lsaquo;</span> Back to {{ event.title }}
+        <a class="gp-textlink" href="{{ url_for('home') }}#stay-plugged-in">
+          <span class="gp-chevron">&lsaquo;</span> Back to What's Next
         </a>
       </div>
     {% endif %}
 
     <div class="gp-event-footer" style="margin-top: 3rem;">
-      <a class="gp-textlink" href="{{ url_for('event_detail', event_id=event.id) }}">
-        <span class="gp-chevron">&lsaquo;</span> Back to Event
+      <a class="gp-textlink" href="{{ url_for('home') }}#stay-plugged-in">
+        <span class="gp-chevron">&lsaquo;</span> Back to What's Next
       </a>
     </div>
   </div>

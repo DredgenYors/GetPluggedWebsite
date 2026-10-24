@@ -299,17 +299,6 @@ class Event(db.Model):
     cover_focus_x = db.Column(db.Float, default=50.0, nullable=False)
     cover_focus_y = db.Column(db.Float, default=50.0, nullable=False)
 
-    # ---- Ticketing (Square Checkout Links - see TicketOrder below) ----
-    tickets_enabled = db.Column(db.Boolean, default=False, nullable=False)
-    # Free-text display price (e.g. "$25" or "$20 adv / $25 door") - the
-    # real price lives in Square's own Checkout Link, this is only what's
-    # shown to the customer before they click through to pay.
-    ticket_price = db.Column(db.String(50), default="", nullable=False)
-    # A Checkout Link created in Square's own dashboard for this event.
-    # Opened in a new tab from the ticket order page - nothing here talks
-    # to Square's API directly.
-    square_checkout_url = db.Column(db.String(500), default="", nullable=False)
-
     artists = db.relationship("Artist", secondary=event_artists, backref="events")
     media_items = db.relationship("Media", backref="event", cascade="all, delete-orphan")
 
@@ -330,24 +319,40 @@ class StayPluggedRow(db.Model):
     """A row in the home page's "Stay Plugged In" list - admin-managed,
     independent of the Gallery's Event model since these are forward-looking
     promotional entries (events, collabs, announcements) and their date is
-    often not a real calendar date yet (e.g. "Coming Soon")."""
+    often not a real calendar date yet (e.g. "Coming Soon").
+
+    This - not the Gallery/Event model - is where ticket sales live: the
+    Gallery is for viewing past events/recap photos only, while "What's
+    Next" rows represent genuinely upcoming events, some of which have
+    ticket sales turned on and some of which are just an announcement with
+    nothing to buy yet."""
     id = db.Column(db.Integer, primary_key=True)
     label = db.Column(db.String(100), default="Announcement", nullable=False)
     title = db.Column(db.String(200), default="New Update", nullable=False)
     detail = db.Column(db.String(300), default="", nullable=False)
     date_text = db.Column(db.String(100), default="", nullable=False)
     status = db.Column(db.String(100), default="Coming Soon", nullable=False)
-    links_to_tickets = db.Column(db.Boolean, default=False, nullable=False)
+
+    # ---- Ticketing (Square Checkout Links - see TicketOrder below) ----
+    tickets_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    # Free-text display price (e.g. "$25" or "$20 adv / $25 door") - the
+    # real price lives in Square's own Checkout Link, this is only what's
+    # shown to the customer before they click through to pay.
+    ticket_price = db.Column(db.String(50), default="", nullable=False)
+    # A Checkout Link created in Square's own dashboard for this row's
+    # event. Opened in a new tab from the ticket order page - nothing here
+    # talks to Square's API directly.
+    square_checkout_url = db.Column(db.String(500), default="", nullable=False)
 
 class TicketOrder(db.Model):
-    """One customer's ticket request for an event (see Event.tickets_enabled
-    above). Payment itself happens on Square's own hosted Checkout Link, not
-    in this app, so "status" here is self-reported by the customer clicking
-    through to pay - not a verified payment state. Admins reconcile against
-    Square's own dashboard and mark orders paid manually (see
-    /admin/ticket-orders/<id>/mark-paid)."""
+    """One customer's ticket request for a "What's Next" row (see
+    StayPluggedRow.tickets_enabled above). Payment itself happens on
+    Square's own hosted Checkout Link, not in this app, so "status" here is
+    self-reported by the customer clicking through to pay - not a verified
+    payment state. Admins reconcile against Square's own dashboard and mark
+    orders paid manually (see /admin/ticket-orders/<id>/mark-paid)."""
     id = db.Column(db.Integer, primary_key=True)
-    event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
+    row_id = db.Column(db.Integer, db.ForeignKey("stay_plugged_row.id"), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(200), nullable=False)
     phone = db.Column(db.String(50), default="", nullable=False)
@@ -356,7 +361,7 @@ class TicketOrder(db.Model):
     status = db.Column(db.String(20), default="pending", nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    event = db.relationship("Event", backref=db.backref("ticket_orders", cascade="all, delete-orphan"))
+    row = db.relationship("StayPluggedRow", backref=db.backref("ticket_orders", cascade="all, delete-orphan"))
 
 class MarginImage(db.Model):
     """One photo in a side-margin collage (see .gp-margin-deco in
@@ -524,7 +529,9 @@ def home():
             "detail": row.detail,
             "date_text": row.date_text,
             "status": row.status,
-            "links_to_tickets": row.links_to_tickets,
+            "tickets_enabled": row.tickets_enabled,
+            "ticket_price": row.ticket_price,
+            "square_checkout_url": row.square_checkout_url,
         })
 
     return render_template(
@@ -613,24 +620,24 @@ def tickets():
 # Link handles actual availability if the admin sets a limit there).
 MAX_TICKET_QUANTITY = 20
 
-@app.route("/events/<int:event_id>/tickets")
-def event_tickets(event_id):
-    """Customer-facing ticket order page: submit info, then pay on Square
-    in a new tab. See TicketOrder for why payment status is self-reported
-    rather than verified here."""
-    event = Event.query.get_or_404(event_id)
+@app.route("/stay-plugged/<int:row_id>/tickets")
+def row_tickets(row_id):
+    """Customer-facing ticket order page for a "What's Next" row: submit
+    info, then pay on Square in a new tab. See TicketOrder for why payment
+    status is self-reported rather than verified here."""
+    row = StayPluggedRow.query.get_or_404(row_id)
     can_edit = current_user.is_authenticated and current_user.is_admin()
-    if not event.tickets_enabled and not can_edit:
+    if not row.tickets_enabled and not can_edit:
         abort(404)
-    return render_template("event_tickets.html", event=event, can_edit=can_edit)
+    return render_template("row_tickets.html", row=row, can_edit=can_edit)
 
-@app.route("/events/<int:event_id>/ticket-orders", methods=["POST"])
-def create_ticket_order(event_id):
+@app.route("/stay-plugged/<int:row_id>/ticket-orders", methods=["POST"])
+def create_row_ticket_order(row_id):
     """Submit a customer's ticket request - the form step before Square."""
-    event = Event.query.get_or_404(event_id)
-    if not event.tickets_enabled:
+    row = StayPluggedRow.query.get_or_404(row_id)
+    if not row.tickets_enabled:
         return jsonify({"ok": False, "error": "Tickets aren't available for this event."}), 400
-    if not event.square_checkout_url:
+    if not row.square_checkout_url:
         return jsonify({"ok": False, "error": "Ticket payment isn't set up for this event yet. Please check back soon."}), 400
 
     data = request.get_json(silent=True) or {}
@@ -656,11 +663,11 @@ def create_ticket_order(event_id):
     if not (1 <= quantity <= MAX_TICKET_QUANTITY):
         return jsonify({"ok": False, "error": f"Quantity must be between 1 and {MAX_TICKET_QUANTITY}."}), 400
 
-    order = TicketOrder(event_id=event.id, name=name, email=email, phone=phone, quantity=quantity)
+    order = TicketOrder(row_id=row.id, name=name, email=email, phone=phone, quantity=quantity)
     db.session.add(order)
     db.session.commit()
 
-    return jsonify({"ok": True, "order_id": order.id, "square_checkout_url": event.square_checkout_url})
+    return jsonify({"ok": True, "order_id": order.id, "square_checkout_url": row.square_checkout_url})
 
 @app.route("/admin/inline-add-event", methods=["POST"])
 @admin_required
@@ -823,10 +830,7 @@ def admin_inline_edit_event_cover_focus(event_id):
     return jsonify({"ok": True, "x": event.cover_focus_x, "y": event.cover_focus_y})
 
 # Event fields editable in place on /gallery/<id>: max length (strings) or "date".
-EVENT_INLINE_FIELDS = {
-    "title": 200, "location": 200, "description": 4000, "date": "date",
-    "ticket_price": 50, "square_checkout_url": 500,
-}
+EVENT_INLINE_FIELDS = {"title": 200, "location": 200, "description": 4000, "date": "date"}
 
 @app.route("/admin/inline-edit-event", methods=["POST"])
 @admin_required
@@ -858,8 +862,6 @@ def admin_inline_edit_event():
     else:
         if field == "title" and not value:
             return jsonify({"ok": False, "error": "Title can't be empty."}), 400
-        if field == "square_checkout_url" and value and not value.startswith(("http://", "https://")):
-            return jsonify({"ok": False, "error": "Enter a full URL (starting with https://)."}), 400
         max_len = EVENT_INLINE_FIELDS[field]
         if len(value) > max_len:
             return jsonify({"ok": False, "error": f"Too long (max {max_len} characters)."}), 400
@@ -872,23 +874,23 @@ def admin_inline_edit_event():
     db.session.commit()
     return jsonify({"ok": True, "value": display_value, "raw_value": value})
 
-@app.route("/admin/events/<int:event_id>/toggle-tickets", methods=["POST"])
+@app.route("/admin/stay-plugged-rows/<int:row_id>/toggle-tickets", methods=["POST"])
 @admin_required
-def admin_toggle_event_tickets(event_id):
-    """Turn ticket sales on/off for an event, from its own page."""
-    event = Event.query.get_or_404(event_id)
-    event.tickets_enabled = not event.tickets_enabled
+def admin_toggle_row_tickets(row_id):
+    """Turn ticket sales on/off for a "What's Next" row, from the home page."""
+    row = StayPluggedRow.query.get_or_404(row_id)
+    row.tickets_enabled = not row.tickets_enabled
     db.session.commit()
-    return jsonify({"ok": True, "redirect": url_for("event_detail", event_id=event.id)})
+    return jsonify({"ok": True, "redirect": url_for("home") + "#stay-plugged-in"})
 
-@app.route("/admin/events/<int:event_id>/tickets")
+@app.route("/admin/stay-plugged-rows/<int:row_id>/tickets")
 @admin_required
-def admin_event_ticket_diagnostics(event_id):
-    """Table of every ticket order submitted for this event, for the admin
-    to reconcile against Square's own dashboard and fulfill."""
-    event = Event.query.get_or_404(event_id)
-    orders = TicketOrder.query.filter_by(event_id=event.id).order_by(TicketOrder.created_at.desc()).all()
-    return render_template("admin/ticket_diagnostics.html", event=event, orders=orders)
+def admin_row_ticket_diagnostics(row_id):
+    """Table of every ticket order submitted for this row, for the admin to
+    reconcile against Square's own dashboard and fulfill."""
+    row = StayPluggedRow.query.get_or_404(row_id)
+    orders = TicketOrder.query.filter_by(row_id=row.id).order_by(TicketOrder.created_at.desc()).all()
+    return render_template("admin/ticket_diagnostics.html", row=row, orders=orders)
 
 @app.route("/admin/ticket-orders/<int:order_id>/mark-paid", methods=["POST"])
 @admin_required
@@ -902,7 +904,7 @@ def admin_mark_ticket_order_paid(order_id):
     order.status = "pending" if order.status == "paid" else "paid"
     db.session.commit()
     flash(f"Order marked {order.status}.", "success")
-    return redirect(url_for("admin_event_ticket_diagnostics", event_id=order.event_id))
+    return redirect(url_for("admin_row_ticket_diagnostics", row_id=order.row_id))
 
 @app.route("/admin/inline-add-stay-plugged-row", methods=["POST"])
 @admin_required
@@ -926,21 +928,11 @@ def admin_inline_delete_stay_plugged_row():
     db.session.commit()
     return jsonify({"ok": True, "redirect": url_for("home") + "#stay-plugged-in"})
 
-@app.route("/admin/inline-toggle-stay-plugged-row-link", methods=["POST"])
-@admin_required
-def admin_inline_toggle_stay_plugged_row_link():
-    """Turn a row's status badge into a real link to the Tickets page, or back into plain text."""
-    data = request.get_json(silent=True) or {}
-    row = StayPluggedRow.query.get(data.get("row_id"))
-    if not row:
-        return jsonify({"ok": False, "error": "Row not found."}), 404
-
-    row.links_to_tickets = not row.links_to_tickets
-    db.session.commit()
-    return jsonify({"ok": True, "redirect": url_for("home") + "#stay-plugged-in"})
-
 # StayPluggedRow fields editable in place: max length for each.
-STAY_PLUGGED_ROW_FIELDS = {"label": 100, "title": 200, "detail": 300, "date_text": 100, "status": 100}
+STAY_PLUGGED_ROW_FIELDS = {
+    "label": 100, "title": 200, "detail": 300, "date_text": 100, "status": 100,
+    "ticket_price": 50, "square_checkout_url": 500,
+}
 
 @app.route("/admin/inline-edit-stay-plugged-row", methods=["POST"])
 @admin_required
@@ -962,6 +954,8 @@ def admin_inline_edit_stay_plugged_row():
     value = value.strip()
     if field == "title" and not value:
         return jsonify({"ok": False, "error": "Title can't be empty."}), 400
+    if field == "square_checkout_url" and value and not value.startswith(("http://", "https://")):
+        return jsonify({"ok": False, "error": "Enter a full URL (starting with https://)."}), 400
 
     max_len = STAY_PLUGGED_ROW_FIELDS[field]
     if len(value) > max_len:

@@ -3,10 +3,10 @@
   if (!form) return;
 
   const csrfEl = document.getElementById("gp-ticket-csrf");
-  const eventIdEl = document.getElementById("gp-ticket-event-id");
+  const rowIdEl = document.getElementById("gp-ticket-row-id");
   const csrfToken = csrfEl ? csrfEl.value : null;
-  const eventId = eventIdEl ? eventIdEl.value : null;
-  if (!csrfToken || !eventId) return;
+  const rowId = rowIdEl ? rowIdEl.value : null;
+  if (!csrfToken || !rowId) return;
 
   const errorEl = document.getElementById("gp-ticket-form-error");
   const submitBtn = document.getElementById("gp-ticket-submit-btn");
@@ -34,7 +34,7 @@
 
     let result;
     try {
-      const res = await fetch(`/events/${eventId}/ticket-orders`, {
+      const res = await fetch(`/stay-plugged/${rowId}/ticket-orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
         body: JSON.stringify(body),

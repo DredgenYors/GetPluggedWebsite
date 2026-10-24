@@ -60,47 +60,6 @@
       </div>
     </div>
 
-    <!-- Tickets -->
-    {% if event.tickets_enabled or can_edit %}
-    <div class="gp-event-tickets">
-      <div class="gp-event-recap-head">
-        <p class="gp-event-recap-label">Tickets</p>
-        {% if can_edit %}
-        <label class="gp-ticket-toggle-label">
-          <input type="checkbox" class="gp-ticket-toggle" data-event-id="{{ event.id }}" {% if event.tickets_enabled %}checked{% endif %}>
-          Ticket Sales Enabled
-        </label>
-        {% endif %}
-      </div>
-
-      {% if can_edit %}
-      <div class="gp-event-ticket-admin-fields">
-        <div>
-          <div class="gp-event-meta-label">Ticket Price</div>
-          <div class="gp-event-meta-value" data-editable data-type="text" data-entity="event" data-entity-id="{{ event.id }}" data-field="ticket_price" data-allow-empty="true" data-empty-placeholder="Add a price">{{ event.ticket_price or "Add a price" }}</div>
-        </div>
-        <div>
-          <div class="gp-event-meta-label">Square Checkout Link</div>
-          <div class="gp-event-meta-value" data-editable data-type="text" data-entity="event" data-entity-id="{{ event.id }}" data-field="square_checkout_url" data-allow-empty="true" data-empty-placeholder="Add a Square Checkout Link">{{ event.square_checkout_url or "Add a Square Checkout Link" }}</div>
-        </div>
-      </div>
-      {% endif %}
-
-      {% if event.tickets_enabled %}
-      <div class="gp-event-ticket-ctas">
-        <a class="gp-btn gp-btn-solid" href="{{ url_for('event_tickets', event_id=event.id) }}">
-          Get Tickets{% if event.ticket_price %} &mdash; {{ event.ticket_price }}{% endif %} <span class="gp-arrow">&#8599;</span>
-        </a>
-        {% if can_edit %}
-        <a class="gp-textlink" href="{{ url_for('admin_event_ticket_diagnostics', event_id=event.id) }}">View Ticket Diagnostics</a>
-        {% endif %}
-      </div>
-      {% elif can_edit %}
-      <p class="gp-empty-note">Ticket sales are off right now. Add a price and Square Checkout Link above, then turn on Ticket Sales Enabled.</p>
-      {% endif %}
-    </div>
-    {% endif %}
-
     <!-- Recap: Photos -->
     <div class="gp-event-recap">
       <div class="gp-event-recap-head">

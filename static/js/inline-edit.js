@@ -961,7 +961,7 @@
       if (ticketToggle) {
         ticketToggle.disabled = true;
         try {
-          const res = await fetch(`/admin/events/${ticketToggle.dataset.eventId}/toggle-tickets`, {
+          const res = await fetch(`/admin/stay-plugged-rows/${ticketToggle.dataset.rowId}/toggle-tickets`, {
             method: "POST",
             headers: { "X-CSRFToken": csrfToken },
           });

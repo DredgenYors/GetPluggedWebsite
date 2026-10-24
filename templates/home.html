@@ -180,6 +180,19 @@
             {% if row.detail or can_edit %}
             <p class="gp-next-row-detail" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="detail" data-allow-empty="true" data-empty-placeholder="Add detail">{{ row.detail or "Add detail" }}</p>
             {% endif %}
+            {% if can_edit %}
+            <div class="gp-next-row-ticket-admin">
+              <label class="gp-next-row-link-toggle" title="Turn ticket sales on or off for this row">
+                <input type="checkbox" class="gp-ticket-toggle" data-row-id="{{ row.id }}" {% if row.tickets_enabled %}checked{% endif %}>
+                Ticket Sales Enabled
+              </label>
+              <span class="gp-next-row-ticket-field" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="ticket_price" data-allow-empty="true" data-empty-placeholder="Add a price">{{ row.ticket_price or "Add a price" }}</span>
+              <span class="gp-next-row-ticket-field" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="square_checkout_url" data-allow-empty="true" data-empty-placeholder="Add a Square Checkout Link">{{ row.square_checkout_url or "Add a Square Checkout Link" }}</span>
+              {% if row.tickets_enabled %}
+              <a class="gp-textlink" href="{{ url_for('admin_row_ticket_diagnostics', row_id=row.id) }}">View Ticket Diagnostics</a>
+              {% endif %}
+            </div>
+            {% endif %}
             {% else %}
             <span class="gp-label-accent">{{ row.label }}</span>
             <h3 class="gp-next-row-title">{{ row.title }}</h3>
@@ -189,16 +202,12 @@
           <div class="gp-next-row-meta">
             {% if row.removable %}
             <div class="gp-next-row-date" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="date_text" data-allow-empty="true" data-empty-placeholder="Add date">{{ row.date_text or "Add date" }}</div>
-            {% if row.links_to_tickets %}
-            <a class="gp-next-row-badge gp-next-row-badge-link" href="{{ url_for('tickets') }}" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="status">{{ row.status }}</a>
+            {% if row.tickets_enabled %}
+            <a class="gp-next-row-badge gp-next-row-badge-link" href="{{ url_for('row_tickets', row_id=row.id) }}" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="status">{{ row.status }}</a>
             {% else %}
             <span class="gp-next-row-badge" data-editable data-type="text" data-entity="stay_plugged_row" data-entity-id="{{ row.id }}" data-field="status">{{ row.status }}</span>
             {% endif %}
             {% if can_edit %}
-            <label class="gp-next-row-link-toggle" title="Link this badge to the Tickets page">
-              <input type="checkbox" class="gp-row-link-toggle" data-row-id="{{ row.id }}" {% if row.links_to_tickets %}checked{% endif %}>
-              Link to Tickets
-            </label>
             <button type="button" class="gp-next-row-remove" data-row-id="{{ row.id }}" title="Remove row">&times;</button>
             {% endif %}
             {% else %}
