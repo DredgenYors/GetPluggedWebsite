@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy # Access database connection, instead of writing raw SQL
-from forms import LoginForm, SiteSettingsForm, ArtistForm, EventForm, MediaForm
+from forms import LoginForm, SiteSettingsForm, ArtistForm
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms.validators import DataRequired
@@ -581,10 +581,6 @@ def event_detail_modal(event_id):
     an admin never leaves the blurred popup to manage an event."""
     return render_template("_event_modal.html", **load_event_context(event_id))
 
-@app.route("/tickets")
-def tickets():
-    return render_template("tickets.html")
-
 # How many tickets a single order can request - a sanity cap, not a real
 # inventory/capacity system (there isn't one here; Square's own Checkout
 # Link handles actual availability if the admin sets a limit there).
@@ -1095,16 +1091,6 @@ def admin_home():
     # content is edited inline on the live pages; only Users and Settings
     # remain in active use, so send visitors straight to Users.
     return redirect(url_for("admin_users"))
-    total_artists = Artist.query.count()
-    total_events = Event.query.count()
-
-    settings = get_settings()
-    return render_template(
-        "admin/home.html",
-        total_artists=total_artists,
-        total_events=total_events,
-        settings=settings
-    )
 
 @app.route("/admin/artists")
 @login_required
@@ -1161,119 +1147,6 @@ def logout():
     logout_user()
     flash("Logged out.", "success")
     return redirect(url_for("home"))
-
-@app.route("/admin/events")
-@login_required
-def admin_events():
-    return redirect(url_for("admin_users"))
-    events = Event.query.order_by(Event.date.desc()).all()
-    return render_template("admin/events.html", events=events)
-
-@app.route("/admin/events/new", methods=["GET", "POST"])
-@login_required
-def admin_events_new():
-    return redirect(url_for("admin_users"))
-    form = EventForm()
-    if form.validate_on_submit():
-        event = Event(
-            title=form.title.data.strip(),
-            date=form.date.data,
-            location=(form.location.data or "").strip(),
-        )
-        db.session.add(event)
-        db.session.commit()
-        flash("Event created.", "success")
-        return redirect(url_for("admin_events"))
-    return render_template("admin/event_form.html", form=form, mode="new")
-
-@app.route("/admin/events/<int:event_id>/edit", methods=["GET", "POST"])
-@login_required
-def admin_events_edit(event_id):
-    return redirect(url_for("admin_users"))
-    event = Event.query.get_or_404(event_id)
-    form = EventForm(obj=event)
-
-    if form.validate_on_submit():
-        event.title = form.title.data.strip()
-        event.date = form.date.data
-        event.location = (form.location.data or "").strip()
-        db.session.commit()
-        flash("Event updated.", "success")
-        return redirect(url_for("admin_events"))
-
-    return render_template("admin/event_form.html", form=form, mode="edit", event=event)
-
-@app.route("/admin/events/<int:event_id>/delete", methods=["POST"])
-@login_required
-def admin_events_delete(event_id):
-    return redirect(url_for("admin_users"))
-    event = Event.query.get_or_404(event_id)
-    db.session.delete(event)
-    db.session.commit()
-    flash("Event deleted.", "warning")
-    return redirect(url_for("admin_events"))
-
-@app.route("/admin/events/<int:event_id>/artists", methods=["GET", "POST"])
-@login_required
-def admin_event_artists(event_id):
-    return redirect(url_for("admin_users"))
-    event = Event.query.get_or_404(event_id)
-    artists = Artist.query.order_by(Artist.display_name.asc()).all()
-
-    if request.method == "POST":
-        selected_ids = request.form.getlist("artist_ids")  # list of strings
-        selected_ids = [int(x) for x in selected_ids]
-
-        selected_artists = Artist.query.filter(Artist.id.in_(selected_ids)).all()
-        event.artists = selected_artists
-        db.session.commit()
-
-        flash("Event artists updated.", "success")
-        return redirect(url_for("admin_events"))
-
-    return render_template("admin/event_artists.html", event=event, artists=artists)
-
-@app.route("/admin/events/<int:event_id>/media", methods=["GET", "POST"])
-@login_required
-def admin_event_media(event_id):
-    return redirect(url_for("admin_users"))
-    event = Event.query.get_or_404(event_id)
-
-    form = MediaForm()
-    if form.validate_on_submit():
-        item = Media(
-            event_id=event.id,
-            media_type=form.media_type.data,
-            url=form.url.data.strip(),
-            caption=(form.caption.data or "").strip(),
-        )
-        db.session.add(item)
-        db.session.commit()
-        flash("Media added.", "success")
-        return redirect(url_for("admin_event_media", event_id=event.id))
-
-    photos = Media.query.filter_by(event_id=event.id, media_type="photo").order_by(Media.id.desc()).all()
-    videos = Media.query.filter_by(event_id=event.id, media_type="video").order_by(Media.id.desc()).all()
-
-    return render_template(
-        "admin/event_media.html",
-        event=event,
-        form=form,
-        photos=photos,
-        videos=videos,
-    )
-
-
-@app.route("/admin/media/<int:media_id>/delete", methods=["POST"])
-@login_required
-def admin_media_delete(media_id):
-    return redirect(url_for("admin_users"))
-    item = Media.query.get_or_404(media_id)
-    event_id = item.event_id
-    db.session.delete(item)
-    db.session.commit()
-    flash("Media deleted.", "warning")
-    return redirect(url_for("admin_event_media", event_id=event_id))
 
 @app.route("/admin/users", methods=["GET", "POST"])
 @admin_required   # <-- allow admin + super_admin

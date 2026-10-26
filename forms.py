@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField
+from wtforms import BooleanField, StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import Optional, URL, DataRequired, Length
 
 class SiteSettingsForm(FlaskForm):
@@ -32,22 +32,6 @@ class ArtistForm(FlaskForm):
     display_name = StringField("Name", validators=[DataRequired()])
     instagram_handle = StringField("Instagram Handle", validators=[Optional()])
     submit = SubmitField("Save Artist")
-
-class EventForm(FlaskForm):
-    title = StringField("Event Title", validators=[DataRequired()])
-    date = DateField("Event Date", validators=[DataRequired()], format="%Y-%m-%d")
-    location = StringField("Location", validators=[Optional()])
-    submit = SubmitField("Save Event")
-
-class MediaForm(FlaskForm):
-    media_type = SelectField(
-        "Type",
-        choices=[("photo", "Photo"), ("video", "Video")],
-        validators=[DataRequired()],
-    )
-    url = StringField("Media URL", validators=[DataRequired(), URL()])
-    caption = StringField("Caption", validators=[Optional()])
-    submit = SubmitField("Add Media")
 
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
