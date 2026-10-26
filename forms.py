@@ -28,11 +28,6 @@ class SiteSettingsForm(FlaskForm):
 
     submit = SubmitField("Save Settings")
 
-class ArtistForm(FlaskForm):
-    display_name = StringField("Name", validators=[DataRequired()])
-    instagram_handle = StringField("Instagram Handle", validators=[Optional()])
-    submit = SubmitField("Save Artist")
-
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])

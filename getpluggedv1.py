@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy # Access database connection, instead of writing raw SQL
-from forms import LoginForm, SiteSettingsForm, ArtistForm
+from forms import LoginForm, SiteSettingsForm
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms.validators import DataRequired
@@ -414,33 +414,6 @@ def super_admin_required(f):
             return redirect(url_for("admin_home"))
         return f(*args, **kwargs)
     return wrapper
-
-artists = [
-            {'name': 'Barti', 'social_media': {'instagram': '@chaevscarti'}},
-            {'name': 'Brandin Tyrik', 'social_media': {'instagram': '@brandintyrik'}},
-            {'name': 'Drew Heart', 'social_media': {'instagram': '@drewheartofficial'}},
-            {'name': 'Drizzy A', 'social_media': {'instagram': '@drizzya._'}},
-            {'name': 'Meexhy', 'social_media': {'instagram': '@meexhy_munyun'}},
-            {'name': 'Nuwell', 'social_media': {'instagram': '@nuwell.official'}},
-            {'name': 'Jus Montana', 'social_media': {'instagram': '@jusmontanaa'}},
-            {'name': 'DStxckz', 'social_media': {'instagram': '@dstxckz1'}},
-            {'name': 'K On Go', 'social_media': {'instagram': '@kiemo.ongo'}},
-            {'name': 'Trav2x', 'social_media': {'instagram': '@trav2x_'}},
-            {'name': 'The Only Notion', 'social_media': {'instagram': '@theonlynotion_'}},
-            {'name': '$K Dinero', 'social_media': {'instagram': '@freetwiz'}},
-            {'name': 'Maestroo J', 'social_media': {'instagram': '@maestroosoundz'}},
-            {'name': 'Tr1pt', 'social_media': {'instagram': '@tr1pt973'}},
-            {'name': 'Ryuu Richy', 'social_media': {'instagram': '@ryuurichy'}},
-            {'name': 'Dify', 'social_media': {'instagram': '@dify_music'}},
-            {'name': 'SheLuvsTJ', 'social_media': {'instagram': '@wheresclubtj'}},
-            {'name': 'Sage Solaris', 'social_media': {'instagram': '@iamsagesolaris'}},
-            {'name': 'Mehre', 'social_media': {'instagram': '@davinciimehre'}},
-            {'name': 'Casanova Red', 'social_media': {'instagram': '@therealcasanovared'}},
-            {'name': 'Stretch Dakillah', 'social_media': {'instagram': '@stretch_dakillah'}},
-            {'name': 'Jayy Balla', 'social_media': {'instagram': '@jayyballa973'}},
-            {'name': 'Rastafaro', 'social_media': {'instagram': '@imrastafaro'}}
-]
-
 
 @app.context_processor
 def inject_globals():
@@ -1091,55 +1064,6 @@ def admin_home():
     # content is edited inline on the live pages; only Users and Settings
     # remain in active use, so send visitors straight to Users.
     return redirect(url_for("admin_users"))
-
-@app.route("/admin/artists")
-@login_required
-def admin_artists():
-    return redirect(url_for("admin_users"))
-    artists = Artist.query.order_by(Artist.display_name.asc()).all()
-    return render_template("admin/artists.html", artists=artists)
-
-@app.route("/admin/artists/new", methods=["GET", "POST"])
-@login_required
-def admin_artists_new():
-    return redirect(url_for("admin_users"))
-    form = ArtistForm()
-    if form.validate_on_submit():
-        artist = Artist(
-            display_name=form.display_name.data.strip(),
-            instagram_handle=form.instagram_handle.data.strip().lstrip("@"),
-        )
-        db.session.add(artist)
-        db.session.commit()
-        flash("Artist added.", "success")
-        return redirect(url_for("admin_artists"))
-    return render_template("admin/artist_form.html", form=form, mode="new")
-
-@app.route("/admin/artists/<int:artist_id>/edit", methods=["GET", "POST"])
-@login_required
-def admin_artists_edit(artist_id):
-    return redirect(url_for("admin_users"))
-    artist = Artist.query.get_or_404(artist_id)
-    form = ArtistForm(obj=artist)
-
-    if form.validate_on_submit():
-        artist.display_name = form.display_name.data.strip()
-        artist.instagram_handle = form.instagram_handle.data.strip().lstrip("@")
-        db.session.commit()
-        flash("Artist updated.", "success")
-        return redirect(url_for("admin_artists"))
-
-    return render_template("admin/artist_form.html", form=form, mode="edit", artist=artist)
-
-@app.route("/admin/artists/<int:artist_id>/delete", methods=["POST"])
-@login_required
-def admin_artists_delete(artist_id):
-    return redirect(url_for("admin_users"))
-    artist = Artist.query.get_or_404(artist_id)
-    db.session.delete(artist)
-    db.session.commit()
-    flash("Artist deleted.", "warning")
-    return redirect(url_for("admin_artists"))
 
 @app.route("/logout")
 @login_required
