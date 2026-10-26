@@ -89,9 +89,9 @@
                            href="{{ url_for('home') }}#services">{{ site_settings.nav_label_services }}</a>
                     </li>
                     <li>
-                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %} {% if request.endpoint == 'previous' %}active{% endif %}"
+                        <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"
                            data-editable data-field="nav_label_gallery" data-type="text"
-                           href="{{ url_for('previous') }}">{{ site_settings.nav_label_gallery }}</a>
+                           href="{{ url_for('home') }}#gallery-preview">{{ site_settings.nav_label_gallery }}</a>
                     </li>
                     <li>
                         <a class="gp-nav-item {% if request.endpoint == 'home' %}gp-anim-init{% endif %}"

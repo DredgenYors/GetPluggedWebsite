@@ -9,17 +9,6 @@
         <span class="gp-admin-sidebar-label">Admin Directory</span>
 
         <div class="gp-admin-sidebar-nav">
-          <a class="gp-btn gp-btn-outline"
-            href="{{ url_for('admin_settings') }}"
-            {% if request.endpoint == 'admin_home' %}
-              data-bs-toggle="tooltip"
-              data-bs-placement="bottom"
-              data-bs-custom-class="gp-tooltip gp-tooltip--sidebar"
-              title="Edit homepage text, contact info, and ticket settings"
-            {% endif %}>
-            Settings
-          </a>
-
           {% if current_user.is_authenticated and current_user.is_admin() %}
             <a class="gp-btn gp-btn-outline"
               href="{{ url_for('admin_users') }}"

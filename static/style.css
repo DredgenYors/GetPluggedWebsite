@@ -2217,19 +2217,17 @@ body.gp-edit-mode .gp-margin-deco{
   font-style: italic;
 }
 
+/* A single element now (not one <p> per paragraph - see home.html), so it
+   can be a single inline-editable textarea field; white-space:pre-line
+   turns the blank line between paragraphs in the saved text into the
+   same kind of visual gap the old per-<p> layout gave each one. */
 .gp-story-paragraphs{
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 3rem;
-}
-
-.gp-story-paragraphs p{
   color: var(--gp-muted-text);
   line-height: 1.7;
   font-size: 1rem;
   max-width: 52ch;
-  margin: 0;
+  margin: 0 0 3rem;
+  white-space: pre-line;
 }
 
 .gp-story-stats{
@@ -2562,6 +2560,14 @@ body.gp-edit-mode .gp-margin-deco{
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--gp-border-warm);
+}
+
+/* ---- Contact section admin panel (see home.html #contact) ---- */
+.gp-contact-admin-panel{
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--gp-border-warm);
+  max-width: 32ch;
 }
 
 .gp-event-recap-head{

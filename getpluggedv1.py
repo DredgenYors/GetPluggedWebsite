@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy # Access database connection, instead of writing raw SQL
-from forms import LoginForm, SiteSettingsForm
+from forms import LoginForm
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms.validators import DataRequired
@@ -96,11 +96,9 @@ INLINE_TEXT_FIELDS = {
     "stay_plugged_lede": 300, "stay_plugged_footer_text": 200,
     "coming_soon_title": 200, "coming_soon_body": 1000,
 
-    # NOTE: what_is_body is intentionally excluded - it renders as multiple
-    # separate <p> tags (split on blank lines), which doesn't map to a single
-    # inline-editable element. Still editable from Admin > Settings.
     "our_story_eyebrow": 100,
     "story_heading_prefix": 100, "story_heading_accent": 100, "story_heading_suffix": 100,
+    "what_is_body": 4000,
     "stat1_value": 50, "stat1_label": 50,
     "stat2_value": 50, "stat2_label": 50,
     "stat3_value": 50, "stat3_label": 50,
@@ -108,13 +106,16 @@ INLINE_TEXT_FIELDS = {
 
     "contact_eyebrow": 100, "contact_heading_line1": 100, "contact_heading_line2": 100,
     "contact_lede": 400, "contact_cta_email_label": 50, "contact_cta_follow_label": 50,
+    "email": 200, "phone": 50,
+    "instagram_url": 500, "twitter_url": 500, "tiktok_url": 500,
 
     "footer_text": 200,
-
-    "tickets_eyebrow": 100, "tickets_heading": 200, "tickets_subheading": 400,
-    "tickets_event_title": 200, "tickets_event_date": 100, "tickets_event_location": 200,
-    "tickets_cta_label": 50,
 }
+
+# Fields in INLINE_TEXT_FIELDS above that must look like a URL (or be empty)
+# to be accepted - same "starts with http(s)://" check used for a Square
+# Checkout Link, just reused for the other outbound links the site stores.
+INLINE_URL_FIELDS = {"instagram_url", "twitter_url", "tiktok_url"}
 
 # Whitelist of SiteSettings image columns editable inline -> filename prefix to use.
 INLINE_IMAGE_FIELDS = {
@@ -122,18 +123,13 @@ INLINE_IMAGE_FIELDS = {
     "services_image": "services",
     "founder1_image": "founder1",
     "founder2_image": "founder2",
-    "tickets_image": "tickets",
 }
 
 # SiteSettings image fields that also have a focal-point picker -> their x/y column names.
-SETTINGS_IMAGE_FOCUS_FIELDS = {
-    "tickets_image": ("tickets_focus_x", "tickets_focus_y"),
-}
+SETTINGS_IMAGE_FOCUS_FIELDS = {}
 
 class SiteSettings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    events_confirmed = db.Column(db.Boolean, default=False, nullable=False)
-    ticket_url = db.Column(db.String(500), default="", nullable=False)
 
     email = db.Column(db.String(200), default="getpluggednj@gmail.com", nullable=False)
     phone = db.Column(db.String(50), default="", nullable=False)
@@ -231,18 +227,6 @@ class SiteSettings(db.Model):
 
     # ---- Footer ----
     footer_text = db.Column(db.String(200), default="Get Plugged NJ. All rights reserved.", nullable=False)
-
-    # ---- Tickets page ----
-    tickets_image = db.Column(db.String(500), default="", nullable=False)
-    tickets_focus_x = db.Column(db.Float, default=50.0, nullable=False)
-    tickets_focus_y = db.Column(db.Float, default=50.0, nullable=False)
-    tickets_eyebrow = db.Column(db.String(100), default="Tickets", nullable=False)
-    tickets_heading = db.Column(db.String(200), default="Get Your Tickets", nullable=False)
-    tickets_subheading = db.Column(db.String(400), default="Secure your spot at our next event. Tickets are available now.", nullable=False)
-    tickets_event_title = db.Column(db.String(200), default="Our Next Event", nullable=False)
-    tickets_event_date = db.Column(db.String(100), default="Date TBD", nullable=False)
-    tickets_event_location = db.Column(db.String(200), default="", nullable=False)
-    tickets_cta_label = db.Column(db.String(50), default="Buy Tickets", nullable=False)
 
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -481,48 +465,6 @@ def home():
         'home.html',
         gallery_preview=gallery_preview,
         stay_plugged_rows=stay_plugged_rows,
-    )
-
-@app.route("/previous")
-def previous():
-    # dropdown list
-    events = Event.query.order_by(Event.date.desc()).all()
-
-    selected = request.args.get("event", "all")
-
-    if selected == "all":
-        # All events view
-        all_artists = (
-            Artist.query
-            .join(event_artists, Artist.id == event_artists.c.artist_id)
-            .distinct()
-            .order_by(Artist.display_name.asc())
-            .all()
-        )
-        photos = Media.query.filter_by(media_type="photo").order_by(Media.id.desc()).all()
-        videos = Media.query.filter_by(media_type="video").order_by(Media.id.desc()).all()
-        selected_event = None
-    else:
-        # Specific event view
-        selected_event = Event.query.get_or_404(int(selected))
-        all_artists = (
-            Artist.query
-            .join(event_artists, Artist.id == event_artists.c.artist_id)
-            .filter(event_artists.c.event_id == selected_event.id)
-            .order_by(Artist.display_name.asc())
-            .all()
-        )
-        photos = Media.query.filter_by(event_id=selected_event.id, media_type="photo").order_by(Media.id.desc()).all()
-        videos = Media.query.filter_by(event_id=selected_event.id, media_type="video").order_by(Media.id.desc()).all()
-
-    return render_template(
-        "previous.html",
-        events=events,
-        selected_event=selected_event,
-        selected_event_key=selected,
-        all_artists=all_artists,
-        photos=photos,
-        videos=videos,
     )
 
 def load_event_context(event_id):
@@ -917,39 +859,6 @@ def admin_inline_edit_stay_plugged_row():
     display_value = value or placeholders.get(field, value)
     return jsonify({"ok": True, "value": display_value})
 
-@app.route("/admin/settings", methods=["GET", "POST"])
-@admin_required
-def admin_settings():
-    settings = get_settings()  # your helper that guarantees 1 row exists
-    form = SiteSettingsForm(obj=settings)  # pre-fill form from DB row
-
-    if form.validate_on_submit():
-        settings.events_confirmed = form.events_confirmed.data
-
-        # Only update ticket_url if user typed something.
-        new_url = (form.ticket_url.data or "").strip()
-        if new_url:
-            settings.ticket_url = new_url
-        # else: keep existing settings.ticket_url unchanged
-
-        settings.email = (form.email.data or "").strip()
-        settings.phone = (form.phone.data or "").strip()
-        settings.instagram_url = (form.instagram_url.data or "").strip()
-        settings.twitter_url = (form.twitter_url.data or "").strip()
-        settings.tiktok_url = (form.tiktok_url.data or "").strip()
-
-        settings.coming_soon_title = (form.coming_soon_title.data or "").strip()
-        settings.coming_soon_body = (form.coming_soon_body.data or "").strip()
-
-        settings.what_is_body = (form.what_is_body.data or "").strip()
-
-        db.session.commit()
-
-        flash("Settings Saved!", "success")
-        return redirect(url_for("admin_settings"))
-
-    return render_template("admin/settings.html", form=form, settings=settings)
-
 @app.route("/admin/inline-edit", methods=["POST"])
 @admin_required
 def admin_inline_edit():
@@ -967,6 +876,10 @@ def admin_inline_edit():
     max_len = INLINE_TEXT_FIELDS[field]
     if len(value) > max_len:
         return jsonify({"ok": False, "error": f"Too long (max {max_len} characters)."}), 400
+    if field in INLINE_URL_FIELDS and value and not value.startswith(("http://", "https://")):
+        return jsonify({"ok": False, "error": "Enter a full URL (starting with https://)."}), 400
+    if field == "email" and value and "@" not in value:
+        return jsonify({"ok": False, "error": "Enter a valid email address."}), 400
 
     settings = get_settings()
     setattr(settings, field, value)

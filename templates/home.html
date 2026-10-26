@@ -236,11 +236,7 @@
       </h2>
     </div>
 
-    <div class="gp-story-paragraphs">
-      {% for para in (site_settings.what_is_body or "").split('\n\n') %}
-        {% if para.strip() %}<p class="gp-anim-init">{{ para.strip() }}</p>{% endif %}
-      {% endfor %}
-    </div>
+    <div class="gp-story-paragraphs gp-anim-init" data-editable data-type="textarea" data-field="what_is_body">{{ site_settings.what_is_body }}</div>
 
     <div class="gp-story-stats">
       <div class="gp-anim-init"><div class="gp-story-stat-value" data-editable data-field="stat1_value" data-type="text">{{ site_settings.stat1_value }}</div><div class="gp-story-stat-label" data-editable data-field="stat1_label" data-type="text">{{ site_settings.stat1_label }}</div></div>
@@ -296,7 +292,31 @@
         <span data-editable data-field="contact_cta_follow_label" data-type="text">{{ site_settings.contact_cta_follow_label }}</span>
       </a>
       {% endif %}
+      {% if site_settings.phone %}
+      <a class="gp-btn gp-btn-ghost gp-anim-init" href="tel:{{ site_settings.phone }}">Call Us</a>
+      {% endif %}
     </div>
+
+    {% if can_edit %}
+    <div class="gp-contact-admin-panel">
+      <span class="gp-admin-sidebar-label" style="margin-bottom: 0.75rem;">Contact Info (admin only)</span>
+
+      <div class="gp-event-meta-label">Email</div>
+      <div class="gp-event-meta-value" data-editable data-type="text" data-field="email" data-allow-empty="true" data-empty-placeholder="Add an email address">{{ site_settings.email or "Add an email address" }}</div>
+
+      <div class="gp-event-meta-label" style="margin-top: 1rem;">Phone</div>
+      <div class="gp-event-meta-value" data-editable data-type="text" data-field="phone" data-allow-empty="true" data-empty-placeholder="Add a phone number">{{ site_settings.phone or "Add a phone number" }}</div>
+
+      <div class="gp-event-meta-label" style="margin-top: 1rem;">Instagram URL</div>
+      <div class="gp-event-meta-value" data-editable data-type="text" data-field="instagram_url" data-allow-empty="true" data-empty-placeholder="Add an Instagram link">{{ site_settings.instagram_url or "Add an Instagram link" }}</div>
+
+      <div class="gp-event-meta-label" style="margin-top: 1rem;">Twitter / X URL</div>
+      <div class="gp-event-meta-value" data-editable data-type="text" data-field="twitter_url" data-allow-empty="true" data-empty-placeholder="Add a Twitter / X link">{{ site_settings.twitter_url or "Add a Twitter / X link" }}</div>
+
+      <div class="gp-event-meta-label" style="margin-top: 1rem;">TikTok URL</div>
+      <div class="gp-event-meta-value" data-editable data-type="text" data-field="tiktok_url" data-allow-empty="true" data-empty-placeholder="Add a TikTok link">{{ site_settings.tiktok_url or "Add a TikTok link" }}</div>
+    </div>
+    {% endif %}
   </div>
 </section>
 
@@ -583,19 +603,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const eyebrow = section.querySelector(".gp-eyebrow");
       const rule = section.querySelector(".gp-rule");
       const title = section.querySelector(".gp-reveal-title-wrap .gp-story-title");
-      const paragraphs = gsap.utils.toArray(section.querySelectorAll(".gp-story-paragraphs p"));
+      const paragraphs = section.querySelector(".gp-story-paragraphs");
       const stats = gsap.utils.toArray(section.querySelectorAll(".gp-story-stats > div"));
       const founders = gsap.utils.toArray(section.querySelectorAll(".gp-founder"));
 
-      clearInit(eyebrow, rule, ...paragraphs, ...stats, ...founders);
+      clearInit(eyebrow, rule, paragraphs, ...stats, ...founders);
 
       const tl = gsap.timeline();
       revealEyebrowRule(tl, eyebrow, rule);
       if (title) tl.to(title, { yPercent: 0, duration: 0.7, ease: "power3.out" }, "-=0.2");
-      if (paragraphs.length) {
+      if (paragraphs) {
         tl.fromTo(paragraphs,
           { opacity: 0, y: 14, filter: "blur(4px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power2.out", stagger: 0.1 },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power2.out" },
           "-=0.3"
         );
       }
