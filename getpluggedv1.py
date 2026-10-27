@@ -106,7 +106,7 @@ INLINE_TEXT_FIELDS = {
 
     "contact_eyebrow": 100, "contact_heading_line1": 100, "contact_heading_line2": 100,
     "contact_lede": 400, "contact_cta_email_label": 50, "contact_cta_follow_label": 50,
-    "email": 200, "phone": 50,
+    "email": 200,
     "instagram_url": 500, "twitter_url": 500, "tiktok_url": 500,
 
     "footer_text": 200,
@@ -132,7 +132,6 @@ class SiteSettings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     email = db.Column(db.String(200), default="getpluggednj@gmail.com", nullable=False)
-    phone = db.Column(db.String(50), default="", nullable=False)
     instagram_url = db.Column(db.String(500), default="https://www.instagram.com/getpluggednj/", nullable=False)
     twitter_url = db.Column(db.String(500), default="https://twitter.com/getpluggednj", nullable=False)
     tiktok_url = db.Column(db.String(500), default="https://www.tiktok.com/@getpluggednj", nullable=False)

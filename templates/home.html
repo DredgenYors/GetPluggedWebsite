@@ -292,9 +292,6 @@
         <span data-editable data-field="contact_cta_follow_label" data-type="text">{{ site_settings.contact_cta_follow_label }}</span>
       </a>
       {% endif %}
-      {% if site_settings.phone %}
-      <a class="gp-btn gp-btn-ghost gp-anim-init" href="tel:{{ site_settings.phone }}">Call Us</a>
-      {% endif %}
     </div>
 
     {% if can_edit %}
@@ -303,9 +300,6 @@
 
       <div class="gp-event-meta-label">Email</div>
       <div class="gp-event-meta-value" data-editable data-type="text" data-field="email" data-allow-empty="true" data-empty-placeholder="Add an email address">{{ site_settings.email or "Add an email address" }}</div>
-
-      <div class="gp-event-meta-label" style="margin-top: 1rem;">Phone</div>
-      <div class="gp-event-meta-value" data-editable data-type="text" data-field="phone" data-allow-empty="true" data-empty-placeholder="Add a phone number">{{ site_settings.phone or "Add a phone number" }}</div>
 
       <div class="gp-event-meta-label" style="margin-top: 1rem;">Instagram URL</div>
       <div class="gp-event-meta-value" data-editable data-type="text" data-field="instagram_url" data-allow-empty="true" data-empty-placeholder="Add an Instagram link">{{ site_settings.instagram_url or "Add an Instagram link" }}</div>
