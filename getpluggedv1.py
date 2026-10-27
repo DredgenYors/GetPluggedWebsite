@@ -28,7 +28,15 @@ if not _secret_key:
             "only, set FLASK_DEBUG=1 instead to use an insecure dev key."
         )
 app.config["SECRET_KEY"] = _secret_key
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///getplugged.db")
+
+# Most managed Postgres providers (and the DATABASE_URL older Heroku-style
+# tooling still hands out) use the "postgres://" scheme, but SQLAlchemy 1.4+
+# only recognizes "postgresql://" - normalize here so whichever the host
+# gives us works without a host-specific fix.
+_database_url = os.environ.get("DATABASE_URL", "sqlite:///getplugged.db")
+if _database_url.startswith("postgres://"):
+    _database_url = _database_url.replace("postgres://", "postgresql://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = _database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Admin-uploaded images (logo, founder photos, services placeholder, etc.)
@@ -46,9 +54,37 @@ csrf = CSRFProtect(app)
 
 db = SQLAlchemy(app)
 
+# Uploaded images go to Cloudflare R2 (S3-compatible object storage) when all
+# four of these are set, which is required on hosts with no persistent disk
+# (e.g. Render's free tier - its filesystem is wiped on every redeploy).
+# Falls back to local disk with zero config, so local development is
+# unaffected. R2_PUBLIC_BASE_URL is the bucket's public base URL (its
+# r2.dev URL, or a custom domain mapped to it) - site_image() already
+# returns any http(s):// value as-is, so a saved R2 URL needs no other
+# template/display changes anywhere in the app.
+R2_BUCKET = os.environ.get("R2_BUCKET")
+R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID")
+R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID")
+R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY")
+R2_PUBLIC_BASE_URL = (os.environ.get("R2_PUBLIC_BASE_URL") or "").rstrip("/")
+USE_R2 = bool(R2_BUCKET and R2_ACCOUNT_ID and R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY and R2_PUBLIC_BASE_URL)
+
+_r2_client = None
+if USE_R2:
+    import boto3
+    _r2_client = boto3.client(
+        "s3",
+        endpoint_url=f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com",
+        aws_access_key_id=R2_ACCESS_KEY_ID,
+        aws_secret_access_key=R2_SECRET_ACCESS_KEY,
+        region_name="auto",
+    )
+
 
 def save_uploaded_image(file_storage, prefix):
-    """Save an uploaded image under static/uploads and return its static-relative path.
+    """Save an uploaded image and return a value site_image() can resolve to
+    a src URL: a full R2 URL when USE_R2 is on, otherwise the same
+    static-relative "uploads/..." path as before.
 
     Returns None if no file was provided (caller should then leave the existing value alone).
     """
@@ -60,13 +96,31 @@ def save_uploaded_image(file_storage, prefix):
         return None
 
     filename = secure_filename(f"{prefix}-{uuid.uuid4().hex[:8]}.{ext}")
+
+    if USE_R2:
+        key = f"uploads/{filename}"
+        _r2_client.upload_fileobj(
+            file_storage,
+            R2_BUCKET,
+            key,
+            ExtraArgs={"ContentType": file_storage.mimetype or "application/octet-stream"},
+        )
+        return f"{R2_PUBLIC_BASE_URL}/{key}"
+
     file_storage.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
     return f"uploads/{filename}"
 
 def delete_uploaded_file(path):
-    """Remove a previously-uploaded file given its stored "uploads/..." path.
-    No-ops for empty values or external (http/https) URLs."""
-    if not path or not path.startswith("uploads/"):
+    """Remove a previously-uploaded file given its stored value (an R2 URL
+    under R2_PUBLIC_BASE_URL, or a local "uploads/..." path). No-ops for
+    empty values or any other external (http/https) URL."""
+    if not path:
+        return
+    if USE_R2 and path.startswith(R2_PUBLIC_BASE_URL + "/"):
+        key = path[len(R2_PUBLIC_BASE_URL) + 1:]
+        _r2_client.delete_object(Bucket=R2_BUCKET, Key=key)
+        return
+    if not path.startswith("uploads/"):
         return
     file_path = os.path.join(app.config["UPLOAD_FOLDER"], os.path.basename(path))
     if os.path.isfile(file_path):

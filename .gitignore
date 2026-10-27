@@ -8,3 +8,18 @@ old/unused/templates/upcoming.html
 old/unused/templates/upcoming_coming_soon.html
 old/unused/templates/upcoming_confirmed.html
 old/unused/getpluggedpythonanywheresourcecode.py
+
+# The live database and admin-uploaded images used to be committed to git as
+# a stand-in for real persistence during development. That doesn't work for
+# a deployed site (real customer/ticket data can't depend on a git commit),
+# so production now uses Postgres + Cloudflare R2 instead (see wsgi.py /
+# DATABASE_URL / R2_* env vars) and these stay purely local dev state.
+instance/*.db
+static/uploads/*
+
+# Compiled bytecode cache - regenerated automatically, never needs tracking.
+__pycache__/
+*.pyc
+
+# Local environment variables (SECRET_KEY, ADMIN_PASSWORD, DATABASE_URL, R2_*)
+.env
