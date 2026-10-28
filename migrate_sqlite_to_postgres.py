@@ -53,6 +53,13 @@ def main():
     with app.app_context():
         db.create_all()  # no-op for tables that already exist, creates any that don't
 
+        # getpluggedv1 auto-creates a default SiteSettings row the moment
+        # it's imported (see get_settings(), called at module level) if the
+        # table is empty - which it is, on a freshly created database, by
+        # the time this import happens. Clear it before inserting the real
+        # one from SQLite, or the real row (same id) collides with it.
+        SiteSettings.query.delete()
+
         for table, is_association in TABLES:
             table_name = table.name if is_association else table.__tablename__
             rows = sqlite_con.execute(f"SELECT * FROM {table_name}").fetchall()
@@ -75,14 +82,18 @@ def main():
         db.session.commit()
 
         # Advance each table's id sequence past the highest id we just
-        # inserted, so the next ORM-generated insert doesn't collide.
+        # inserted, so the next ORM-generated insert doesn't collide. Table
+        # names are double-quoted since "user" is a reserved/ambiguous
+        # identifier in Postgres (bare "user" resolves to the current
+        # session's username, not the table) - quoting makes every name
+        # unambiguous, not just that one.
         for table, is_association in TABLES:
             if is_association or "id" not in table.__table__.columns:
                 continue
             table_name = table.__tablename__
             db.session.execute(db.text(
-                f"SELECT setval(pg_get_serial_sequence('{table_name}', 'id'), "
-                f"COALESCE((SELECT MAX(id) FROM {table_name}), 1))"
+                f'SELECT setval(pg_get_serial_sequence(\'"{table_name}"\', \'id\'), '
+                f'COALESCE((SELECT MAX(id) FROM "{table_name}"), 1))'
             ))
         db.session.commit()
 
