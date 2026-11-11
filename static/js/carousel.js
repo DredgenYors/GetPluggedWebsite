@@ -200,9 +200,11 @@
     // within) rather than tracked as a flag toggled by mouseenter/leave/
     // pointerdown/up listeners - that earlier approach could get stuck
     // "paused" forever whenever a pair of events didn't fire in the exact
-    // order assumed (e.g. a drag that ends outside the element). :hover
-    // and :focus-within can't get stuck - they always reflect the real
-    // cursor/focus position, including for the whole duration of a drag.
+    // order assumed (e.g. a drag that ends outside the element). On a real
+    // pointer/keyboard (HOVER_CAPABLE), :hover and :focus-within reliably
+    // clear on their own; on touch they don't - a tap can leave either one
+    // permanently stuck "on" with no leave event to ever clear it - which
+    // is exactly why both checks below are gated behind HOVER_CAPABLE.
     let lastTime = null;
     let arrowPauseUntil = 0;
 
@@ -228,7 +230,7 @@
         time >= arrowPauseUntil &&
         document.visibilityState === "visible" &&
         !(HOVER_CAPABLE && viewport.matches(":hover")) &&
-        !root.matches(":focus-within");
+        !(HOVER_CAPABLE && root.matches(":focus-within"));
 
       if (shouldDrift) {
         viewport.scrollLeft += PX_PER_SEC * dt;
