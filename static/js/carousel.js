@@ -1,6 +1,10 @@
 (function () {
   const PX_PER_SEC = 40;
   const REDUCE_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Touch devices have no real pointer to leave :hover, so a tap can leave
+  // an element permanently "stuck" matching :hover - only trust it as a
+  // pause signal on devices that have an actual hovering pointer.
+  const HOVER_CAPABLE = window.matchMedia("(hover: hover)").matches;
 
   // Coverflow-style depth effect: tuned per "slot" of distance from the
   // viewport's center (1 slot = one item-width-plus-gap away), clamped at
@@ -223,7 +227,7 @@
       const shouldDrift =
         time >= arrowPauseUntil &&
         document.visibilityState === "visible" &&
-        !viewport.matches(":hover") &&
+        !(HOVER_CAPABLE && viewport.matches(":hover")) &&
         !root.matches(":focus-within");
 
       if (shouldDrift) {
