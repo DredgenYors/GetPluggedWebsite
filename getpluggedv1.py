@@ -10,6 +10,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms.validators import DataRequired
 from functools import wraps
 from flask_wtf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 
@@ -51,6 +53,13 @@ MAX_MARGIN_IMAGES_PER_SIDE = 6
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 csrf = CSRFProtect(app)
+
+# In-memory storage is fine here: Render's free tier runs a single instance,
+# so there's no second process with its own separate counter to desync
+# from, and losing the counts on a redeploy just means a reset clock, not a
+# security gap. Only /login gets an explicit, tighter limit (below); this
+# default just keeps any other route from being hammered.
+limiter = Limiter(key_func=get_remote_address, app=app, default_limits=["200 per hour"])
 
 db = SQLAlchemy(app)
 
@@ -1001,6 +1010,7 @@ def admin_inline_edit_image_focus():
     return jsonify({"ok": True, "x": getattr(settings, x_col), "y": getattr(settings, y_col)})
 
 @app.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per minute;50 per hour", methods=["POST"])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
