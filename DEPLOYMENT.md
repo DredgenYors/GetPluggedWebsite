@@ -11,10 +11,11 @@ The live site runs at **https://getpluggedwebsite.onrender.com/** on three free-
 ## How a code change reaches the live site
 
 1. Push to the `main` branch on GitHub (`DredgenYors/GetPluggedWebsite`).
-2. Render is connected to that repo/branch and auto-deploys on every push - no manual deploy step.
-3. First-time or rare schema changes still need a manual migration (see below); routine code/content changes don't.
+2. On Render, open the service and click **Manual Deploy → Deploy latest commit**. (Auto-Deploy on push would skip this step if turned on in the service's Settings tab - confirmed as of 2026-11-11 that a push alone did *not* trigger a deploy, so either Auto-Deploy is off or isn't picking up pushes; check that setting if you'd rather not deploy manually each time.)
+3. A deploy briefly restarts the running process - a request that lands in that exact window can return a one-off 500, which clears itself within seconds once the new version is up. Don't mistake that for a real failure; recheck a few times before concluding something's actually broken.
+4. First-time or rare schema changes still need a manual migration (see below); routine code/content changes don't.
 
-If a deploy breaks something, Render keeps a history of previous deploys on the service's dashboard that you can roll back to.
+If a deploy breaks something for real (not just the brief restart blip above), Render keeps a history of previous deploys on the service's dashboard that you can redeploy from.
 
 ## Environment variables (set in Render's dashboard, under the service's Environment tab)
 
