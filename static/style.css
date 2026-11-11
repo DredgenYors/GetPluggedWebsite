@@ -2789,6 +2789,18 @@ body.gp-photo-lightbox-open{ overflow: hidden; }
   -webkit-backdrop-filter: blur(8px);
 }
 
+/* Mobile browsers (iOS Safari in particular) don't reliably keep this
+   overlay's higher z-index painted over the fixed .gp-nav (84px tall)
+   during scroll/address-bar transitions - the nav can visually reappear
+   on top, trapping the close button underneath it. Rather than fight that
+   per-browser quirk, just give the box enough top clearance on narrow
+   screens that the close button never sits in the nav's band to begin
+   with, regardless of which element the browser paints on top at that
+   moment. */
+@media (max-width: 767.98px){
+  .gp-modal-overlay{ padding-top: calc(84px + 1rem); }
+}
+
 .gp-modal-overlay[hidden]{ display: none; }
 
 /* The fetched content lives in a plain wrapper div with no width of its
